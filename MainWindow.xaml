@@ -715,7 +715,7 @@
                     <!-- Версия (Centered to align with author text) -->
                     <Grid Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,14">
                         <Border Padding="12,4" CornerRadius="12" Background="#0Affffff" BorderBrush="#1Affffff" BorderThickness="1">
-                            <TextBlock Text="V3.2.0" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GrayBrush}" Opacity="0.6"/>
+                            <TextBlock Text="V3.3.0" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GrayBrush}" Opacity="0.6"/>
                         </Border>
                     </Grid>
 

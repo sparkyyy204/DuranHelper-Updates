@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+publish_output/
+Output/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# ASI build artifacts
+ASI_Plugin/build/
+ASI_Plugin/.vs/
+
+# Crash logs
+crash.txt
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
