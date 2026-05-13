@@ -46,7 +46,7 @@ jobs:
 
     # === 4. Создание ZIP-архива для автообновления ===
     - name: Zip for Auto-Updater
-      run: powershell -command "Compress-Archive -Path 'publish_output\*' -DestinationPath 'Output\update_package.zip' -Force"
+      run: powershell -command "Compress-Archive -Path 'publish_output\*' -DestinationPath 'Output\update.zip' -Force"
 
     # === 5. Загрузка в Релизы GitHub ===
     - name: Upload Release Asset
@@ -54,4 +54,4 @@ jobs:
       with:
         files: |
           Output/Setup_DuranHelper.exe
-          Output/update_package.zip
+          Output/update.zip
