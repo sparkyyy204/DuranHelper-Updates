@@ -1,0 +1,13 @@
+<?xml version='1.0'?>
+<Obfuscator>
+  <Var name="InPlace" value="true" />
+  <Var name="KeepPublicApi" value="true" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="RenameProperties" value="true" />
+  <Var name="RenameEvents" value="true" />
+  <Var name="RenameFields" value="true" />
+  <Var name="UseUnicodeNames" value="true" />
+  <Var name="Optimize" value="true" />
+  
+  <Module name="$(InPath)\DuranHelper.dll" />
+</Obfuscator>

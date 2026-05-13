@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="100%" height="100%" style="background-color: transparent;">
+  <defs>
+    <filter id="glowGoldMajor" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="15" flood-color="#d2a65e" flood-opacity="0.8"/>
+    </filter>
+    <filter id="glowGoldBtn" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#d2a65e" flood-opacity="0.5"/>
+    </filter>
+    <clipPath id="windowClip">
+      <path d="M 0,0 L 975,0 A 25,25 0 0,1 1000,25 L 1000,650 L 25,650 A 25,25 0 0,1 0,625 Z" />
+    </clipPath>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#161b22" stroke-width="1"/>
+    </pattern>
+
+    <linearGradient id="bgCardMajor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c2128" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0d1117" stop-opacity="0.9"/>
+    </linearGradient>
+
+      <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#d2a65e" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#0d1117" stop-opacity="0"/>
+      </radialGradient>
+
+    <style>
+      .btn-hover { transition: filter 0.2s, stroke 0.2s; cursor: pointer; }
+      .btn-hover:hover { filter: brightness(1.3); }
+      .btn-hover-solid { transition: fill 0.2s; cursor: pointer; }
+      .btn-hover-solid:hover { fill: #1c2128; }
+      .text-epic { font-family: Segoe UI, Arial; fill: #ffffff; }
+      .text-gray { font-family: Segoe UI, Arial; fill: #8b949e; }
+      .text-gold { font-family: Segoe UI, Arial; fill: #d2a65e; }
+    </style>
+  </defs>
+
+  <g clip-path="url(#windowClip)">
+    <rect width="1000" height="650" fill="#0d1117" />
+    <rect width="1000" height="650" fill="url(#grid)" opacity="0.3"/>
+
+    <!-- Left Nav -->
+    <path d="M 0,0 L 100,0 L 100,650 L 25,650 A 25,25 0 0,1 0,625 Z" fill="#11151d" />
+    <line x1="100" y1="0" x2="100" y2="650" stroke="#30363d" stroke-width="1"/>
+    <text x="50" y="55" font-family="Arial" font-size="36" font-weight="bold" fill="#d2a65e" text-anchor="middle">D</text>
+    <line x1="30" y1="80" x2="70" y2="80" stroke="#30363d" stroke-width="1"/>
+
+    <g transform="translate(0, 110)">
+      <rect x="0" y="0" width="100" height="80" fill="#0d1117" />
+      <rect x="0" y="20" width="4" height="40" rx="2" fill="#d2a65e" />
+      <rect x="40" y="20" width="8" height="8" rx="2" fill="none" stroke="#d2a65e" stroke-width="2"/>
+      <rect x="52" y="20" width="8" height="8" rx="2" fill="none" stroke="#d2a65e" stroke-width="2"/>
+      <rect x="40" y="32" width="8" height="8" rx="2" fill="none" stroke="#d2a65e" stroke-width="2"/>
+      <rect x="52" y="32" width="8" height="8" rx="2" fill="none" stroke="#d2a65e" stroke-width="2"/>
+      <text x="50" y="60" font-family="Segoe UI, Arial" font-size="10" font-weight="bold" fill="#d2a65e" text-anchor="middle">ГЛАВНАЯ</text>
+
+      <g class="btn-hover-solid" transform="translate(0, 80)">
+        <path d="M 40 20 L 40 38 L 50 38 L 50 20 Z" fill="none" stroke="#8b949e" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M 50 20 L 50 38 L 60 38 L 60 20 Z" fill="none" stroke="#8b949e" stroke-width="2" stroke-linejoin="round"/>
+        <text x="50" y="60" font-family="Segoe UI, Arial" font-size="10" font-weight="bold" fill="#8b949e" text-anchor="middle">ЗАКОНЫ</text>
+      </g>
+      <g class="btn-hover-solid" transform="translate(0, 160)">
+        <rect x="38" y="25" width="24" height="14" rx="2" fill="none" stroke="#8b949e" stroke-width="2"/>
+        <line x1="42" y1="29" x2="44" y2="29" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+        <line x1="48" y1="29" x2="50" y2="29" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+        <line x1="54" y1="29" x2="56" y2="29" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+        <line x1="45" y1="34" x2="55" y2="34" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+        <text x="50" y="60" font-family="Segoe UI, Arial" font-size="10" font-weight="bold" fill="#8b949e" text-anchor="middle">БИНДЫ</text>
+      </g>
+      <g class="btn-hover-solid" transform="translate(0, 240)">
+        <circle cx="50" cy="30" r="8" fill="none" stroke="#8b949e" stroke-width="2"/>
+        <path d="M50 18 v4 M50 38 v4 M38 30 h4 M58 30 h4 M41.5 21.5 l2.8 2.8 M55.7 35.7 l2.8 2.8 M58.5 21.5 l-2.8 2.8 M44.3 35.7 l-2.8 2.8" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+        <text x="50" y="60" font-family="Segoe UI, Arial" font-size="10" font-weight="bold" fill="#8b949e" text-anchor="middle">ОПЦИИ</text>
+      </g>
+    </g>
+
+    <!-- Header System Links -->
+    <g transform="translate(100, 0)">
+      <text x="30" y="38" font-family="Segoe UI, Arial" font-size="16" font-weight="bold" fill="#ffffff" letter-spacing="1">DURAN HELPER</text>
+      <circle cx="830" cy="32" r="7" fill="#feca2f" cursor="pointer"/>
+      <circle cx="860" cy="32" r="7" fill="#ff5f56" cursor="pointer"/>
+      <line x1="0" y1="60" x2="900" y2="60" stroke="#30363d" stroke-width="1" opacity="0.5"/>
+    </g>
+
+      <!-- App Integrated Content Area (NO POPUP WINDOW, NO PLATE) -->
+      <g transform="translate(140, 75)">
+        <rect x="0" y="0" width="820" height="540" fill="url(#centerGlow)"/>
+
+      <!-- Centered Presentation -->
+      <g transform="translate(410, 10)">
+        
+        <!-- Big EPIC Header -->
+        <text x="0" y="70" class="text-epic" font-size="36" font-weight="900" text-anchor="middle" letter-spacing="1">DURAN HELPER <tspan class="text-gold" filter="url(#glowGoldMajor)">2.0.0</tspan></text>
+        <text x="0" y="105" class="text-epic" font-size="22" font-weight="bold" text-anchor="middle">Добро пожаловать в новую эру!</text>
+
+        <!-- Divider Circles -->
+        <circle cx="0" cy="145" r="15" fill="#0d1117" stroke="#d2a65e" stroke-width="2"/>
+        <circle cx="0" cy="145" r="6" fill="#d2a65e"/>
+
+        <!-- Text Block -->
+        <g transform="translate(0, 185)" class="text-epic" font-size="15" font-weight="400" line-height="22">
+          <text x="0" y="0" text-anchor="middle">Мы провели огромную работу и готовы презентовать совершенно новое</text>
+          <text x="0" y="24" text-anchor="middle">понимание о игровом помощнике в сфере <tspan class="text-gold" font-weight="bold">RADMIR RP</tspan>.</text>
+          
+          <text x="0" y="60" text-anchor="middle">Забудьте об эмуляции нажатий клавиш. Начиная с <tspan font-weight="bold">v2.0.0</tspan>,</text>
+          <text x="0" y="84" text-anchor="middle">Хелпер использует <tspan class="text-gold" font-weight="bold">прямое отправление команд в игру через память</tspan>.</text>
+        </g>
+
+        <!-- Dashed Example Box -->
+        <g transform="translate(-350, 300)">
+          <rect width="700" height="70" rx="8" fill="#1b1612" stroke="#d2a65e" stroke-width="1" stroke-dasharray="6 4" opacity="0.6"/>
+          <text x="350" y="30" class="text-epic" font-size="14" font-weight="bold" font-style="italic" text-anchor="middle">
+            Пример: Вы буквально сможете пока читаете миранду отстреливаться параллельно
+          </text>
+          <text x="350" y="52" class="text-epic" font-size="14" font-weight="bold" font-style="italic" text-anchor="middle">
+            и открывать игровой чат. Хелпер больше не блокирует управление.
+          </text>
+        </g>
+      </g>
+      
+      <!-- Reassurance Box -->
+      <g transform="translate(60, 375)">
+        <rect width="700" height="60" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+        <circle cx="30" cy="30" r="15" fill="#121b16" stroke="#2ea043" stroke-width="1.5"/>
+        <path d="M22 30 L28 36 L38 24" stroke="#2ea043" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <text x="60" y="25" class="text-epic" font-size="14">Весь ваш профиль <tspan class="text-gold" font-weight="bold">сохранен</tspan>.</text>
+        <text x="60" y="45" class="text-gray" font-size="12">Лишь проведите простую настройку в два шага, которые увидите далее.</text>
+      </g>
+
+      <!-- Continue Button -->
+      <!-- Center: 410. Width: 280 -> X = 410 - 140 = 270 -->
+      <g transform="translate(270, 465)" class="btn-hover">
+        <rect width="280" height="50" rx="8" fill="#d2a65e" filter="url(#glowGoldBtn)"/>
+        <text x="140" y="30" class="text-epic" font-size="14" font-weight="900" fill="#0d1117" text-anchor="middle" pointer-events="none" letter-spacing="1">ПРИСТУПИМ!</text>
+      </g>
+    </g>
+  </g>
+
+  <polyline points="0,50 0,0 50,0" fill="none" stroke="#d2a65e" stroke-width="8" stroke-linejoin="miter"/>
+  <polyline points="950,650 1000,650 1000,600" fill="none" stroke="#d2a65e" stroke-width="8" stroke-linejoin="miter"/>
+</svg>

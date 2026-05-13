@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <RootNamespace>FSB_helper_C__</RootNamespace>
+    <Nullable>disable</Nullable>
+    
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>DURANHELPER</AssemblyName>
+    <Product>DURAN HELPER</Product>
+    <UseWPF>true</UseWPF>
+    <Title>DURAN HELPER</Title>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Obfuscar" Version="2.2.50">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DuranOverlay.asi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,57 @@
+name: Build and Release Setup
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # === 1. Сборка C++ ASI Плагина ===
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # Собираем C++ проект
+    - name: Build C++ ASI
+      run: msbuild ASI_Plugin\DuranOverlay.sln /p:Configuration=Release /p:Platform=Win32
+
+    # Копируем готовый ASI в корень лаунчера, чтобы C# проект его подхватил
+    - name: Copy ASI to Launcher Root
+      run: copy ASI_Plugin\build\Release\DuranOverlay.asi "DuranOverlay.asi"
+
+    # === 2. Сборка C# Лаунчера ===
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    # Устанавливаем зависимости и собираем проект
+    - name: Restore dependencies
+      run: dotnet restore "DuranHelper.csproj"
+
+    # Публикуем готовые файлы (вместе с библиотеками) в папку publish_output
+    - name: Build and Publish C# Launcher
+      run: dotnet publish "DuranHelper.csproj" -c Release -r win-x64 --self-contained false -o publish_output
+
+    # === 3. Создание Установщика через Inno Setup ===
+    - name: Compile Inno Setup Script
+      uses: minicomp/iscc-action@v3
+      with:
+        script: DuranHelper.iss
+
+    # === 4. Создание ZIP-архива для автообновления ===
+    - name: Zip for Auto-Updater
+      run: powershell -command "Compress-Archive -Path 'publish_output\*' -DestinationPath 'Output\update_package.zip' -Force"
+
+    # === 5. Загрузка в Релизы GitHub ===
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          Output/Setup_DuranHelper.exe
+          Output/update_package.zip

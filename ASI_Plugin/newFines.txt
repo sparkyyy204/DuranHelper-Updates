@@ -1,0 +1,663 @@
+﻿void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
+    float cx = o.x + 20, cy = o.y + 65;
+
+    // Empty state
+    if (fineItems.empty()) {
+        // Disabled search (Matched active measurements)
+        dl->AddRectFilled(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_HEADER, 6.0f);
+        dl->AddRect(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_BORDER, 6.0f, 0, 1.5f);
+        dl->AddCircle(ImVec2(o.x+35, o.y+80), 4.0f, C_GRAY2, 12, 2.0f);
+        dl->AddLine(ImVec2(o.x+38, o.y+83), ImVec2(o.x+42, o.y+87), C_GRAY2, 2.0f);
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x+50, o.y+73), IM_COL32(74,80,89,255),
+            "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB5\xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD1\x83\xD0\xBF\xD0\xB5\xD0\xBD..."); // Поиск недоступен...
+        
+        // Left area: X-in-circle icon
+        float icx = o.x + 215, icy = o.y + 230;
+        dl->AddCircle(ImVec2(icx, icy-20), 30.0f, C_BORDER, 24, 4.0f);
+        dl->AddLine(ImVec2(icx-15, icy-30), ImVec2(icx+15, icy-10), C_LINE, 4.0f);
+        dl->AddLine(ImVec2(icx-15, icy-10), ImVec2(icx+15, icy-30), C_LINE, 4.0f);
+        const char* noArt = "\xD0\x9D\xD0\x95\xD0\xA2 \xD0\x94\xD0\x9E\xD0\xA1\xD0\xA2\xD0\xA3\xD0\x9F\xD0\x9D\xD0\xAB\xD0\xA5 \xD0\xA1\xD0\xA2\xD0\x90\xD0\xA2\xD0\x95\xD0\x99"; // НЕТ ДОСТУПНЫХ СТАТЕЙ
+        ImVec2 naSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, noArt);
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx-naSz.x/2, icy+25), C_GRAY, noArt);
+        
+        // Right panel (empty state - same size as active: x=470, w=210)
+        float px = o.x + 470, py = o.y + 65;
+        float panW = 210;
+        dl->AddRectFilled(ImVec2(px, py), ImVec2(px+panW, py+345), C_HEADER, 8.0f);
+        dl->AddRect(ImVec2(px, py), ImVec2(px+panW, py+345), C_BORDER, 8.0f, 0, 1.5f);
+        
+        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+20, py+14), C_WHITE,
+            "\xD0\x98\xD0\xA2\xD0\x9E\xD0\x93\xD0\x9E\xD0\x92\xD0\xAB\xD0\x99 \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4"); // ИТОГОВЫЙ ШТРАФ
+        dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+panW-20, py+37), C_BORDER);
+        dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+40, py+37), C_GRAY2);
+        
+        // Empty message
+        const char* emEmpty = "\xD0\xA1\xD0\xBF\xD0\xB8\xD1\x81\xD0\xBE\xD0\xBA \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB9 \xD0\xBF\xD1\x83\xD1\x81\xD1\x82."; // Список нарушений пуст.
+        ImVec2 e1 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, emEmpty);
+        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+panW/2-e1.x/2, py+80), IM_COL32(92,99,112,255), emEmpty);
+        const char* emClick = "\xD0\x9A\xD0\xBB\xD0\xB8\xD0\xBA\xD0\xBD\xD0\xB8\xD1\x82\xD0\xB5 \xD0\xBF\xD0\xBE \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD1\x8F\xD0\xBC \xD1\x81\xD0\xBB\xD0\xB5\xD0\xB2\xD0\xB0."; // Кликните по статьям слева.
+        ImVec2 e2 = fontSegoeBold14->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, emClick);
+        dl->AddText(fontSegoeBold14, 10.0f, ImVec2(px+panW/2-e2.x/2, py+95), IM_COL32(74,80,89,255), emClick);
+        
+        // Dashed separator (same position as active: py+150)
+        DrawDashedLine(dl, ImVec2(px+20, py+150), ImVec2(px+190, py+150), C_LINE, 4, 4);
+        
+        // Sum = 0 (positioned same as active state)
+        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+20, py+165), IM_COL32(92,99,112,255),
+            "\xD0\x9E\xD0\x91\xD0\xA9\xD0\x90\xD0\xAF \xD0\xA1\xD0\xA3\xD0\x9C\xD0\x9C\xD0\x90:"); // ОБЩАЯ СУММА:
+        {
+            std::string zeroStr = "0 \xD1\x80\xD1\x83\xD0\xB1.";
+            float zeroW = fontSegoeBlack32->CalcTextSizeA(22.0f, FLT_MAX, 0.0f, zeroStr.c_str()).x;
+            dl->AddText(fontSegoeBlack32, 22.0f, ImVec2(px+190-zeroW, py+155), C_GRAY, zeroStr.c_str());
+        }
+        
+        // Revoke checkbox disabled (same position as active: py+185)
+        float rvY = py + 185;
+        dl->AddRectFilled(ImVec2(px+20, rvY), ImVec2(px+190, rvY+30), C_INPUT, 4.0f);
+        dl->AddRect(ImVec2(px+20, rvY), ImVec2(px+190, rvY+30), C_BORDER, 4.0f, 0, 1.0f);
+        dl->AddRect(ImVec2(px+28, rvY+9), ImVec2(px+40, rvY+21), C_GRAY2, 2.0f, 0, 1.0f);
+        dl->AddText(fontSegoeBold12, 9.0f, ImVec2(px+44, rvY+10), IM_COL32(92,99,112,255),
+            "\xD0\xA1 \xD0\x98\xD0\x97\xD0\xAA\xD0\xAF\xD0\xA2\xD0\x98\xD0\x95\xD0\x9C \xD0\x92\xD0\x9E\xD0\x94. \xD0\xA3\xD0\x94\xD0\x9E\xD0\xA1\xD0\xA2."); // С ИЗЪЯТИЕМ ВОД. УДОСТ.
+        
+        // ID input disabled (same position as active)
+        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20, py+226), IM_COL32(92,99,112,255),
+            "ID \xD0\x9D\xD0\x90\xD0\xA0\xD0\xA3\xD0\xA8\xD0\x98\xD0\xA2\xD0\x95\xD0\x9B\xD0\xAF"); // ID НАРУШИТЕЛЯ
+        dl->AddRectFilled(ImVec2(px+20, py+242), ImVec2(px+190, py+274), C_INPUT, 4.0f);
+        dl->AddRect(ImVec2(px+20, py+242), ImVec2(px+190, py+274), C_BORDER, 4.0f, 0, 1.5f);
+        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+35, py+252), IM_COL32(74,80,89,255), "ID...");
+        
+        // Buttons disabled (same positions as active: clear 60px, issue 105px)
+        float btnY = py + 295;
+        dl->AddRectFilled(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_HEADER, 4.0f);
+        dl->AddRect(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_BORDER, 4.0f, 0, 1.5f);
+        {
+            const char* ct = "\xD0\x9E\xD0\xA7\xD0\x98\xD0\xA1\xD0\xA2\xD0\x98\xD0\xA2\xD0\xAC"; // ОЧИСТИТЬ
+            ImVec2 cs = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, ct);
+            dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20+(60-cs.x)/2, btnY+(34-cs.y)/2), IM_COL32(92,99,112,255), ct);
+        }
+        dl->AddRectFilled(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), C_HEADER, 4.0f);
+        dl->AddRect(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), C_BORDER, 4.0f, 0, 1.5f);
+        {
+            const char* ft = "\xD0\x92\xD0\xAB\xD0\x9F\xD0\x98\xD0\xA1\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4"; // ВЫПИСАТЬ ШТРАФ
+            ImVec2 fs = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, ft);
+            dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+85+(105-fs.x)/2, btnY+(34-fs.y)/2), IM_COL32(92,99,112,255), ft);
+        }
+        return;
+    }
+
+    // Search bar
+    ImGui::SetCursorScreenPos(ImVec2(cx, cy));
+    ImGui::PushItemWidth(440);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, C_HEADER);
+    ImGui::PushStyleColor(ImGuiCol_Border, C_BORDER);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(30.0f, 8.0f));
+    ImGui::PushFont(fontSegoeBold14);
+    ImGui::InputTextWithHint("##fineSearch", "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD1\x8F...", searchFines, 256);
+    ImGui::PopFont();
+    ImGui::PopStyleVar(3);
+    ImGui::PopStyleColor(2);
+    ImGui::PopItemWidth();
+    // Magnifying glass icon
+    dl->AddCircle(ImVec2(cx+15, cy+16), 4.0f, C_GRAY, 12, 2.0f);
+    dl->AddLine(ImVec2(cx+18, cy+19), ImVec2(cx+22, cy+23), C_GRAY, 2.0f);
+
+    // Left: violation list - SVG: items 380w, starting at y=110
+    float listY = o.y + 110;
+    float listH = H - 110 - 15;
+    std::string sq = ToLowerUTF8(searchFines);
+    float listW = 430;
+
+    ImGui::SetCursorScreenPos(ImVec2(cx, listY));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, C_HEADER);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
+    ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 6.0f);
+    ImGui::BeginChild("##FinesList", ImVec2(listW + 10, listH), false, ImGuiWindowFlags_NoBackground);
+    ImDrawList* cdl = ImGui::GetWindowDrawList();
+
+    ImVec2 cp = ImGui::GetCursorScreenPos();
+    float yy = 0;
+    for (int i = 0; i < (int)fineItems.size(); i++) {
+        auto& fi = fineItems[i];
+        if (!sq.empty() && ToLowerUTF8(fi.id).find(sq) == std::string::npos && ToLowerUTF8(fi.name).find(sq) == std::string::npos)
+            continue;
+
+        float rx = cp.x, ry = cp.y + yy;
+
+        float revokeBadgeW = fi.hasLicRevoke ? 26.0f : 0.0f;
+
+        std::string amtStr = FormatNumber(fi.amount) + " \xD1\x80\xD1\x83\xD0\xB1.";
+        float amtW = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, amtStr.c_str()).x;
+        
+        float endX = rx + listW - 5.0f - amtW;
+        float revokeBadgeX = endX - revokeBadgeW - (revokeBadgeW > 0 ? 10.0f : 0.0f);
+        
+        float divX = rx + 115.0f;
+        float maxNameW = revokeBadgeX - (divX + 10.0f);
+        if (maxNameW < 60.0f) maxNameW = 60.0f;
+        
+        ImVec2 nameSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, maxNameW, fi.name.c_str());
+        float itemH = nameSz.y > 20.0f ? nameSz.y + 24.0f : 40.0f;
+
+        if (fi.selected) {
+            cdl->AddRectFilled(ImVec2(rx, ry), ImVec2(rx+listW, ry+itemH), C_GOLD_BG, 6.0f);
+            cdl->AddRect(ImVec2(rx, ry), ImVec2(rx+listW, ry+itemH), C_GOLD, 6.0f, 0, 1.5f);
+        } else {
+            cdl->AddRectFilled(ImVec2(rx, ry), ImVec2(rx+listW, ry+itemH), C_HEADER, 6.0f);
+            cdl->AddRect(ImVec2(rx, ry), ImVec2(rx+listW, ry+itemH), C_BORDER, 6.0f, 0, 1.5f);
+        }
+
+        // Checkbox
+        float cbx = rx + 15.0f, cby = ry + (itemH - 16.0f) * 0.5f;
+        if (fi.selected) {
+            cdl->AddRectFilled(ImVec2(cbx, cby), ImVec2(cbx+16, cby+16), C_GOLD, 3.0f);
+            cdl->AddLine(ImVec2(cbx+3, cby+8), ImVec2(cbx+6, cby+11), C_DARK, 2.0f);
+            cdl->AddLine(ImVec2(cbx+6, cby+11), ImVec2(cbx+13, cby+3), C_DARK, 2.0f);
+        } else {
+            cdl->AddRect(ImVec2(cbx, cby), ImVec2(cbx+16, cby+16), C_GRAY2, 3.0f, 0, 1.5f);
+        }
+
+        // Texts
+        float nameY = ry + (itemH > 40.0f ? 12.0f : (itemH - 14.0f) * 0.5f);
+        float centerY = ry + (itemH - 14.0f) * 0.5f;
+        
+        // ID + Type (centered fixed columns)
+        float idW = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, fi.id.c_str()).x;
+        float idX = (rx + 55.0f) - (idW * 0.5f);
+        cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(idX, centerY), C_WHITE, fi.id.c_str());
+        
+        if (!fi.type.empty()) {
+            bool isUK = (fi.type.find("\xD0\xA3\xD0\x9A") != std::string::npos); // "УК"
+            ImU32 fgCol = isUK ? C_RED : C_GOLD;
+            float tw = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, fi.type.c_str()).x;
+            float typeX = (rx + 92.5f) - (tw * 0.5f);
+            cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(typeX, centerY), fgCol, fi.type.c_str());
+        }
+        
+        cdl->AddLine(ImVec2(divX, ry+12), ImVec2(divX, ry+itemH-12), C_LINE, 1.5f);
+
+        cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(divX+8, nameY), C_WHITE, fi.name.c_str(), nullptr, maxNameW);
+
+        // "ВУ" badge
+        float badgeY = ry + (itemH - 20.0f) * 0.5f;
+        if (fi.hasLicRevoke) {
+            cdl->AddRectFilled(ImVec2(revokeBadgeX, badgeY), ImVec2(revokeBadgeX+26, badgeY+20), C_RED_BG, 4.0f);
+            const char* bTxt = "\xD0\x92\xD0\xA3"; // ВУ uppercase
+            float bw = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, bTxt).x;
+            cdl->AddText(fontSegoeBold12, 11.0f, ImVec2(revokeBadgeX + (26-bw)/2, badgeY + 4.0f), C_RED, bTxt);
+        }
+
+        // Amount
+        float amtY = ry + (itemH - 14.0f) * 0.5f;
+        cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(endX, amtY), fi.selected ? C_GOLD : C_GRAY, amtStr.c_str());
+
+        ImGui::SetCursorScreenPos(ImVec2(rx, ry));
+        char btnId[32]; sprintf_s(btnId, "##fine%d", i);
+        if (ImGui::InvisibleButton(btnId, ImVec2(listW, itemH)))
+            fi.selected = !fi.selected;
+
+        yy += itemH + 2.0f;
+    }
+    ImGui::Dummy(ImVec2(0, 2.0f)); // Small padding at the bottom, no full-height duplicate
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(4);
+    // Right: summary panel
+    float px = o.x + 470, py = o.y + 65;
+    float panW = 210;
+    dl->AddRectFilled(ImVec2(px, py), ImVec2(px+panW, py+345), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(px, py), ImVec2(px+panW, py+345), C_BORDER, 8.0f, 0, 1.5f);
+
+    // "ИТОГОВЫЙ ШТРАФ" - SVG: x=20 y=25 font-size=12
+    dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+20, py+14), C_WHITE, "\xD0\x98\xD0\xa2\xD0\x9E\xD0\x93\xD0\x9E\xD0\x92\xD0\xAB\xD0\x99 \xD0\xa8\xD0\xa2\xD0\xa0\xD0\x90\xD0\xa4");
+    dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+190, py+37), C_BORDER);
+    dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+80, py+37), C_GOLD);
+
+    // Selected items in scrollable region
+    int total = 0;
+    bool anyRevoke = false;
+    ImGui::SetCursorScreenPos(ImVec2(px+20, py+55));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, C_HEADER);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
+    ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 6.0f);
+    ImGui::BeginChild("##SelectedFines", ImVec2(170, 80), false, ImGuiWindowFlags_NoBackground);
+    ImDrawList* scl = ImGui::GetWindowDrawList();
+    ImVec2 sfp = ImGui::GetCursorScreenPos();
+    float sy = 0;
+    for (auto& fi : fineItems) {
+        if (!fi.selected) continue;
+        total += fi.amount;
+        if (fi.hasLicRevoke) anyRevoke = true;
+        scl->AddText(fontSegoeBold14, 11.0f, ImVec2(sfp.x, sfp.y + sy), C_GOLD, fi.id.c_str());
+        float idW2 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, fi.id.c_str()).x;
+        
+        std::string a2 = FormatNumber(fi.amount);
+        float a2W = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, a2.c_str()).x;
+        
+        float maxName2W = 160.0f - idW2 - 10.0f - a2W - 10.0f;
+        if (maxName2W < 40.0f) maxName2W = 40.0f;
+        
+        ImVec2 nameSz2 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, maxName2W, fi.name.c_str());
+        
+        scl->AddText(fontSegoeBold14, 11.0f, ImVec2(sfp.x+idW2+8, sfp.y + sy), C_WHITE, fi.name.c_str(), nullptr, maxName2W);
+        scl->AddText(fontSegoeBold14, 11.0f, ImVec2(sfp.x+160-a2W, sfp.y + sy), C_WHITE, a2.c_str());
+        
+        sy += (nameSz2.y > 15.0f ? nameSz2.y + 6.0f : 20.0f);
+    }
+    ImGui::Dummy(ImVec2(0, sy > 0 ? sy : 1));
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(4);
+    
+    if (sy == 0) {
+        float emptyCenterY = py + 95;
+        float iconRadius = 24.0f;
+        
+        // Draw background circle
+        dl->AddCircleFilled(ImVec2(px + panW / 2, emptyCenterY - 15), iconRadius, IM_COL32(23, 30, 43, 255));
+        dl->AddCircle(ImVec2(px + panW / 2, emptyCenterY - 15), iconRadius, C_BORDER, 24, 1.5f);
+        
+        // Draw document/fine icon
+        float ix = px + panW / 2;
+        float iy = emptyCenterY - 15;
+        dl->AddRect(ImVec2(ix - 8, iy - 10), ImVec2(ix + 8, iy + 10), C_GRAY, 2.0f, 0, 1.5f); // Paper
+        dl->AddLine(ImVec2(ix - 4, iy - 4), ImVec2(ix + 4, iy - 4), C_GRAY, 1.5f); // Line 1
+        dl->AddLine(ImVec2(ix - 4, iy), ImVec2(ix + 4, iy), C_GRAY, 1.5f); // Line 2
+        dl->AddLine(ImVec2(ix - 4, iy + 4), ImVec2(ix + 1, iy + 4), C_GRAY, 1.5f); // Line 3
+        dl->AddCircleFilled(ImVec2(ix + 8, iy + 10), 6.0f, C_HEADER); // Cutout for badge
+        dl->AddCircleFilled(ImVec2(ix + 8, iy + 10), 4.0f, C_GOLD); // Gold badge (warning)
+        
+        const char* emClick = "\xD0\x9A\xD0\xBB\xD0\xB8\xD0\xBA\xD0\xBD\xD0\xB8\xD1\x82\xD0\xB5 \xD0\xBF\xD0\xBE \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD1\x8F\xD0\xBC \xD1\x81\xD0\xBB\xD0\xB5\xD0\xB2\xD0\xB0."; // Кликните по статьям слева.
+        ImVec2 e2 = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, emClick);
+        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+panW/2-e2.x/2, emptyCenterY + 20), IM_COL32(74,80,89,255), emClick);
+    }
+
+    // Dashed separator
+    DrawDashedLine(dl, ImVec2(px+20, py+150), ImVec2(px+190, py+150), C_LINE, 4, 4);
+
+    // "ОБЩАЯ СУММА:" and total on the same visual line
+    dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+20, py+165), C_GRAY, "\xD0\x9E\xD0\x91\xD0\xa9\xD0\x90\xD0\xAF \xD0\xa1\xD0\xa3\xD0\x9C\xD0\x9C\xD0\x90:");
+    std::string totalStr = FormatNumber(total) + " \xD1\x80\xD1\x83\xD0\xB1.";
+    float totalW = fontSegoeBlack32->CalcTextSizeA(22.0f, FLT_MAX, 0.0f, totalStr.c_str()).x;
+    dl->AddText(fontSegoeBlack32, 22.0f, ImVec2(px+190-totalW, py+155), C_GOLD, totalStr.c_str());
+
+    // "С ИЗЪЯТИЕМ ВОД. УДОСТОВЕРЕНИЯ"
+    float rvY = py + 185;
+    bool canRevoke = anyRevoke; // enabled if at least one selected fine has revoke
+    bool isRevoked = canRevoke && fineWithRevoke;
+    ImU32 rvCol = canRevoke ? (isRevoked ? C_RED : C_GOLD) : C_GRAY2;
+    ImU32 rvBgCol = canRevoke ? (isRevoked ? C_RED_BG : IM_COL32(0,0,0,0)) : C_INPUT;
+    
+    dl->AddRectFilled(ImVec2(px+20, rvY), ImVec2(px+190, rvY+30), rvBgCol, 4.0f);
+    dl->AddRect(ImVec2(px+20, rvY), ImVec2(px+190, rvY+30), rvCol, 4.0f, 0, 1.0f);
+    
+    if (isRevoked) {
+        dl->AddRectFilled(ImVec2(px+28, rvY+9), ImVec2(px+40, rvY+21), C_RED, 2.0f);
+        dl->AddLine(ImVec2(px+30, rvY+15), ImVec2(px+33, rvY+18), C_DARK, 1.5f);
+        dl->AddLine(ImVec2(px+33, rvY+18), ImVec2(px+38, rvY+11), C_DARK, 1.5f);
+    } else {
+        dl->AddRect(ImVec2(px+28, rvY+9), ImVec2(px+40, rvY+21), canRevoke ? C_LINE : C_GRAY2, 2.0f, 0, 1.0f);
+    }
+    
+    // Allow toggle of revoke checkbox physically
+    ImGui::SetCursorScreenPos(ImVec2(px+20, rvY));
+    if (ImGui::InvisibleButton("##toggleRevoke", ImVec2(170, 30))) {
+        if (canRevoke) {
+            fineWithRevoke = !fineWithRevoke;
+        }
+    }
+    
+    dl->AddText(fontSegoeBold12, 9.0f, ImVec2(px+44, rvY+10), isRevoked ? C_RED : (canRevoke ? C_GOLD : C_GRAY2),
+        "\xD0\xa1 \xD0\x98\xD0\x97\xD0\xAA\xD0\xAF\xD0\xa2\xD0\x98\xD0\x95\xD0\x9C \xD0\x92\xD0\x9E\xD0\x94. \xD0\xa3\xD0\x94\xD0\x9E\xD0\xa1\xD0\xa2.");
+
+    // ID input
+    dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20, py+226), C_GRAY, "ID \xD0\x9D\xD0\x90\xD0\xa0\xD0\xa3\xD0\xa8\xD0\x98\xD0\xa2\xD0\x95\xD0\x9B\xD0\xAF");
+    ImGui::SetCursorScreenPos(ImVec2(px+20, py+242));
+    ImGui::PushItemWidth(170);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, C_INPUT);
+    ImGui::PushStyleColor(ImGuiCol_TextDisabled, IM_COL32(100,110,120,255));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 6.0f));
+    ImGui::PushFont(fontSegoeBold14);
+    ImGui::InputTextWithHint("##fineId", "\xD0\x92\xD0\xB2\xD0\xB5\xD0\xB4\xD0\xB8\xD1\x82\xD0\xB5 ID \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB8\xD1\x82\xD0\xB5\xD0\xBB\xD1\x8F", fineIdBuf, 32);
+    ImGui::PopFont();
+    ImGui::PopStyleVar(2);
+    ImGui::PopStyleColor(2);
+    ImGui::PopItemWidth();
+
+    // Buttons at bottom
+    float btnY = py + 295;
+    // "ОЧИСТИТЬ" (clear) w=60 h=34
+    ImGui::SetCursorScreenPos(ImVec2(px+20, btnY));
+    bool clrClicked = ImGui::InvisibleButton("##clearFines", ImVec2(60, 34));
+    bool clrHover = ImGui::IsItemHovered();
+    
+    dl->AddRectFilled(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), clrHover ? IM_COL32(255,255,255,10) : C_BOX, 4.0f);
+    dl->AddRect(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_LINE, 4.0f, 0, 1.5f);
+    {
+        const char* clrTxt = "\xD0\x9E\xD0\xa7\xD0\x98\xD0\xa1\xD0\xa2\xD0\x98\xD0\xa2\xD0\xAC";
+        ImVec2 clrSz = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, clrTxt);
+        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20+(60-clrSz.x)/2, btnY+(34-clrSz.y)/2), clrHover ? C_WHITE : C_GRAY, clrTxt);
+    }
+    if (clrClicked) {
+        for (auto& fi : fineItems) fi.selected = false;
+        memset(fineIdBuf, 0, sizeof(fineIdBuf));
+        fineWithRevoke = false;
+    }
+
+    // "ВЫПИСАТЬ ШТРАФ" (issue fine) w=105 h=34
+    ImGui::SetCursorScreenPos(ImVec2(px+85, btnY));
+    bool issClicked = ImGui::InvisibleButton("##issueFine", ImVec2(105, 34));
+    bool issHover = ImGui::IsItemHovered();
+    
+    dl->AddRectFilled(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), issHover ? IM_COL32(63,185,80,255) : C_GREEN, 4.0f);
+    {
+        const char* issTxt = "\xD0\x92\xD0\xAB\xD0\x9F\xD0\x98\xD0\xa1\xD0\x90\xD0\xa2\xD0\xAC \xD0\xa8\xD0\xa2\xD0\xa0\xD0\x90\xD0\xA4";
+        ImVec2 issSz = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, issTxt);
+        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+85+(105-issSz.x)/2, btnY+(34-issSz.y)/2), C_DARK, issTxt);
+    }
+    if (issClicked) {
+        // --- Issue Fine Logic ---
+        std::string idStr(fineIdBuf);
+        // Trim spaces
+        while (!idStr.empty() && idStr.front() == ' ') idStr.erase(idStr.begin());
+        while (!idStr.empty() && idStr.back() == ' ') idStr.pop_back();
+        
+        if (idStr.empty()) {
+            ShowError("\xD0\x92\xD0\xB2\xD0\xB5\xD0\xB4\xD0\xB8\xD1\x82\xD0\xB5 ID \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB8\xD1\x82\xD0\xB5\xD0\xBB\xD1\x8F!", C_RED); // Введите ID нарушителя!
+        } else {
+            // Check for any selected fines
+            bool hasSelected = false;
+            int totalAmt = 0;
+            
+            // Group articles by type for formatting
+            std::map<std::string, std::vector<std::string>> groupedArticles;
+            for (auto& fi : fineItems) {
+                if (!fi.selected) continue;
+                hasSelected = true;
+                totalAmt += fi.amount;
+                // Add to list for this type
+                groupedArticles[fi.type].push_back(fi.id);
+            }
+            
+            if (!hasSelected) {
+                ShowError("\xD0\x92\xD1\x8B\xD0\xB1\xD0\xB5\xD1\x80\xD0\xB8\xD1\x82\xD0\xB5 \xD1\x85\xD0\xBE\xD1\x82\xD1\x8F \xD0\xB1\xD1\x8B \xD0\xBE\xD0\xB4\xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB5!", C_RED); // Выберите хотя бы одно нарушение!
+            } else {
+                // Build article string: ID1, ID2 TYPE1, ID3 TYPE2
+                std::string articlesStr;
+                for (auto const& [type, ids] : groupedArticles) {
+                    if (!articlesStr.empty()) articlesStr += ", ";
+                    for (size_t i = 0; i < ids.size(); i++) {
+                        articlesStr += ids[i];
+                        if (i < ids.size() - 1) articlesStr += ", ";
+                    }
+                    articlesStr += " " + type;
+                }
+
+                if (totalAmt > 25000) totalAmt = 25000;
+
+                std::string cmd = "/ticket " + idStr + " " + std::to_string(totalAmt) + " " + articlesStr;
+                std::string cp1251cmd = UTF8ToCP1251(cmd.c_str());
+                
+                Toggle();
+                RunOnMainThread([cp1251cmd]() {
+                    SendSAMPMessage(cp1251cmd.c_str());
+                });
+                
+                // Build quote text if quoting is enabled
+                std::string quoteStr;
+                if (quoteFines) {
+                    quoteStr = "\xD0\x92\xD1\x8B\xD0\xBF\xD0\xB8\xD1\x81\xD0\xB0\xD0\xBD \xD1\x88\xD1\x82\xD1\x80\xD0\xB0\xD1\x84 \xD0\xBF\xD0\xBE:\n";
+                    for (auto& fi : fineItems) {
+                        if (!fi.selected) continue;
+                        quoteStr += fi.id + " \"" + fi.type + "\"\n";
+                        quoteStr += fi.name + "\n";
+                    }
+                    quoteStr += "\xD0\x98\xD1\x82\xD0\xBE\xD0\xB3\xD0\xBE\xD0\xB2\xD0\xB0\xD1\x8F \xD1\x81\xD1\x83\xD0\xBC\xD0\xBC\xD0\xB0: " + FormatNumber(totalAmt) + " \xD1\x80\xD1\x83\xD0\xB1.";
+                }
+                
+                // Start unified sequence (revoke + quote via /go /stop)
+                bool needRevoke = fineWithRevoke;
+                bool needQuote = quoteFines;
+                StartFineSequence(idStr, articlesStr, needRevoke, needQuote, quoteStr);
+                
+                // Clear state after issuing successfully
+                for (auto& fi : fineItems) fi.selected = false;
+                memset(fineIdBuf, 0, sizeof(fineIdBuf));
+                fineWithRevoke = false;
+            }
+        }
+    }
+}
+
+// ===== Binder Tab ===== SVG: sidebar x=20,y=65 w=140 h=347; search x=180,y=65 w=500 h=32; cards 240w×45h
+void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
+    // Left sidebar - SVG: translate(20,65) w=140 h=347 rx=8
+    float sx = o.x + 20, sy = o.y + 65;
+    float sbW = 140, sbH = 347;
+    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx+sbW, sy+sbH), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(sx, sy), ImVec2(sx+sbW, sy+sbH), C_BORDER, 8.0f, 0, 1.5f);
+
+    // "ГРУППЫ БИНДОВ" - SVG: font-size=10 font-weight=900 letter-spacing=1
+    dl->AddText(fontSegoeBold14, 12.0f, ImVec2(sx+12, sy+14), C_GRAY,
+        "\xD0\x93\xD0\xa0\xD0\xa3\xD0\x9F\xD0\x9F\xD0\xAB \xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\x9E\xD0\x92");
+    dl->AddLine(ImVec2(sx+10, sy+40), ImVec2(sx+130, sy+40), C_BORDER, 1.5f);
+
+    auto& binds = BinderManager::Get().Binds;
+    
+    // Empty state
+    if (binds.empty()) {
+        // Sidebar: folder icon + "Нет групп"
+        float fgx = sx + (sbW / 2.0f), fgy = sy + 160;
+        dl->AddRectFilled(ImVec2(fgx-15, fgy-10), ImVec2(fgx+15, fgy+10), C_LINE, 2.0f);
+        dl->AddLine(ImVec2(fgx-15, fgy-6), ImVec2(fgx+15, fgy-6), C_LINE, 2.0f);
+        const char* ngText = "\xD0\x9D\xD0\xB5\xD1\x82 \xD0\xB3\xD1\x80\xD1\x83\xD0\xBF\xD0\xBF";
+        ImVec2 ngSz = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, ngText);
+        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(fgx - ngSz.x/2, fgy+20), IM_COL32(92,99,112,255), ngText);
+        
+        float rx = o.x + 180, ry = o.y + 65;
+        dl->AddRectFilled(ImVec2(rx, ry), ImVec2(rx+500, ry+32), C_HEADER, 6.0f);
+        dl->AddRect(ImVec2(rx, ry), ImVec2(rx+500, ry+32), C_BORDER, 6.0f, 0, 1.5f);
+        dl->AddCircle(ImVec2(rx+15, ry+16), 4.0f, C_GRAY2, 12, 2.0f);
+        dl->AddLine(ImVec2(rx+18, ry+19), ImVec2(rx+22, ry+23), C_GRAY2, 2.0f);
+        dl->AddText(fontSegoeBold14, 13.0f, ImVec2(rx+30, ry+9), IM_COL32(74,80,89,255),
+            "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB5\xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD1\x83\xD0\xBF\xD0\xB5\xD0\xBD..."); // Поиск недоступен...
+        
+        // Center: grid icon (4 small squares + bar)
+        float gcx = rx + 245, gcy = ry + 170;
+        dl->AddRectFilled(ImVec2(gcx-50, gcy-30), ImVec2(gcx+50, gcy+30), IM_COL32(0,0,0,0)); // transparent
+        dl->AddRect(ImVec2(gcx-50, gcy-30), ImVec2(gcx+50, gcy+30), C_BORDER, 6.0f, 0, 4.0f);
+        dl->AddRectFilled(ImVec2(gcx-35, gcy-15), ImVec2(gcx-20, gcy), C_LINE, 2.0f);
+        dl->AddRectFilled(ImVec2(gcx-15, gcy-15), ImVec2(gcx, gcy), C_LINE, 2.0f);
+        dl->AddRectFilled(ImVec2(gcx+5, gcy-15), ImVec2(gcx+20, gcy), C_LINE, 2.0f);
+        dl->AddRectFilled(ImVec2(gcx+25, gcy-15), ImVec2(gcx+40, gcy), C_LINE, 2.0f);
+        dl->AddRectFilled(ImVec2(gcx-15, gcy+5), ImVec2(gcx+40, gcy+15), C_LINE, 2.0f);
+        
+        // Empty state match for Binder
+        const char* noBinds = "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\xAB \xD0\x9D\xD0\x95 \xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x95\xD0\x9D\xD0\xAB"; // БИНДЫ НЕ НАСТРОЕНЫ
+        ImVec2 nb = fontSegoeBold20->CalcTextSizeA(16.0f, FLT_MAX, 0.0f, noBinds);
+        dl->AddText(fontSegoeBold20, 16.0f, ImVec2(gcx-nb.x/2, gcy+55), C_GRAY, noBinds);
+        
+        const char* sub = "\xD0\xA1\xD0\xBE\xD0\xB7\xD0\xB4\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x84\xD0\xB8\xD0\xBB\xD1\x8C \xD0\xB8 \xD0\xB4\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD1\x8B \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5."; // Создайте профиль и добавьте бинды в лаунчере.
+        ImVec2 sb2 = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, sub);
+        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(gcx-sb2.x/2, gcy+75), IM_COL32(92,99,112,255), sub);
+        return;
+    }
+    std::vector<std::string> groups;
+    for (auto& b : binds) {
+        if (!b.Group.empty()) {
+            std::string lGroup = ToLowerUTF8(b.Group);
+            if (lGroup == "\xd0\xb2\xd1\x81\xd0\xb5" || lGroup == "all") continue; // Skip "Все" or "ВСЕ"
+            
+            bool found = false;
+            for (auto& g : groups) {
+                if (ToLowerUTF8(g) == lGroup) { found = true; break; }
+            }
+            if (!found) groups.push_back(b.Group);
+        }
+    }
+
+    // "Все бинды (N)" - SVG: x=10 y=55 w=120 h=26
+    float gy = sy + 50;
+    bool allSel = (selectedBindGroup == -1);
+    char allLabel[64];
+    sprintf_s(allLabel, "\xD0\x92\xD1\x81\xD0\xB5 \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD1\x8B (%d)", (int)binds.size());
+    if (allSel) {
+        dl->AddRectFilled(ImVec2(sx+10, gy), ImVec2(sx+130, gy+28), C_GOLD_BG, 6.0f);
+        dl->AddRectFilled(ImVec2(sx+10, gy), ImVec2(sx+12, gy+28), C_GOLD, 2.0f);
+    }
+    dl->AddText(fontSegoeBold14, 11.0f, ImVec2(sx+20, gy+6), allSel ? C_GOLD : C_WHITE, allLabel);
+    ImGui::SetCursorScreenPos(ImVec2(sx+10, gy));
+    if (ImGui::InvisibleButton("##grpAll", ImVec2(120, 28))) selectedBindGroup = -1;
+    gy += 32;
+
+    for (int gi = 0; gi < (int)groups.size(); gi++) {
+        int count = 0;
+        std::string lTarget = ToLowerUTF8(groups[gi]);
+        for (auto& b : binds) if (ToLowerUTF8(b.Group) == lTarget) count++;
+        
+        bool gSel = (selectedBindGroup == gi);
+        if (gSel) {
+            dl->AddRectFilled(ImVec2(sx+10, gy), ImVec2(sx+130, gy+28), C_GOLD_BG, 6.0f);
+            dl->AddRectFilled(ImVec2(sx+10, gy), ImVec2(sx+12, gy+28), C_GOLD, 2.0f);
+        }
+        
+        char grpLabel[128];
+        sprintf_s(grpLabel, "%s (%d)", groups[gi].c_str(), count);
+        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(sx+20, gy+6), gSel ? C_GOLD : C_WHITE, grpLabel);
+        
+        ImGui::SetCursorScreenPos(ImVec2(sx+10, gy));
+        char gid[32]; sprintf_s(gid, "##grp%d", gi);
+        if (ImGui::InvisibleButton(gid, ImVec2(120, 28))) selectedBindGroup = gi;
+        gy += 32;
+    }
+
+    // Right: search + cards - SVG: translate(180,65), search w=500 h=32
+    float rx = o.x + 180, ry = o.y + 65;
+    float rw = 500;
+
+    // Search bar - SVG: w=500 h=32 rx=6
+    ImGui::SetCursorScreenPos(ImVec2(rx, ry));
+    ImGui::PushItemWidth(rw);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, C_HEADER);
+    ImGui::PushStyleColor(ImGuiCol_Border, C_BORDER);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.5f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(30.0f, 8.0f));
+    ImGui::PushFont(fontSegoeBold14);
+    ImGui::InputTextWithHint("##bindSearch",
+        "\xD0\x9F\xD0\xBe\xD0\xB8\xD1\x81\xD0\xBA \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD0\xB0...", searchBinder, 256);
+    ImGui::PopFont();
+    ImGui::PopStyleVar(3);
+    ImGui::PopStyleColor(2);
+    ImGui::PopItemWidth();
+    // Magnifying glass icon
+    dl->AddCircle(ImVec2(rx+15, ry+16), 4.0f, C_GRAY, 12, 2.0f);
+    dl->AddLine(ImVec2(rx+18, ry+19), ImVec2(rx+22, ry+23), C_GRAY, 2.0f);
+
+    // Cards area - SVG: cards 235w×45h, two columns, 10px gap, starting at y=45 from search
+    float cardsY = ry + 45;
+    float cardW = 235;
+    float cardH = 45;
+    std::string bsq = ToLowerUTF8(searchBinder);
+
+    ImGui::SetCursorScreenPos(ImVec2(rx, cardsY));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, C_HEADER);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
+    ImGui::BeginChild("##BindCards", ImVec2(rw, sbH - 50), false, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_AlwaysVerticalScrollbar);
+    ImDrawList* cdlb = ImGui::GetWindowDrawList();
+
+    ImVec2 bp = ImGui::GetCursorScreenPos();
+    int col = 0;
+    float bx = 0, by = 0;
+
+    for (int i = 0; i < (int)binds.size(); i++) {
+        auto& b = binds[i];
+
+        if (selectedBindGroup >= 0 && selectedBindGroup < (int)groups.size()) {
+            if (b.Group != groups[selectedBindGroup]) continue;
+        }
+        if (!bsq.empty() && ToLowerUTF8(b.name).find(bsq) == std::string::npos && ToLowerUTF8(b.KeyComboStr()).find(bsq) == std::string::npos)
+            continue;
+
+        float cx2 = bp.x + bx, cy2 = bp.y + by;
+        bool hover = ImGui::IsMouseHoveringRect(ImVec2(cx2, cy2), ImVec2(cx2+cardW, cy2+cardH));
+
+        ImU32 borderColor = (b.isAuto || hover) ? C_GOLD : C_BORDER;
+        ImU32 headColor = b.isAuto ? C_GOLD_BG : C_HEADER;
+        
+        cdlb->AddRectFilled(ImVec2(cx2, cy2), ImVec2(cx2+cardW, cy2+cardH), headColor, 8.0f);
+        cdlb->AddRect(ImVec2(cx2, cy2), ImVec2(cx2+cardW, cy2+cardH), borderColor, 8.0f, 0, 1.5f);
+
+        // Key badge - SVG: x=10 y=10 w=50 h=24 rx=4
+        float kbW = 0.0f;
+        if (b.isAuto) {
+            kbW = 50.0f;
+            // Gold logic for auto binds
+            cdlb->AddRectFilled(ImVec2(cx2+10, cy2+10), ImVec2(cx2+10+kbW, cy2+34), C_GOLD, 4.0f);
+            
+            // Draw auto-replace icon (lightning bolt) inside badge centered
+            float acx = cx2+10 + kbW/2 + 0.5f, acy = cy2+22 - 0.5f;
+            cdlb->AddQuadFilled(ImVec2(acx-1, acy-6), ImVec2(acx+4, acy-6), ImVec2(acx+1, acy+1), ImVec2(acx-4, acy+1), C_DARK);
+            cdlb->AddTriangleFilled(ImVec2(acx-2, acy+1), ImVec2(acx+3, acy+1), ImVec2(acx-1, acy+7), C_DARK);
+        } else {
+            std::string keyStr = b.KeyComboStr();
+            if (keyStr.empty()) keyStr = "\xD0\x9D\xD0\x95\xD0\xa2";
+            float tw = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, keyStr.c_str()).x;
+            kbW = tw + 14.0f;
+            if (kbW < 50.0f) kbW = 50.0f;
+            
+            bool hasKey = !keyStr.empty() && keyStr != "\xD0\x9D\xD0\x95\xD0\xa2";
+            if (hasKey && hover) {
+                cdlb->AddRectFilled(ImVec2(cx2+10, cy2+10), ImVec2(cx2+10+kbW, cy2+34), C_GOLD, 4.0f);
+                cdlb->AddText(fontSegoeBold12, 10.0f, ImVec2(cx2+10+(kbW-tw)/2, cy2+15), C_DARK, keyStr.c_str());
+            } else {
+                cdlb->AddRectFilled(ImVec2(cx2+10, cy2+10), ImVec2(cx2+10+kbW, cy2+34), C_BORDER, 4.0f);
+                cdlb->AddRect(ImVec2(cx2+10, cy2+10), ImVec2(cx2+10+kbW, cy2+34), C_LINE, 4.0f);
+                cdlb->AddText(fontSegoeBold12, 10.0f, ImVec2(cx2+10+(kbW-tw)/2, cy2+15),
+                    hasKey ? C_GOLD : C_GRAY, keyStr.c_str());
+            }
+        }
+
+        // Name - SVG: x=70 y=27 font-size=12
+        cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(cx2+10+kbW+10, cy2+14), hover ? C_GOLD : C_WHITE, b.name.c_str());
+
+        // Play icon - clean triangle with circle
+        float px2 = cx2 + cardW - 25, py2 = cy2 + cardH/2;
+        ImU32 playCol = hover ? C_GOLD : C_GRAY2;
+        cdlb->AddCircleFilled(ImVec2(px2, py2), 9.0f, hover ? IM_COL32(210,166,94,40) : IM_COL32(40,44,52,255), 24);
+        cdlb->AddCircle(ImVec2(px2, py2), 9.0f, playCol, 24, 1.5f);
+        // Smooth triangle (play arrow) — compact, with 3px padding from circle edge
+        ImVec2 triPts[3] = {
+            ImVec2(px2-2.5f, py2-4),
+            ImVec2(px2-2.5f, py2+4),
+            ImVec2(px2+4, py2)
+        };
+        cdlb->AddTriangleFilled(triPts[0], triPts[1], triPts[2], playCol);
+
+        ImGui::SetCursorScreenPos(ImVec2(px2-8, py2-10));
+        char pid[32]; sprintf_s(pid, "##play%d", i);
+        if (ImGui::InvisibleButton(pid, ImVec2(20, 20))) {
+            Toggle();
+            BinderManager::Get().ExecuteBind(b);
+        }
+
+        col++;
+        if (col >= 2) { col = 0; bx = 0; by += cardH + 10; }
+        else { bx = cardW + 10; }
+    }
+    if (col == 1) by += cardH + 10;
+    ImGui::Dummy(ImVec2(0, 15)); // bottom padding so last card isn't clipped
+    ImGui::EndChild();
+    ImGui::PopStyleColor(4);
+}
+
+// ===== Settings Tab ===== SVG: settingstop.svg
+
