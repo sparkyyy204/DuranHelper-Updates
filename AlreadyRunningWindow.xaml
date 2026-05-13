@@ -1,0 +1,45 @@
+<Window x:Class="FSB_helper_C__.AlreadyRunningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DURAN HELPER" Width="420" Height="280"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Topmost="True">
+    <Grid>
+        <!-- Shadow -->
+        <Border Margin="10,2,10,10" CornerRadius="12" Background="#000000" Opacity="0.7">
+            <Border.RenderTransform><TranslateTransform Y="8"/></Border.RenderTransform>
+        </Border>
+
+        <!-- Main card -->
+        <Border Margin="10" CornerRadius="12" Background="#0d1117" BorderBrush="#30363d" BorderThickness="2">
+            <Grid>
+                <!-- Gold top bar -->
+                <Border CornerRadius="12,12,0,0" Height="4" VerticalAlignment="Top" Background="#d2a65e" ClipToBounds="True"/>
+
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,15,0,0">
+                    <!-- Icon circles -->
+                    <Grid Width="90" Height="90" HorizontalAlignment="Center" Margin="0,0,0,15">
+                        <Ellipse Width="90" Height="90" Fill="#d2a65e" Opacity="0.08"/>
+                        <Ellipse Width="70" Height="70" Fill="Transparent" Stroke="#d2a65e" StrokeThickness="1.5" StrokeDashArray="6 4" Opacity="0.8"/>
+                        <Ellipse Width="52" Height="52" Fill="#161b22" Stroke="#d2a65e" StrokeThickness="2"/>
+                        <TextBlock Text="D" FontFamily="Arial" FontSize="28" FontWeight="Black" Foreground="#d2a65e" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Texts -->
+                    <TextBlock Text="СИСТЕМА УЖЕ АКТИВНА" FontFamily="Segoe UI" FontSize="18" FontWeight="Black" Foreground="#ffffff" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    
+                    <TextBlock Text="Программа DURAN HELPER уже работает." FontFamily="Segoe UI" FontSize="12" Foreground="#8b949e" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                    <TextBlock Text="Разверните окно приложения из системного трея." FontFamily="Segoe UI" FontSize="12" Foreground="#8b949e" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+                    <!-- Button -->
+                    <Button Content="ПОНЯТНО" Width="140" Height="34" Cursor="Hand" Click="Close_Click"
+                            FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Foreground="#d2a65e"
+                            Background="#161b22" BorderBrush="#d2a65e" BorderThickness="1.5">
+                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

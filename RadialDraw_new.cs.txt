@@ -1,0 +1,333 @@
+        // ═══ SVG-matched arc path (no gap, exact SVG coords) ═══
+        private string GetArcPath(double cx, double cy, double rIn, double rOut, double startDeg, double endDeg) {
+            double startRad = (startDeg - 90) * Math.PI / 180.0;
+            double endRad   = (endDeg   - 90) * Math.PI / 180.0;
+
+            double p1_out_x = cx + rOut * Math.Cos(startRad);
+            double p1_out_y = cy + rOut * Math.Sin(startRad);
+            double p2_out_x = cx + rOut * Math.Cos(endRad);
+            double p2_out_y = cy + rOut * Math.Sin(endRad);
+            double p2_in_x  = cx + rIn  * Math.Cos(endRad);
+            double p2_in_y  = cy + rIn  * Math.Sin(endRad);
+            double p1_in_x  = cx + rIn  * Math.Cos(startRad);
+            double p1_in_y  = cy + rIn  * Math.Sin(startRad);
+
+            double span = endDeg - startDeg; if (span < 0) span += 360;
+            int largeArc = (span > 180) ? 1 : 0;
+            var ic = System.Globalization.CultureInfo.InvariantCulture;
+
+            return $"M {p1_out_x.ToString(ic)},{p1_out_y.ToString(ic)} " +
+                   $"A {rOut.ToString(ic)},{rOut.ToString(ic)} 0 {largeArc} 1 {p2_out_x.ToString(ic)},{p2_out_y.ToString(ic)} " +
+                   $"L {p2_in_x.ToString(ic)},{p2_in_y.ToString(ic)} " +
+                   $"A {rIn.ToString(ic)},{rIn.ToString(ic)} 0 {largeArc} 0 {p1_in_x.ToString(ic)},{p1_in_y.ToString(ic)} Z";
+        }
+
+        // SVG transform: translate(230,250) scale(0.7) translate(-250,-250)
+        // Canvas header=60px, so canvas center Y = 250-60 = 190
+        private const double _svgCx = 250, _svgCy = 250, _svgScale = 0.7;
+        private const double _canvasCx = 230, _canvasCy = 190;
+        private double SvgX(double x) => _canvasCx + (x - _svgCx) * _svgScale;
+        private double SvgY(double y) => _canvasCy + (y - _svgCy) * _svgScale;
+        private double SvgR(double r) => r * _svgScale;
+
+        // Point on circle (0°=top, clockwise)
+        private (double x, double y) SvgPolar(double angleDeg, double radius) {
+            double rad = (angleDeg - 90) * Math.PI / 180.0;
+            return (_svgCx + radius * Math.Cos(rad), _svgCy + radius * Math.Sin(rad));
+        }
+
+        private void AddEllipse(double svgCx, double svgCy, double svgR, Brush fill, Brush stroke, double strokeW) {
+            double r = SvgR(svgR);
+            var e = new System.Windows.Shapes.Ellipse { Width = r*2, Height = r*2, Fill = fill, Stroke = stroke, StrokeThickness = strokeW };
+            e.IsHitTestVisible = false;
+            Canvas.SetLeft(e, SvgX(svgCx) - r); Canvas.SetTop(e, SvgY(svgCy) - r);
+            canvasRadial.Children.Add(e);
+        }
+
+        private System.Windows.Shapes.Path AddArcSector(double rIn, double rOut, double startDeg, double endDeg,
+            Brush fill, Brush stroke, double strokeW, bool glow = false) {
+            string d = GetArcPath(_svgCx, _svgCy, rIn, rOut, startDeg, endDeg);
+            var path = new System.Windows.Shapes.Path();
+            path.Data = Geometry.Parse(d);
+            path.Fill = fill; path.Stroke = stroke; path.StrokeThickness = strokeW;
+            path.RenderTransform = new TransformGroup {
+                Children = { new TranslateTransform(-_svgCx, -_svgCy), new ScaleTransform(_svgScale, _svgScale), new TranslateTransform(_canvasCx, _canvasCy) }
+            };
+            if (glow) path.Effect = new DropShadowEffect { Color = Color.FromRgb(210,166,94), BlurRadius = 8, ShadowDepth = 0, Opacity = 0.4 };
+            canvasRadial.Children.Add(path);
+            return path;
+        }
+
+        private void AddSvgLine(double x1, double y1, double x2, double y2, Brush stroke, double strokeW) {
+            var ln = new System.Windows.Shapes.Line {
+                X1 = x1, Y1 = y1, X2 = x2, Y2 = y2, Stroke = stroke, StrokeThickness = strokeW
+            };
+            ln.IsHitTestVisible = false;
+            ln.RenderTransform = new TransformGroup {
+                Children = { new TranslateTransform(-_svgCx, -_svgCy), new ScaleTransform(_svgScale, _svgScale), new TranslateTransform(_canvasCx, _canvasCy) }
+            };
+            canvasRadial.Children.Add(ln);
+        }
+
+        private void AddSvgText(double svgX, double svgY, string text, double fontSize, Brush fg, bool bold = true) {
+            var tb = new TextBlock {
+                Text = text, Foreground = fg, FontSize = fontSize * _svgScale,
+                FontWeight = bold ? FontWeights.Bold : FontWeights.Normal,
+                FontFamily = new FontFamily("Segoe UI"), IsHitTestVisible = false
+            };
+            tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Canvas.SetLeft(tb, SvgX(svgX) - tb.DesiredSize.Width / 2);
+            Canvas.SetTop(tb, SvgY(svgY) - tb.DesiredSize.Height / 2);
+            canvasRadial.Children.Add(tb);
+        }
+
+        private void DrawRadialCircle(RadialMenuConfig cfg) {
+            canvasRadial.Children.Clear();
+            bool isGrouped = (cfg.Mode == "Grouped");
+
+            var goldFill    = new SolidColorBrush(Color.FromArgb(66, 210, 166, 94));   // rgba(210,166,94,0.26)
+            var goldStroke  = new SolidColorBrush(Color.FromArgb(230, 210, 166, 94));  // rgba(210,166,94,0.9)
+            var goldLine    = new SolidColorBrush(Color.FromArgb(245, 210, 166, 94));  // rgba(210,166,94,0.96)
+            var darkFill    = new SolidColorBrush(Color.FromArgb(222, 22, 27, 34));    // rgba(22,27,34,0.87)
+            var darkStroke  = new SolidColorBrush(Color.FromArgb(209, 48, 54, 61));    // rgba(48,54,61,0.82)
+            var bindDarkFill   = new SolidColorBrush(Color.FromArgb(234, 22, 27, 34)); // rgba(22,27,34,0.92)
+            var bindDarkStroke = new SolidColorBrush(Color.FromArgb(178, 48, 54, 61)); // rgba(48,54,61,0.7)
+            var bindGoldFill   = new SolidColorBrush(Color.FromArgb(51, 210, 166, 94));  // rgba(210,166,94,0.2)
+            var bindGoldStroke = new SolidColorBrush(Color.FromArgb(217, 210, 166, 94)); // rgba(210,166,94,0.85)
+            var whiteTxt    = new SolidColorBrush(Color.FromArgb(217, 255, 255, 255));
+            var goldTxt     = new SolidColorBrush(Color.FromRgb(210, 166, 94));
+
+            if (isGrouped) {
+                // ═══ INNER RING: 4 groups, each 90°, starting at 315° ═══
+                int nGroups = cfg.GroupCount;
+                double grpStep = 360.0 / nGroups;
+                double grpStart = 315; // SVG: group "АРЕСТ" starts at 315° (top quadrant)
+
+                for (int i = 0; i < nGroups; i++) {
+                    double a1 = grpStart + i * grpStep;
+                    double a2 = a1 + grpStep;
+                    bool sel = (i == _radialSelectedGroupIndex);
+
+                    var p = AddArcSector(42, 150, a1, a2,
+                        sel ? goldFill : darkFill, sel ? goldStroke : darkStroke,
+                        sel ? 2.7 : 2.2, sel);
+                    p.Cursor = Cursors.Hand;
+                    int idx = i;
+                    p.MouseDown += (s, ev) => {
+                        _radialSelectedGroupIndex = idx; _radialSelectedSectorIndex = -1;
+                        DrawRadialCircle(GetRadialConfig()); LoadRadialSectorSettings(GetRadialConfig()); PopulateRadialBindCombo();
+                    };
+
+                    // Edge lines for active group
+                    if (sel) {
+                        var (ix1, iy1) = SvgPolar(a1, 42); var (ox1, oy1) = SvgPolar(a1, 150);
+                        var (ix2, iy2) = SvgPolar(a2, 42); var (ox2, oy2) = SvgPolar(a2, 150);
+                        AddSvgLine(ix1, iy1, ox1, oy1, goldLine, 2.9);
+                        AddSvgLine(ix2, iy2, ox2, oy2, goldLine, 2.9);
+                    }
+
+                    // Group name text
+                    double midDeg = a1 + grpStep / 2.0;
+                    var (tx, ty) = SvgPolar(midDeg, 96); // midpoint of 42..150
+                    string gName = (i < cfg.Groups.Count) ? cfg.Groups[i].Name : $"ГР {i+1}";
+                    var tb = new TextBlock {
+                        Text = gName, Foreground = sel ? Brushes.White : whiteTxt,
+                        FontSize = (gName.Length > 8 ? 13 : 14) * _svgScale, FontWeight = FontWeights.Bold,
+                        FontFamily = new FontFamily("Segoe UI"), IsHitTestVisible = false
+                    };
+                    tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    Canvas.SetLeft(tb, SvgX(tx) - tb.DesiredSize.Width / 2);
+                    Canvas.SetTop(tb, SvgY(ty) - tb.DesiredSize.Height / 2);
+                    tb.Cursor = Cursors.Hand;
+                    tb.MouseDown += (s, ev) => {
+                        _radialSelectedGroupIndex = idx; _radialSelectedSectorIndex = -1;
+                        DrawRadialCircle(GetRadialConfig()); LoadRadialSectorSettings(GetRadialConfig()); PopulateRadialBindCombo();
+                    };
+                    canvasRadial.Children.Add(tb);
+
+                    // Arrow indicators on active group
+                    if (sel) {
+                        var (arrowX, arrowY) = SvgPolar(midDeg, 136);
+                        var arrow1 = new System.Windows.Shapes.Polygon();
+                        arrow1.Points.Add(new Point(SvgX(arrowX - 8), SvgY(arrowY + 5)));
+                        arrow1.Points.Add(new Point(SvgX(arrowX),     SvgY(arrowY - 5)));
+                        arrow1.Points.Add(new Point(SvgX(arrowX + 8), SvgY(arrowY + 5)));
+                        arrow1.Fill = new SolidColorBrush(Color.FromArgb(153, 210, 166, 94));
+                        arrow1.IsHitTestVisible = false;
+                        canvasRadial.Children.Add(arrow1);
+                        var arrow2 = new System.Windows.Shapes.Polygon();
+                        arrow2.Points.Add(new Point(SvgX(arrowX - 8), SvgY(arrowY + 12)));
+                        arrow2.Points.Add(new Point(SvgX(arrowX),     SvgY(arrowY + 2)));
+                        arrow2.Points.Add(new Point(SvgX(arrowX + 8), SvgY(arrowY + 12)));
+                        arrow2.Fill = new SolidColorBrush(Color.FromArgb(77, 210, 166, 94));
+                        arrow2.IsHitTestVisible = false;
+                        canvasRadial.Children.Add(arrow2);
+                    }
+                }
+
+                // ═══ OUTER RING: bind sectors, each 60°, fan centered on active group ═══
+                int nBinds = cfg.Groups[_radialSelectedGroupIndex].SectorCount;
+                var activeSectors = cfg.Groups[_radialSelectedGroupIndex].Sectors;
+                double activeGroupMid = grpStart + _radialSelectedGroupIndex * grpStep + grpStep / 2.0;
+                double fanTotal = nBinds * 60.0;
+                double fanStart = activeGroupMid - fanTotal / 2.0;
+
+                for (int i = 0; i < nBinds; i++) {
+                    double a1 = fanStart + i * 60.0;
+                    double a2 = a1 + 60.0;
+                    bool sel = (_radialSelectedSectorIndex == i);
+
+                    var p = AddArcSector(162, 255, a1, a2,
+                        sel ? bindGoldFill : bindDarkFill, sel ? bindGoldStroke : bindDarkStroke,
+                        sel ? 2.2 : 1.8, sel);
+                    p.Cursor = Cursors.Hand;
+                    int idx = i;
+                    p.MouseDown += (s, ev) => {
+                        _radialSelectedSectorIndex = idx;
+                        DrawRadialCircle(GetRadialConfig()); LoadRadialSectorSettings(GetRadialConfig()); PopulateRadialBindCombo();
+                    };
+
+                    if (sel) {
+                        var (ix1, iy1) = SvgPolar(a1, 162); var (ox1, oy1) = SvgPolar(a1, 255);
+                        var (ix2, iy2) = SvgPolar(a2, 162); var (ox2, oy2) = SvgPolar(a2, 255);
+                        AddSvgLine(ix1, iy1, ox1, oy1, new SolidColorBrush(Color.FromArgb(230, 210, 166, 94)), 2.5);
+                        AddSvgLine(ix2, iy2, ox2, oy2, new SolidColorBrush(Color.FromArgb(230, 210, 166, 94)), 2.5);
+                    }
+
+                    // Bind name text
+                    double midA = a1 + 30;
+                    var (btx, bty) = SvgPolar(midA, 208);
+                    string bname = (i < activeSectors.Count) ? activeSectors[i].BindName : "";
+                    if (string.IsNullOrEmpty(bname)) bname = $"Бинд {i + 1}";
+                    AddSvgText(btx, bty - 12, bname, 12, sel ? Brushes.White : whiteTxt);
+                }
+
+                // Outer arc (decorative, connects bind fan ends)
+                if (nBinds < 6) {
+                    double arcStart = fanStart;
+                    double arcEnd = fanStart + fanTotal;
+                    string arcD = "";
+                    var (as1x, as1y) = SvgPolar(arcStart, 255);
+                    var (as2x, as2y) = SvgPolar(arcEnd, 255);
+                    int la = (fanTotal > 180) ? 1 : 0;
+                    var ic = System.Globalization.CultureInfo.InvariantCulture;
+                    arcD = $"M {as1x.ToString(ic)},{as1y.ToString(ic)} A 255,255 0 {la} 1 {as2x.ToString(ic)},{as2y.ToString(ic)}";
+                    var arcPath = new System.Windows.Shapes.Path();
+                    arcPath.Data = Geometry.Parse(arcD);
+                    arcPath.Stroke = new SolidColorBrush(Color.FromArgb(153, 48, 54, 61));
+                    arcPath.StrokeThickness = 2; arcPath.Fill = Brushes.Transparent; arcPath.IsHitTestVisible = false;
+                    arcPath.RenderTransform = new TransformGroup {
+                        Children = { new TranslateTransform(-_svgCx, -_svgCy), new ScaleTransform(_svgScale, _svgScale), new TranslateTransform(_canvasCx, _canvasCy) }
+                    };
+                    canvasRadial.Children.Add(arcPath);
+
+                    // "+" buttons at fan edges
+                    var (pb1x, pb1y) = SvgPolar(arcStart, 208.5);
+                    var (pb2x, pb2y) = SvgPolar(arcEnd, 208.5);
+                    DrawPlusButton(pb1x, pb1y);
+                    DrawPlusButton(pb2x, pb2y);
+                }
+
+            } else {
+                // ═══ STANDARD MODE: single ring, 8 sectors ═══
+                int nSectors = cfg.SectorCount;
+                double step = 360.0 / nSectors;
+
+                for (int i = 0; i < nSectors; i++) {
+                    double a1 = i * step;
+                    double a2 = a1 + step;
+                    bool sel = (i == _radialSelectedSectorIndex);
+
+                    var p = AddArcSector(42, 150, a1, a2,
+                        sel ? goldFill : darkFill, sel ? goldStroke : darkStroke,
+                        sel ? 2.7 : 2.2, sel);
+                    p.Cursor = Cursors.Hand;
+                    int idx = i;
+                    p.MouseDown += (s, ev) => {
+                        _radialSelectedSectorIndex = idx;
+                        DrawRadialCircle(GetRadialConfig()); LoadRadialSectorSettings(GetRadialConfig()); PopulateRadialBindCombo();
+                    };
+
+                    if (sel) {
+                        var (ix1, iy1) = SvgPolar(a1, 42); var (ox1, oy1) = SvgPolar(a1, 150);
+                        var (ix2, iy2) = SvgPolar(a2, 42); var (ox2, oy2) = SvgPolar(a2, 150);
+                        AddSvgLine(ix1, iy1, ox1, oy1, goldLine, 2.9);
+                        AddSvgLine(ix2, iy2, ox2, oy2, goldLine, 2.9);
+                    }
+
+                    double midA = a1 + step / 2.0;
+                    var (tx, ty) = SvgPolar(midA, 96);
+                    string label = (i + 1).ToString();
+                    if (i < cfg.Sectors.Count && cfg.Sectors[i].Icon != "none" && cfg.Sectors[i].Icon != null) {
+                        int ii = Array.IndexOf(_radialIconKeys, cfg.Sectors[i].Icon);
+                        if (ii >= 0) label = _radialIconLabels[ii];
+                    }
+                    AddSvgText(tx, ty, label, sel ? 15 : 14, sel ? goldTxt : whiteTxt);
+                }
+            }
+
+            // ═══ DECORATIVE RINGS ═══
+            AddEllipse(250, 250, 150,   Brushes.Transparent, new SolidColorBrush(Color.FromArgb(214, 48, 54, 61)), 2);
+            AddEllipse(250, 250, 151.5, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(74, 210, 166, 94)), 2.2);
+            if (!isGrouped) {
+                AddEllipse(250, 250, 154, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(23, 210, 166, 94)), 3);
+            }
+            AddEllipse(250, 250, 42, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(158, 210, 166, 94)), 2.3);
+
+            // ═══ CENTER HUB ═══
+            AddEllipse(250, 250, 42, new SolidColorBrush(Color.FromArgb(247, 22, 27, 34)), null, 0);
+            AddEllipse(250, 250, 36, new SolidColorBrush(Color.FromArgb(168, 8, 10, 15)), null, 0);
+            AddEllipse(250, 250, 16, new SolidColorBrush(Color.FromArgb(23, 210, 166, 94)), null, 0);
+
+            // Letter "D"
+            var dText = new TextBlock {
+                Text = "D", Foreground = goldTxt, FontSize = 24 * _svgScale,
+                FontFamily = new FontFamily("Arial Black"), FontWeight = FontWeights.Black, IsHitTestVisible = false
+            };
+            dText.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Canvas.SetLeft(dText, SvgX(250) - dText.DesiredSize.Width / 2);
+            Canvas.SetTop(dText, SvgY(250) - dText.DesiredSize.Height / 2 + 2);
+            canvasRadial.Children.Add(dText);
+
+            // ═══ UPDATE HEADER ═══
+            if (isGrouped) {
+                int nBinds = cfg.Groups[_radialSelectedGroupIndex].SectorCount;
+                pnlRadialSelectedGroup.Visibility = Visibility.Visible;
+                if (_radialSelectedSectorIndex == -1) {
+                    lblRadialActiveGroupTitle.Text = "ВЫБРАННАЯ ГРУППА";
+                    lblRadialActiveGroupName.Text = $"{cfg.Groups[_radialSelectedGroupIndex].Name}  ({nBinds} биндов)";
+                } else {
+                    lblRadialActiveGroupTitle.Text = "ВЫБРАННЫЙ БИНД";
+                    var activeSectors2 = cfg.Groups[_radialSelectedGroupIndex].Sectors;
+                    string bn = (_radialSelectedSectorIndex < activeSectors2.Count) ? activeSectors2[_radialSelectedSectorIndex].BindName : "";
+                    lblRadialActiveGroupName.Text = string.IsNullOrEmpty(bn) ? $"Бинд {_radialSelectedSectorIndex + 1}" : bn;
+                }
+                lblRadialCanvasHint.Text = $"{nBinds} биндов в группе • кликните для настройки";
+            } else {
+                pnlRadialSelectedGroup.Visibility = Visibility.Visible;
+                lblRadialActiveGroupTitle.Text = "ВЫБРАННЫЙ СЕКТОР";
+                int selIdx = Math.Max(0, _radialSelectedSectorIndex);
+                string[] dirs = { "Вверх", "Вверх-Вправо", "Вправо", "Вниз-Вправо", "Вниз", "Вниз-Влево", "Влево", "Вверх-Влево" };
+                string dir = (selIdx < dirs.Length && cfg.SectorCount == 8) ? dirs[selIdx] : "";
+                string sn = (selIdx < cfg.Sectors.Count && !string.IsNullOrEmpty(cfg.Sectors[selIdx].BindName)) ? cfg.Sectors[selIdx].BindName : "";
+                lblRadialActiveGroupName.Text = string.IsNullOrEmpty(sn) ? $"СЕКТОР {selIdx + 1} — {dir}" : sn;
+                lblRadialCanvasHint.Text = "Нажмите на сектор для настройки бинда";
+            }
+        }
+
+        private void DrawPlusButton(double svgX, double svgY) {
+            double cx = SvgX(svgX), cy = SvgY(svgY);
+            double r = SvgR(14);
+            var circle = new System.Windows.Shapes.Ellipse {
+                Width = r*2, Height = r*2,
+                Fill = new SolidColorBrush(Color.FromRgb(17, 21, 29)),
+                Stroke = new SolidColorBrush(Color.FromRgb(210, 166, 94)),
+                StrokeThickness = 1.5, IsHitTestVisible = false
+            };
+            Canvas.SetLeft(circle, cx - r); Canvas.SetTop(circle, cy - r);
+            canvasRadial.Children.Add(circle);
+            double s = SvgR(6);
+            var hLine = new System.Windows.Shapes.Line { X1 = cx-s, Y1 = cy, X2 = cx+s, Y2 = cy, Stroke = new SolidColorBrush(Color.FromRgb(210,166,94)), StrokeThickness = 2.5, StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round, IsHitTestVisible = false };
+            var vLine = new System.Windows.Shapes.Line { X1 = cx, Y1 = cy-s, X2 = cx, Y2 = cy+s, Stroke = new SolidColorBrush(Color.FromRgb(210,166,94)), StrokeThickness = 2.5, StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round, IsHitTestVisible = false };
+            canvasRadial.Children.Add(hLine); canvasRadial.Children.Add(vLine);
+        }

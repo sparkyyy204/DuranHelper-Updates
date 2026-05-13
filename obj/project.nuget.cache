@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "CwXEg6zcfUw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\vmaki\\Desktop\\DURAN HELPER\\DuranHelper.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\vmaki\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
+    "C:\\Users\\vmaki\\.nuget\\packages\\obfuscar\\2.2.50\\obfuscar.2.2.50.nupkg.sha512",
+    "C:\\Users\\vmaki\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.24\\microsoft.netcore.app.runtime.win-x64.8.0.24.nupkg.sha512",
+    "C:\\Users\\vmaki\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.24\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.24.nupkg.sha512",
+    "C:\\Users\\vmaki\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.24\\microsoft.aspnetcore.app.runtime.win-x64.8.0.24.nupkg.sha512",
+    "C:\\Users\\vmaki\\.nuget\\packages\\microsoft.netcore.app.crossgen2.win-x64\\8.0.24\\microsoft.netcore.app.crossgen2.win-x64.8.0.24.nupkg.sha512"
+  ],
+  "logs": []
+}

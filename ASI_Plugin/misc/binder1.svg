@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 432" width="100%" height="100%" style="background-color: transparent; font-family: 'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <filter id="hudShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glowGold" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#d2a65e" flood-opacity="0.5"/>
+    </filter>
+    <linearGradient id="activeTabGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3d399"/>
+      <stop offset="100%" stop-color="#d2a65e"/>
+    </linearGradient>
+    <clipPath id="overlayClip">
+      <path d="M 0,12 L 12,0 L 688,0 L 700,12 L 700,420 L 688,432 L 12,432 L 0,420 Z" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#overlayClip)" filter="url(#hudShadow)">
+    <rect width="700" height="432" fill="#0a0d12" opacity="0.92" />
+    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+      <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#161b22" stroke-width="1.5"/>
+    </pattern>
+    <rect width="700" height="432" fill="url(#grid)" opacity="0.4"/>
+    <path d="M 0,12 L 12,0 L 688,0 L 700,12 L 700,420 L 688,432 L 12,432 L 0,420 Z" fill="none" stroke="#30363d" stroke-width="2"/>
+    <path d="M 0,12 L 12,0 L 220,0" fill="none" stroke="#d2a65e" stroke-width="2" filter="url(#glowGold)"/>
+
+    <rect x="0" y="0" width="700" height="50" fill="#11151d" opacity="0.8"/>
+    <line x1="0" y1="50" x2="700" y2="50" stroke="#1f242e" stroke-width="2"/>
+
+    <text x="20" y="32" font-family="Arial Black, Impact, sans-serif" font-size="20" font-weight="900" fill="#ffffff" letter-spacing="1">DURAN</text>
+    <text x="110" y="32" font-family="Arial Black, Impact, sans-serif" font-size="20" font-weight="900" fill="#d2a65e" letter-spacing="1" filter="url(#glowGold)">HELPER</text>
+    <rect x="210" y="18" width="34" height="16" rx="4" fill="#e74c3c" opacity="0.15"/>
+    <text x="227" y="30" font-size="9" font-weight="bold" fill="#e74c3c" text-anchor="middle" letter-spacing="1">HUD</text>
+
+    <g transform="translate(260, 12)">
+      <g transform="translate(0, 0)" cursor="pointer">
+        <rect x="0" y="0" width="80" height="26" rx="4" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+        <text x="40" y="17" font-size="11" font-weight="bold" fill="#8b949e" text-anchor="middle" letter-spacing="0.5">ЗАКОНЫ</text>
+      </g>
+      <g transform="translate(90, 0)" cursor="pointer">
+        <rect x="0" y="0" width="160" height="26" rx="4" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+        <text x="80" y="17" font-size="11" font-weight="bold" fill="#8b949e" text-anchor="middle" letter-spacing="0.5">КАЛЬКУЛЯТОР ШТРАФОВ</text>
+      </g>
+      <g transform="translate(260, 0)">
+        <rect x="0" y="0" width="80" height="26" rx="4" fill="url(#activeTabGrad)" filter="url(#glowGold)"/>
+        <text x="40" y="17" font-size="11" font-weight="900" fill="#080a0f" text-anchor="middle" letter-spacing="0.5">БИНДЕР</text>
+      </g>
+    </g>
+
+    <rect x="655" y="12" width="26" height="26" rx="4" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <line x1="663" y1="20" x2="673" y2="30" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+    <line x1="673" y1="20" x2="663" y2="30" stroke="#8b949e" stroke-width="2" stroke-linecap="round"/>
+
+    <g transform="translate(20, 65)">
+      <rect x="0" y="0" width="160" height="345" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+      
+      <text x="15" y="25" font-size="10" font-weight="900" fill="#8b949e" letter-spacing="1">ГРУППЫ БИНДОВ</text>
+      <line x1="15" y1="35" x2="145" y2="35" stroke="#1f242e" stroke-width="1.5"/>
+
+      <rect x="10" y="45" width="140" height="28" rx="4" fill="#d2a65e" opacity="0.15"/>
+      <rect x="10" y="45" width="3" height="28" rx="1.5" fill="#d2a65e"/>
+      <text x="25" y="63" font-size="11" font-weight="bold" fill="#d2a65e">Все бинды (42)</text>
+
+      <text x="25" y="95" font-size="11" font-weight="bold" fill="#ffffff">Патруль / Траффик</text>
+      <text x="25" y="127" font-size="11" font-weight="bold" fill="#ffffff">Задержание / Арест</text>
+      <text x="25" y="159" font-size="11" font-weight="bold" fill="#ffffff">Допросы / ФСБ</text>
+      <text x="25" y="191" font-size="11" font-weight="bold" fill="#ffffff">Лекции стажерам</text>
+    </g>
+
+    <g transform="translate(190, 65)">
+      <rect x="0" y="0" width="490" height="32" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+      <circle cx="15" cy="16" r="4" fill="none" stroke="#6b737f" stroke-width="2"/>
+      <line x1="18" y1="19" x2="22" y2="23" stroke="#6b737f" stroke-width="2" stroke-linecap="round"/>
+      <text x="30" y="20" font-size="11" fill="#6b737f">Поиск бинда (название / хоткей)...</text>
+
+      <g transform="translate(0, 45)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#d2a65e" text-anchor="middle">ALT+1</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Приветствие</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+
+      <g transform="translate(0, 97)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#d2a65e" opacity="0.1" filter="url(#glowGold)"/>
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="none" stroke="#d2a65e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#d2a65e"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#080a0f" text-anchor="middle">F2</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#d2a65e">Мегафон: Остановка</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#d2a65e"/>
+      </g>
+
+      <g transform="translate(0, 149)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#d2a65e" text-anchor="middle">ALT+X</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Зачитать Миранду</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+      
+      <g transform="translate(0, 201)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#8b949e" text-anchor="middle">НЕТ</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Лекция: Субординация</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+
+      <g transform="translate(250, 45)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#d2a65e" text-anchor="middle">ALT+2</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Выдача розыска (/su)</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+
+      <g transform="translate(250, 97)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#d2a65e" text-anchor="middle">F3</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Наручники и конвой</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+
+      <g transform="translate(250, 149)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#d2a65e" text-anchor="middle">NUM 1</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Достать тайзер</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+
+      <g transform="translate(250, 201)" cursor="pointer">
+        <rect x="0" y="0" width="235" height="44" rx="6" fill="#11151d" stroke="#1f242e" stroke-width="1.5"/>
+        <rect x="8" y="10" width="50" height="24" rx="4" fill="#1f242e" stroke="#30363d" stroke-width="1"/>
+        <text x="33" y="26" font-size="10" font-weight="bold" fill="#8b949e" text-anchor="middle">НЕТ</text>
+        <text x="66" y="26" font-size="12" font-weight="bold" fill="#ffffff">Проверка паспорта</text>
+        <path d="M 215 16 L 215 28 L 225 22 Z" fill="#6b737f"/>
+      </g>
+
+    </g>
+
+  </g>
+</svg>
