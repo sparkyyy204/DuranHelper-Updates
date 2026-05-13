@@ -4,6 +4,9 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -40,9 +43,8 @@ jobs:
 
     # === 3. Создание Установщика через Inno Setup ===
     - name: Compile Inno Setup Script
-      uses: minicomp/iscc-action@v3
-      with:
-        script: DuranHelper.iss
+      run: |
+        "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" DuranHelper.iss
 
     # === 4. Создание ZIP-архива для автообновления ===
     - name: Zip for Auto-Updater
@@ -51,6 +53,8 @@ jobs:
     # === 5. Загрузка в Релизы GitHub ===
     - name: Upload Release Asset
       uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           Output/Setup_DuranHelper.exe
