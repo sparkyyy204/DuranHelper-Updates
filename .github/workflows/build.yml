@@ -21,7 +21,7 @@ jobs:
 
     # Собираем C++ проект
     - name: Build C++ ASI
-      run: msbuild ASI_Plugin\DuranOverlay.sln /p:Configuration=Release /p:Platform=Win32
+      run: msbuild ASI_Plugin\DuranOverlay.sln /p:Configuration=Release /p:Platform=x86
 
     # Копируем готовый ASI в корень лаунчера, чтобы C# проект его подхватил
     - name: Copy ASI to Launcher Root
