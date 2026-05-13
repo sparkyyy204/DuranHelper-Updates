@@ -1,5 +1,5 @@
 {
-    "version": "3.1.2",
-    "notes": "• Исправлен импорт биндов из облака\n• Улучшена стабильность соединения",
-    "download_url": "https://github.com/sparkyyy204/DuranHelper-Updates/releases/download/v3.1.2/update.zip"
+    "version": "3.3.0",
+    "notes": "• Переход на безопасные автоматические сборки (CI/CD)\n• Улучшена система обновлений",
+    "download_url": "https://github.com/sparkyyy204/DuranHelper-Updates/releases/download/v3.3.0/update_package.zip"
 }
