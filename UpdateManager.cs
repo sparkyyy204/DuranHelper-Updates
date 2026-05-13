@@ -9,7 +9,7 @@ namespace FSB_helper_C__
 {
     public static class UpdateManager
     {
-        public const string APP_VERSION = "3.2.0";
+        public const string APP_VERSION = "3.3.0";
         private const string JSDELIVR_VERSION_URL = "https://cdn.jsdelivr.net/gh/sparkyyy204/DuranHelper-Updates@main/version.json";
         private const string GITHUB_API_URL = "https://api.github.com/repos/sparkyyy204/DuranHelper-Updates/releases/latest";
         private const int CHECK_TIMEOUT_SECONDS = 8;
