@@ -6,9 +6,7 @@ using System.Threading;
 
 namespace FSB_helper_C__;
 
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
+
 public partial class App : Application
 {
     public static bool IsDebugMode = false;

@@ -20,11 +20,11 @@ namespace FSB_helper_C__
 
         public static async Task<int> CheckForUpdateAsync()
         {
-            // Try jsDelivr CDN first (faster, no rate limits, no blocking)
+
             int result = await CheckViaJsDelivrAsync();
             if (result != -1) return result;
             
-            // Fallback to GitHub API
+
             return await CheckViaGitHubApiAsync();
         }
 
@@ -57,7 +57,7 @@ namespace FSB_helper_C__
             }
             catch
             {
-                return -1; // Signal to try fallback
+                return -1;
             }
         }
 
@@ -110,9 +110,7 @@ namespace FSB_helper_C__
             }
         }
 
-        /// <summary>
-        /// Downloads ZIP, extracts it, and launches batch to replace files.
-        /// </summary>
+
         public static async Task<bool> DownloadAndApplyUpdateAsync(Action<int> progressCallback = null)
         {
             try
@@ -125,7 +123,7 @@ namespace FSB_helper_C__
                 string updateTempDir = Path.Combine(appDir, "_update_temp");
                 string batPath = Path.Combine(appDir, "update.bat");
 
-                // 1. Download ZIP
+
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Add("User-Agent", "DuranHelper");
@@ -169,13 +167,12 @@ namespace FSB_helper_C__
                     response?.Dispose();
                 }
 
-                // 2. Extract ZIP
+
                 if (Directory.Exists(updateTempDir)) Directory.Delete(updateTempDir, true);
                 Directory.CreateDirectory(updateTempDir);
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, updateTempDir);
 
-                // 3. Create update batch script
-                // We use xcopy /Y /E to replace only changed files from temp to appDir
+
                 string appExeName = Path.GetFileName(appPath);
                 string batContent =
                     "@echo off\r\n" +
@@ -195,7 +192,7 @@ namespace FSB_helper_C__
 
                 File.WriteAllText(batPath, batContent, System.Text.Encoding.UTF8);
 
-                // 4. Launch batch
+
                 var psi = new ProcessStartInfo
                 {
                     FileName = batPath,
@@ -214,10 +211,7 @@ namespace FSB_helper_C__
             }
         }
 
-        /// <summary>
-        /// Reads the "CheckUpdates" setting from Settings.json. 
-        /// Returns true by default if the key is missing.
-        /// </summary>
+
         public static bool IsUpdateCheckEnabled()
         {
             try
@@ -233,7 +227,7 @@ namespace FSB_helper_C__
                 }
             }
             catch { }
-            return true; // enabled by default
+            return true;
         }
     }
 }

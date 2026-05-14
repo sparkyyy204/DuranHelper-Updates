@@ -115,7 +115,7 @@ namespace FSB_helper_C__
         /// <summary>Получить выбранный тип раздела (0=2col, 1=text, 2=1col)</summary>
         public int GetSectionTypeIndex() => cbSectionType.SelectedIndex;
 
-        // chkHasPunishments removed: rows are now universal
+
 
         // ═══════════════════════════════════════
         //  CLOSE

@@ -15,48 +15,39 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # === 1. Сборка C++ ASI Плагина ===
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Download missing json.hpp
+    - name: Download json.hpp
       run: |
         New-Item -ItemType Directory -Force -Path ASI_Plugin\libs\json
         Invoke-WebRequest -Uri "https://raw.githubusercontent.com/nlohmann/json/v3.12.0/single_include/nlohmann/json.hpp" -OutFile "ASI_Plugin\libs\json\json.hpp"
 
-    # Собираем C++ проект
     - name: Build C++ ASI
       run: msbuild ASI_Plugin\DuranOverlay.sln /p:Configuration=Release /p:Platform=x86
 
-    # Копируем готовый ASI в корень лаунчера, чтобы C# проект его подхватил
     - name: Copy ASI to Launcher Root
       run: copy ASI_Plugin\build\Release\DuranOverlay.asi "DuranOverlay.asi"
 
-    # === 2. Сборка C# Лаунчера ===
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    # Устанавливаем зависимости и собираем проект
     - name: Restore dependencies
       run: dotnet restore "DuranHelper.csproj"
 
-    # Публикуем готовые файлы (вместе с библиотеками) в папку publish_output
-    - name: Build and Publish C# Launcher
+    - name: Build and Publish Launcher
       run: dotnet publish "DuranHelper.csproj" -c Release -r win-x64 --self-contained false -o publish_output
 
-    # === 3. Создание Установщика через Inno Setup ===
-    - name: Compile Inno Setup Script
+    - name: Compile Inno Setup
       run: |
         & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" DuranHelper.iss
 
-    # === 4. Создание ZIP-архива для автообновления ===
-    - name: Zip for Auto-Updater
+    - name: Create Update Archive
       run: powershell -command "Compress-Archive -Path 'publish_output\*' -DestinationPath 'Output\update.zip' -Force"
 
-    # === 5. Загрузка в Релизы GitHub ===
-    - name: Upload Release Asset
+    - name: Upload Release Assets
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
