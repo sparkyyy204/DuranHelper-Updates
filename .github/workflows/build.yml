@@ -45,7 +45,15 @@ jobs:
         & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" DuranHelper.iss
 
     - name: Create Update Archive
-      run: powershell -command "Compress-Archive -Path 'publish_output\*' -DestinationPath 'Output\update.zip' -Force"
+      run: |
+        New-Item -ItemType Directory -Force -Path update_files
+        Copy-Item publish_output\DURANHELPER.exe update_files\
+        Copy-Item publish_output\DURANHELPER.dll update_files\
+        Copy-Item publish_output\DURANHELPER.deps.json update_files\
+        Copy-Item publish_output\DURANHELPER.runtimeconfig.json update_files\
+        Copy-Item publish_output\DuranOverlay.asi update_files\
+        Copy-Item publish_output\Newtonsoft.Json.dll update_files\
+        Compress-Archive -Path 'update_files\*' -DestinationPath 'Output\update.zip' -Force
 
     - name: Upload Release Assets
       uses: softprops/action-gh-release@v1
