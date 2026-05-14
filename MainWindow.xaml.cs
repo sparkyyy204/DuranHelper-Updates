@@ -122,7 +122,7 @@ namespace FSB_helper_C__
         private bool _isLoaded = false;
         private string _lastAppliedLauncherTheme = null;
         private bool _isStartupStatsAnimating = false;
-        private bool _isEngineRunning = false; // Legacy stub, always false (AHK removed)
+        private bool _isEngineRunning = false;
         private bool _isClosing = false;
         private TaskCompletionSource<bool> _updateDecision;
 
@@ -225,7 +225,7 @@ namespace FSB_helper_C__
                 Verb = "runas" 
             };
             try { Process.Start(proc); } catch { }
-            // AHK removed — ASI only mode
+
             Application.Current.Shutdown();
             Environment.Exit(0);
         }
@@ -1497,7 +1497,7 @@ namespace FSB_helper_C__
 
         private void BtnUpdate_Click(object sender, RoutedEventArgs e)
         {
-            /* Legacy Shield btn event handlers removed */
+            
             ShowCustomToast("КОНФИГ ОБНОВЛЕН", "Настройки сохранены для ASI.", "green", "DuranOverlay.asi готов.");
             _isUpdatingConfig = false;
 
@@ -1510,22 +1510,22 @@ namespace FSB_helper_C__
 
         private void BtnUpdate_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            /* Legacy Shield btn event handlers removed */
+            
         }
 
         private void BtnUpdate_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            /* Legacy Shield btn event handlers removed */
+            
         }
 
         private void BtnInstall_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            /* Legacy Shield btn event handlers removed */
+            
         }
 
         private void BtnInstall_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            /* Legacy Shield btn event handlers removed */
+            
         }
 
         private void InitDefaults()
@@ -1690,7 +1690,7 @@ namespace FSB_helper_C__
                     if (bindsDisabledOverlay != null) bindsDisabledOverlay.Visibility = chkSysBinder.IsChecked == true ? Visibility.Collapsed : Visibility.Visible;
 
                     if (s != null && s.ContainsKey("BinderEngine")) {
-                        // Legacy: always ASI mode now
+
                     }
                     cbBinderEngine.SelectedIndex = 1; // Always ASI
 
@@ -2080,7 +2080,7 @@ namespace FSB_helper_C__
                 bindsDisabledOverlay.Visibility = (chkSysBinder.IsChecked == true) ? Visibility.Collapsed : Visibility.Visible;
             }
             
-            // Unified animation logic removed to prevent fighting with XAML EventTriggers
+
 
             // Specific logic for Advanced Overlay toggle
             if (sender == chkAdvancedOverlay)
@@ -2100,8 +2100,7 @@ namespace FSB_helper_C__
             
             if (hasProfile) cbProfiles.SelectedItem = CurrentProfile; 
             
-            /* pnlActiveProfile removed */ // pnlActiveProfile.Visibility = hasProfile ? Visibility.Visible : Visibility.Collapsed; 
-            /* pnlEmptyProfile removed */ // pnlEmptyProfile.Visibility = hasProfile ? Visibility.Collapsed : Visibility.Visible; 
+
             lblNoProfLaws.Visibility = hasProfile ? Visibility.Collapsed : Visibility.Visible; 
             gridLawsContent.Visibility = hasProfile ? Visibility.Visible : Visibility.Collapsed; 
             lblNoProfBinds.Visibility = hasProfile ? Visibility.Collapsed : Visibility.Visible; 
@@ -2118,7 +2117,7 @@ namespace FSB_helper_C__
 
             }
 
-            // Animate shield removed
+
             
             if (hasProfile) { 
                 InitDefaults(); 
@@ -2479,7 +2478,7 @@ namespace FSB_helper_C__
             // }
         }
 
-        // Legacy AnimateShield and UpdateLaunchButtonForProfile methods removed
+
         private void Header_Drag(object sender, MouseButtonEventArgs e) { if (e.LeftButton == MouseButtonState.Pressed) DragMove(); }
 
         // Инициализация: загрузка данных профиля и отрисовка элементов в окне
@@ -2562,7 +2561,7 @@ namespace FSB_helper_C__
                         } 
                     } catch { } 
                 }
-                // Removed reversion mechanism initialization
+
                 _isLoadingRtf = false; 
                 if (btnSaveRtf != null) { btnSaveRtf.Background = (SolidColorBrush)Application.Current.Resources["LineBrush"]; btnSaveRtf.Foreground = (SolidColorBrush)Application.Current.Resources["GrayBrush"]; }
             } 
@@ -2827,7 +2826,7 @@ namespace FSB_helper_C__
 
         private void Law_Save_Click(object sender, RoutedEventArgs e) { 
             lblLawEditError.Visibility = Visibility.Collapsed;
-            // Length limit removed
+
 
             string currentSection = cbSections.SelectedItem?.ToString();
             if (string.IsNullOrEmpty(currentSection) || !MasterData[CurrentProfile].Laws.ContainsKey(currentSection)) return;
@@ -3131,14 +3130,14 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             await Task.Delay(20);
             UpdateBindsList(); 
             UpdateToggleGroupButton(); 
-            // SaveData() REMOVED: Serializing 5MB of Profile Data on the main thread for a local UI filter change 
+
             // causes a 2-second bottleneck. Settings states are naturally persisted during App_Close.
         }
         private void Group_Radio_Loaded(object sender, RoutedEventArgs e) { if (sender is RadioButton rb && rb.Tag != null) { if (rb.Tag.ToString() == _currentBindGroup) rb.IsChecked = true; } }
 
         private void UpdateToggleGroupButton()
         {
-            // Button was removed in UI
+
         }
 
         private void Groups_Edit_Click(object sender, RoutedEventArgs e) { 
@@ -3976,8 +3975,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         private void OpenDialog(UIElement win) { Panel.SetZIndex(DialogOverlay, 1300); Panel.SetZIndex(win, 1310); DialogOverlay.Visibility = Visibility.Visible; WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = Visibility.Collapsed; win.Visibility = Visibility.Visible; DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); }
         private async void Dialog_Close(object sender, RoutedEventArgs e) { this.PreviewKeyDown -= Window_PreviewKeyDown; DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); await Task.Delay(150); DialogOverlay.Visibility = Visibility.Collapsed; Panel.SetZIndex(DialogOverlay, 1000); WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = Visibility.Collapsed; }
 
-        // OpenInput — removed, replaced by _dialogHost.ShowInput
-        // TxtInput_TextChanged — removed, handled by DialogHost
+
+
 
         private void Update_Yes_Click(object sender, RoutedEventArgs e) { _updateDecision?.TrySetResult(true); }
         private void Update_No_Click(object sender, RoutedEventArgs e) { _updateDecision?.TrySetResult(false); }
@@ -3990,9 +3989,9 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
         private void Open_VK(object sender, RoutedEventArgs e) { try { Process.Start(new ProcessStartInfo("https://vk.com/duranhelper") { UseShellExecute = true }); } catch { } }
 
-        // Input_Ok_Click — removed, logic moved to callbacks in each ShowInput call
+
         
-        // Alert_Yes_Click — removed, logic moved to callbacks in each ShowAlert call
+
 
         private void Theme_Changed(object sender, SelectionChangedEventArgs e) { 
             if(!_isLoaded) return;
