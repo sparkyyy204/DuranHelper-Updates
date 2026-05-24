@@ -563,14 +563,15 @@ namespace FSB_helper_C__
             }
             
             // Fade and slide in Sidebar and Content UI
+            // Sequenced AFTER the window expansion (starts at 0.5s and 0.6s)
             var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
             if (SidebarPanel != null && SidebarPanel_TT != null) {
-                SidebarPanel.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
-                SidebarPanel_TT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(-30, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
+                SidebarPanel.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.5), EasingFunction = ease });
+                SidebarPanel_TT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(-30, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.5), EasingFunction = ease });
             }
             if (Tabs != null && Tabs_TT != null) {
-                Tabs.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.3), EasingFunction = ease });
-                Tabs_TT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.3), EasingFunction = ease });
+                Tabs.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.6), EasingFunction = ease });
+                Tabs_TT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.6), EasingFunction = ease });
             }
             // --- Version Badge Color Transition ---
             if (SplashVersionBorder != null && SplashVersionText != null) {
@@ -631,7 +632,10 @@ namespace FSB_helper_C__
             UpdateMainBorderOverlay();
             MainBorderOverlay.Opacity = 1;
             
-            // Draw the shield and start stats animation
+            // Wait just slightly (150ms) so the starry night starts fading in WHILE the panels are finishing their fade-in (creates a cohesive overlapping effect)
+            await Task.Delay(150); 
+            
+            // Draw the starry night shield and start stats animation AFTER panels are visible
             AnimateShieldDraw();
             _ = AnimateDashboardStatsAsync();
         }
