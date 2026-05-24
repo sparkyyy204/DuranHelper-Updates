@@ -1,0 +1,1003 @@
+{
+  "Binds": {
+    "Radial": {
+      "id": "Radial",
+      "name": "Radial Menu",
+      "key": "B",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [],
+      "isAuto": false
+    },
+    "287990": {
+      "id": "287990",
+      "name": "Представится кратко",
+      "key": "Alt + Q",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "Федеральная служба безопасности.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 32
+        }
+      ],
+      "isAuto": false
+    },
+    "4e2c59": {
+      "id": "4e2c59",
+      "name": "Представиться полностью",
+      "key": "",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "Здравия желаю, ФСБ. *ЗВ* *ФАМ*",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/do Достал удостоверение.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/me показал удостоверение на уровне глаз",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 40
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/doc ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "b68311": {
+      "id": "b68311",
+      "name": "Удостоверение",
+      "key": "Alt + F",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/doc ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "1dbfeb": {
+      "id": "1dbfeb",
+      "name": "Забрать документы",
+      "key": "Alt + E",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/checkdocs ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "54e1c0": {
+      "id": "54e1c0",
+      "name": "Наручники",
+      "key": "Alt + 1",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/cuff ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "88b00c": {
+      "id": "88b00c",
+      "name": "Список розыскиваемых",
+      "key": "\\",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/wanted",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "b4e30f": {
+      "id": "b4e30f",
+      "name": "Погоня",
+      "key": "Alt + \\",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/pg",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "e06fc5": {
+      "id": "e06fc5",
+      "name": "Рация с тегом",
+      "key": "RShift",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ* ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "ca8bd9": {
+      "id": "ca8bd9",
+      "name": "Департамент",
+      "key": "NumPad1",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/d [ФСБ] - []",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 1
+        }
+      ],
+      "isAuto": false
+    },
+    "96a715": {
+      "id": "96a715",
+      "name": "Ескорт",
+      "key": "Alt + 2",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/escort ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "995d11": {
+      "id": "995d11",
+      "name": "Фоторобот",
+      "key": "Alt + 3",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/me открыл програму поиска по лицу",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/me составил фоторобот человека",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/do Личность человека установлена.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "3690bd": {
+      "id": "3690bd",
+      "name": "Обыск",
+      "key": "Alt + 4",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/search ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "622b6f": {
+      "id": "622b6f",
+      "name": "Объявить в розыск",
+      "key": "Alt + 5",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/su ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "7fc2ac": {
+      "id": "7fc2ac",
+      "name": "Изменить личное дело",
+      "key": "Alt + 7",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/do КПК в руках.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/me сверил фоторобот, звание и именной шеврон сотрудника",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/do Личное дело сотрудника найденно.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/me внес изменения в личное дело сотрудника",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "/c 60",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 6,
+          "action": "PRESS",
+          "value": "Escape",
+          "desc": "КНОПКА",
+          "ColorCode": "#ff7b72",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "c9d27e": {
+      "id": "c9d27e",
+      "name": "Миранда",
+      "key": "Alt + U",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "Вы имеете право хранить молчание.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 33
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "Всё, что вы скажете, может и будет использовано против Вас в суде.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "Вы имеете право на адвоката.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "Если у вас нет адвоката, он будет предоставлен вам по вашему требованию.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "Вы понимаете свои права?",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "f690e3": {
+      "id": "f690e3",
+      "name": "Выехал на МО",
+      "key": "мо1",
+      "active": true,
+      "group": "Сопровождения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ*  Докладывает: *ИМЯ* | Выехал на сопровождение военной колонны.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 44
+        }
+      ],
+      "isAuto": true
+    },
+    "d8ecfa": {
+      "id": "d8ecfa",
+      "name": "Продолжаю МО",
+      "key": "мо2",
+      "active": true,
+      "group": "Сопровождения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ*  Докладывает: *ИМЯ* |  Продолжаю сопровождение военной колонны.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "c22685": {
+      "id": "c22685",
+      "name": "Закончил МО",
+      "key": "мо3",
+      "active": true,
+      "group": "Сопровождения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ*  Докладывает: *ИМЯ* |  Закончил сопровождение военной колонны.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "abffd0": {
+      "id": "abffd0",
+      "name": "Выехал на МЗ",
+      "key": "мз1",
+      "active": true,
+      "group": "Сопровождения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ*  Докладывает: *ИМЯ* | Выехал на сопровождение медицинского персонала.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "f28d35": {
+      "id": "f28d35",
+      "name": "Продолжаю МЗ",
+      "key": "мз2",
+      "active": true,
+      "group": "Сопровождения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ*  Докладывает: *ИМЯ* | Продолжаю сопровождение медицинского персонала.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "3fe3d1": {
+      "id": "3fe3d1",
+      "name": "Закончил МЗ",
+      "key": "мз3",
+      "active": true,
+      "group": "Сопровождения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/r *ТЕГ*  Докладывает: *ИМЯ* | Закончил сопровождение медицинского персонала.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "5e9a1c": {
+      "id": "5e9a1c",
+      "name": "Адвокат. МВД",
+      "key": "адвокат1",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/d [ФСБ] - [Пра-во] Вызываю адвоката в допросную МВД.  Время вызова *ВРЕМЯ*",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 75
+        }
+      ],
+      "isAuto": true
+    },
+    "42ad7a": {
+      "id": "42ad7a",
+      "name": "Адвокат. ФСБ",
+      "key": "адвокат3",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/d [ФСБ] - [Пра-во] Вызываю адвоката в допросную ФСБ.  Время вызова *ВРЕМЯ*",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 23
+        }
+      ],
+      "isAuto": true
+    },
+    "0b556e": {
+      "id": "0b556e",
+      "name": "Адвокат. ФСИН",
+      "key": "адвокат2",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/d [ФСБ] - [Пра-во] Вызываю адвоката в допросную ФСИН.  Время вызова *ВРЕМЯ*",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 23
+        }
+      ],
+      "isAuto": true
+    },
+    "303de2": {
+      "id": "303de2",
+      "name": ".rep",
+      "key": "/rep",
+      "active": true,
+      "group": "Быстрые сокращения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/report",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "03b754": {
+      "id": "03b754",
+      "name": ".куз",
+      "key": ".куз",
+      "active": true,
+      "group": "Быстрые сокращения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/report",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "d2f31e": {
+      "id": "d2f31e",
+      "name": "/eje",
+      "key": "/eje",
+      "active": true,
+      "group": "Быстрые сокращения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/eject",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "ae622d": {
+      "id": "ae622d",
+      "name": ".уоу",
+      "key": ".уоу",
+      "active": true,
+      "group": "Быстрые сокращения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/eject",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "658a7f": {
+      "id": "658a7f",
+      "name": ".зг",
+      "key": ".зг",
+      "active": true,
+      "group": "Быстрые сокращения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/putpl ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "3e3f9d": {
+      "id": "3e3f9d",
+      "name": "/pu",
+      "key": "/pu",
+      "active": true,
+      "group": "Быстрые сокращения",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/putpl",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    },
+    "fd1f96": {
+      "id": "fd1f96",
+      "name": "Личное дело заключенного",
+      "key": "",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/do КПК в руках.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/me открыл личное дело заключенного",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 17
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/do Процессс...",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/do Личное дело открыто.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    }
+  },
+  "Groups": [
+    "Сопровождения",
+    "Быстрые сокращения"
+  ],
+  "Variables": {
+    "*ИМЯ*": "",
+    "*ФАМ*": "",
+    "*ТЕГ*": "",
+    "*ЗВ*": ""
+  },
+  "RadialMenu": {
+    "Enabled": true,
+    "Mode": "Grouped",
+    "SectorCount": 4,
+    "Sectors": [
+      {
+        "BindId": "287990",
+        "BindName": "Представится кратко",
+        "Icon": "star",
+        "RequiresId": false
+      },
+      {
+        "BindId": "",
+        "BindName": "",
+        "Icon": "none",
+        "RequiresId": false
+      },
+      {
+        "BindId": "",
+        "BindName": "",
+        "Icon": "none",
+        "RequiresId": false
+      },
+      {
+        "BindId": "",
+        "BindName": "",
+        "Icon": "none",
+        "RequiresId": false
+      }
+    ],
+    "GroupCount": 4,
+    "Groups": [
+      {
+        "Name": "Аррест",
+        "SectorCount": 5,
+        "Sectors": [
+          {
+            "BindId": "3690bd",
+            "BindName": "Обыск",
+            "Icon": "lightning",
+            "RequiresId": true
+          },
+          {
+            "BindId": "54e1c0",
+            "BindName": "Наручники",
+            "Icon": "lightning",
+            "RequiresId": true
+          },
+          {
+            "BindId": "96a715",
+            "BindName": "Ескорт",
+            "Icon": "lightning",
+            "RequiresId": true
+          },
+          {
+            "BindId": "1dbfeb",
+            "BindName": "Забрать документы",
+            "Icon": "lightning",
+            "RequiresId": true
+          },
+          {
+            "BindId": "open_wanted",
+            "BindName": "Открыть розыск 📌",
+            "Icon": "badge",
+            "RequiresId": false
+          }
+        ]
+      },
+      {
+        "Name": "Поставки",
+        "SectorCount": 6,
+        "Sectors": [
+          {
+            "BindId": "abffd0",
+            "BindName": "Выехал на МЗ",
+            "Icon": "car",
+            "RequiresId": false
+          },
+          {
+            "BindId": "f690e3",
+            "BindName": "Выехал на МО",
+            "Icon": "car",
+            "RequiresId": false
+          },
+          {
+            "BindId": "d8ecfa",
+            "BindName": "Продолжаю МО",
+            "Icon": "car",
+            "RequiresId": false
+          },
+          {
+            "BindId": "c22685",
+            "BindName": "Закончил МО",
+            "Icon": "car",
+            "RequiresId": false
+          },
+          {
+            "BindId": "3fe3d1",
+            "BindName": "Закончил МЗ",
+            "Icon": "car",
+            "RequiresId": false
+          },
+          {
+            "BindId": "f28d35",
+            "BindName": "Продолжаю МЗ",
+            "Icon": "car",
+            "RequiresId": false
+          }
+        ]
+      },
+      {
+        "Name": "Связь",
+        "SectorCount": 5,
+        "Sectors": [
+          {
+            "BindId": "0b556e",
+            "BindName": "Адвокат. ФСИН",
+            "Icon": "star",
+            "RequiresId": false
+          },
+          {
+            "BindId": "42ad7a",
+            "BindName": "Адвокат. ФСБ",
+            "Icon": "star",
+            "RequiresId": false
+          },
+          {
+            "BindId": "5e9a1c",
+            "BindName": "Адвокат. МВД",
+            "Icon": "star",
+            "RequiresId": false
+          },
+          {
+            "BindId": "e06fc5",
+            "BindName": "Рация с тегом",
+            "Icon": "star",
+            "RequiresId": false
+          },
+          {
+            "BindId": "ca8bd9",
+            "BindName": "Департамент",
+            "Icon": "star",
+            "RequiresId": false
+          }
+        ]
+      },
+      {
+        "Name": "Проц. Действия",
+        "SectorCount": 6,
+        "Sectors": [
+          {
+            "BindId": "88b00c",
+            "BindName": "Список розыскиваемых",
+            "Icon": "document",
+            "RequiresId": false
+          },
+          {
+            "BindId": "995d11",
+            "BindName": "Фоторобот",
+            "Icon": "document",
+            "RequiresId": false
+          },
+          {
+            "BindId": "b68311",
+            "BindName": "Удостоверение",
+            "Icon": "document",
+            "RequiresId": true
+          },
+          {
+            "BindId": "287990",
+            "BindName": "Представится кратко",
+            "Icon": "document",
+            "RequiresId": false
+          },
+          {
+            "BindId": "c9d27e",
+            "BindName": "Миранда",
+            "Icon": "document",
+            "RequiresId": false
+          },
+          {
+            "BindId": "4e2c59",
+            "BindName": "Представиться полностью",
+            "Icon": "document",
+            "RequiresId": true
+          }
+        ]
+      }
+    ]
+  }
+}

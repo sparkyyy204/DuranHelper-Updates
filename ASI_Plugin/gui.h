@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <d3d9.h>
 #include <string>
 #include <vector>
@@ -22,6 +22,15 @@ struct FineItem {
     std::string name;     // "Езда без гос. знаков"
     int amount;           // 8000
     bool hasLicRevoke;    // лишение ВУ
+    bool selected;        // checkbox state
+};
+
+struct WantedItem {
+    std::string id;       // "[1.1]"
+    std::string type;     // "УК"
+    std::string name;     // text
+    int stars;            // 2
+    std::string note;
     bool selected;        // checkbox state
 };
 
@@ -74,9 +83,27 @@ struct RadialMenuGroup {
     std::vector<RadialSector> sectors;
 };
 
+// ===== Notification System =====
+struct Notification {
+    std::string type;
+    std::string text;
+    std::string keyAccept;
+    std::string actionAccept;
+    std::string keyCancel;
+    std::string actionCancel;
+    float duration;
+    float maxDuration;
+    bool hasProgress;
+    ImU32 color;
+    bool isPayday;
+};
+
+extern float savedSensX, savedSensY;
+
 class Gui {
 public:
     static bool show;
+    static bool showBinderHint;
     static bool clearNextFrame;
         
     static float alpha;
@@ -107,6 +134,12 @@ public:
     static bool fineWithRevoke;
     static float fineScrollY;
 
+    // Wanted
+    static std::vector<WantedItem> wantedItems;
+    static char searchWanted[256];
+    static char wantedIdBuf[32];
+    static float wantedScrollY;
+    
     // Binder
     static int selectedBindGroup;    // -1 = all
     static char searchBinder[256];
@@ -119,6 +152,43 @@ public:
     static bool toggleNeedsAlt;
     static bool toggleNeedsCtrl;
     static bool toggleNeedsShift;
+
+    // --- Window State & Features ---
+    static bool windowDraggable;
+    static float overlayPosX;
+    static float overlayPosY;
+    static bool blockKeyboardInput;
+    
+    // --- Tab Visibility ---
+    static bool showTabBinder;
+    static bool showTabFines;
+    static bool showTabLaws;
+    static bool showTabWanted;
+
+    static int binderHintKey;
+    static std::string binderHintKeyStr;
+    static bool binderHintNeedsAlt;
+    static bool binderHintNeedsCtrl;
+    static bool binderHintNeedsShift;
+
+    static int issueFineKey;
+    static std::string issueFineKeyStr;
+    static bool issueFineNeedsAlt;
+    static bool issueFineNeedsCtrl;
+    static bool issueFineNeedsShift;
+
+    static int cancelFineKey;
+    static std::string cancelFineKeyStr;
+    static bool cancelFineNeedsAlt;
+    static bool cancelFineNeedsCtrl;
+    static bool cancelFineNeedsShift;
+
+    static int stopBindKey;              // Key to abort a running bind sequence (0 = disabled)
+    static inline std::string stopBindKeyStr = "";
+    static inline bool stopBindNeedsAlt = false;
+    static inline bool stopBindNeedsCtrl = false;
+    static inline bool stopBindNeedsShift = false;
+
     static int currentTheme;          // 0 = Default, 1 = Black, 2 = Grey
     static int binderDelay;            // ms between bind steps (0-1000, step 200)
     static bool rememberTab;           // remember last active tab
@@ -129,14 +199,21 @@ public:
     static bool quoteExtended;
     static bool quoteChapter;
     static bool quoteFines;
+    static bool quoteWanted;
+    
+    // Notifications
+    static bool notifyFineIssue;
+    static bool notifyPayday;
     
     // Error notification
     static std::string overlayErrorMsg;
     static ImU32 overlayErrorColor;
     static float overlayErrorTimer;
 
-    // Database (stub)
+    // Database
     static std::vector<PlayerRecord> playerDb;
+    static int selectedDbPlayer;
+    static char searchDatabase[256];
 
     // Radial Menu
     static bool radialMenuOpen;
@@ -157,26 +234,34 @@ public:
     
     static void Init(IDirect3DDevice9* pDevice);
     static void Render();
+    static void RenderBinderHint();
     static void Toggle();
+    static void ToggleBinderHint();
     static void LoadLaws();
     static void LoadFines();
+    static void LoadWanted();
     static void LoadVersion();
     static void LoadSettings();
     static void SaveSettings();
     static void LoadRadialConfig();
     static void ShowError(const std::string& msg, ImU32 color);
-    static void ApplyTheme();
+    static void AddNotification(const std::string& type, const std::string& text, const std::string& keyAccept, const std::string& actionAccept, const std::string& keyCancel, const std::string& actionCancel, float maxDuration, bool hasProgress, ImU32 color);
+    static void ApplyTheme(float alphaMul = 1.0f);
     static void ExecuteLawQuote(const std::string& utf8text);
+    static void ClearNotifications();
 
 private:
+    static std::vector<Notification> activeNotifications;
     static void SetupStyle();
+    static void RenderNotifications();
     static void DrawHudFrame(ImDrawList* dl, ImVec2 origin);
     static void DrawTabs(ImDrawList* dl, ImVec2 origin);
     static void RenderLawsTab(ImDrawList* dl, ImVec2 origin);
     static void RenderFinesTab(ImDrawList* dl, ImVec2 origin);
     static void RenderBinderTab(ImDrawList* dl, ImVec2 origin);
+    static void RenderWantedTab(ImDrawList* dl, ImVec2 origin);
     static void RenderSettingsTab(ImDrawList* dl, ImVec2 origin);
-    static void RenderDatabaseStub(ImDrawList* dl, ImVec2 origin);
+    static void RenderDatabaseTab(ImDrawList* dl, ImVec2 origin);
     static void RenderRadialMenu();
     static void RenderRadialIdInput();
     static void DrawRadialIcon(ImDrawList* dl, ImVec2 center, float size, const std::string& icon, ImU32 color);
