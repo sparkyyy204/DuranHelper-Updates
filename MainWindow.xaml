@@ -1331,7 +1331,7 @@
                                                                         <Rectangle Stroke="{DynamicResource LineBrush}" StrokeThickness="1" StrokeDashArray="4 4" RadiusX="6" RadiusY="6" IsHitTestVisible="False"/>
                                                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                                 <TextBlock Text="+" Foreground="#8b949e" FontSize="16" FontWeight="Bold" Margin="0,-2,8,0" VerticalAlignment="Center"/>
-                                                                                <TextBlock Text="ДОБАВИТЬ СТАТЬЮ" Foreground="#8b949e" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                                                <TextBlock Text="ДОБАВИТЬ СТАТЬЮ ШТРАФА" Foreground="#8b949e" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
                                                                             </StackPanel>
                                                                         </Grid>
                                                                         <ControlTemplate.Triggers>
@@ -3071,7 +3071,7 @@
                                 <Grid>
                                     <Button Style="{StaticResource ModalCloseBtn}" Margin="0,15,15,0" VerticalAlignment="Top" HorizontalAlignment="Right" Click="Fine_Edit_Cancel_Click"/>
                                     <StackPanel Margin="30">
-                                        <TextBlock Text="⚙️ РЕДАКТОР СТАТЬИ КАЛЬКУЛЯТОРА" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0,0,0,15"/>
+                                        <TextBlock Text="⚙️ РЕДАКТОР СТАТЬИ ШТРАФА" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0,0,0,15"/>
                                         <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1.5" Margin="0,0,0,30"/>
                                     
                                     <Grid Margin="0,0,0,25">

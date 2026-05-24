@@ -53,6 +53,7 @@ jobs:
         Copy-Item publish_output\DURANHELPER.runtimeconfig.json update_files\
         Copy-Item publish_output\DuranOverlay.asi update_files\
         Copy-Item publish_output\Newtonsoft.Json.dll update_files\
+        Copy-Item publish_output\ConfigBase update_files\ -Recurse
         Compress-Archive -Path 'update_files\*' -DestinationPath 'Output\update.zip' -Force
 
     - name: Upload Release Assets
