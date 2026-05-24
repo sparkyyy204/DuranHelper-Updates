@@ -3352,7 +3352,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 if (string.IsNullOrEmpty(kvp.Value.id)) kvp.Value.id = kvp.Key;
             }
 
-            var all = MasterData[CurrentProfile].Binds.Values.Where(b => b.id != "Radial").ToList(); 
+            var all = MasterData[CurrentProfile].Binds.Values.Where(b => !string.Equals(b.id, "Radial", StringComparison.OrdinalIgnoreCase) && b.name != "Radial Menu").ToList(); 
             var filtered = _currentBindGroup == "ВСЕ" ? all : all.Where(b => b.group == _currentBindGroup).ToList();
             
             if (txtBindSearch != null && !string.IsNullOrWhiteSpace(txtBindSearch.Text)) {
