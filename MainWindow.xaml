@@ -345,7 +345,7 @@
 
             <!-- === SPLASH CARD CONTENT (visible during loading) === -->
             <Path x:Name="SplashBg" Data="M 0,12 L 12,0 L 448,0 L 460,12 L 460,188 L 448,200 L 12,200 L 0,188 Z" Fill="{DynamicResource SidebarBrush}">
-                <Path.Effect><DropShadowEffect RenderingBias="Quality" BlurRadius="60" ShadowDepth="25" Opacity="0.9" Color="Black"/></Path.Effect>
+                <Path.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="60" ShadowDepth="25" Opacity="0.9" Color="Black"/></Path.Effect>
             </Path>
             
             <!-- Clipped-corner border outline for splash -->
