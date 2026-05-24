@@ -17,6 +17,7 @@ namespace FSB_helper_C__
         public string Type { get; set; } = "2col"; // "1col", "2col", "3col", "text"
         public List<LawItem> Items { get; set; } = new List<LawItem>();
         public string RtfData { get; set; } = ""; // Для Блокнота
+        public string PlainText { get; set; } = ""; // Cached plain text
         public string Hotkey { get; set; } = ""; // Хоткей для оверлея
         public bool HasPunishments { get; set; } = true;
     }
@@ -86,6 +87,14 @@ namespace FSB_helper_C__
         public string note { get; set; } = "";
     }
 
+    public class WantedArticle {
+        public string id { get; set; } = "";
+        public string type { get; set; } = "УК";
+        public string name { get; set; } = "";
+        public int stars { get; set; } = 1;
+        public string note { get; set; } = "";
+    }
+
     public class RadialMenuSector {
         public string BindId { get; set; } = "";
         public string BindName { get; set; } = "";
@@ -114,7 +123,7 @@ namespace FSB_helper_C__
 
     public class ProfileData { 
         public Dictionary<string, LawSection> Laws { get; set; } = new Dictionary<string, LawSection>(); 
-        public Dictionary<string, BindItem> Binds { get; set; } = new Dictionary<string, BindItem>(); 
+        public Dictionary<string, BindItem> Binds { get; set; } = new Dictionary<string, BindItem>() { { "Radial", new BindItem { id = "Radial", name = "Radial Menu", key = "B" } } }; 
         public List<string> Groups { get; set; } = new List<string>(); 
         public Dictionary<string, string> Variables { get; set; } = new Dictionary<string, string>(); 
         public Dictionary<string, Dictionary<string, string>> CustomThemes { get; set; } = new Dictionary<string, Dictionary<string, string>>();
@@ -122,6 +131,7 @@ namespace FSB_helper_C__
         public string OverlayTheme { get; set; } = "Default (Dark Blue)";
         public string OverlayText { get; set; } = ""; 
         public List<FineArticle> Fines { get; set; } = new List<FineArticle>();
+        public List<WantedArticle> Wanted { get; set; } = new List<WantedArticle>();
         public string GamePath { get; set; } = "";
         public List<string> InstalledCloudIds { get; set; } = new List<string>();
         public RadialMenuConfig RadialMenu { get; set; } = new RadialMenuConfig();

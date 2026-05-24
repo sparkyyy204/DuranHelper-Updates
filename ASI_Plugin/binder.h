@@ -1,9 +1,9 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <windows.h>
-#include "libs/json/json.hpp"
+#include "json.hpp"
 
 using json = nlohmann::ordered_json;
 

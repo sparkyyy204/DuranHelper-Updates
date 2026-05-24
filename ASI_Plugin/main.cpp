@@ -20,10 +20,12 @@
 HMODULE g_hModule = nullptr;
 HWND g_hWnd = nullptr;
 WNDPROC oWndProc = nullptr;
+bool g_WndProcHooked = false;
 #include <fstream>
 
 bool g_Initialized = false;
 std::atomic<bool> g_CancelQuote(false);
+std::atomic<bool> g_CancelBind(false);  // Stop running binder sequence
 
 // ===== Function signatures =====
 using EndScene_t = HRESULT(__stdcall*)(IDirect3DDevice9*);
@@ -236,6 +238,13 @@ static void ProcessMainThreadTasks() {
 static std::atomic<int> g_FineSequenceState{0}; // 0=idle, 1=waiting_revoke, 2=waiting_quote
 static std::atomic<bool> g_FineSequenceGo{false};
 static std::atomic<bool> g_FineSequenceStop{false};
+static std::atomic<bool> g_FineSequenceCancel{false};
+
+static std::atomic<int> g_WantedSequenceState{0}; // 0=idle, 1=waiting_issue, 2=waiting_quote
+static std::atomic<bool> g_WantedSequenceGo{false};
+static std::atomic<bool> g_WantedSequenceStop{false};
+static std::atomic<bool> g_WantedSequenceCancel{false};
+
 
 // Keep for SendSAMPMessage intercept (our own sends)
 bool InterceptFineCommand(const std::string& cmd) {
@@ -275,27 +284,33 @@ static bool __fastcall HookedRPC(void* pThis, void* /*edx*/, int* uniqueID, RakN
 }
 
 void StartFineSequence(const std::string& targetId, const std::string& articleMsg, bool doRevoke, bool doQuote, const std::string& quoteText) {
+    g_FineSequenceCancel.store(false);
     std::thread([id = targetId, art = articleMsg, doRevoke, doQuote, quoteText]() {
+        bool revoked = false;
         // --- Phase 1: License Revocation ---
         if (doRevoke) {
             g_FineSequenceState.store(1);
             g_FineSequenceGo.store(false);
             g_FineSequenceStop.store(false);
 
-            // "Лишить ВУ игрока X? ALT+Пробел - лишить, Пробел - отменить (30 сек)"
-            std::string msgUtf8 = "{2EA043}[DURAN HELPER] {FFFFFF}\xD0\x9B\xD0\xB8\xD1\x88\xD0\xB8\xD1\x82\xD1\x8C \xD0\x92\xD0\xA3 \xD0\xB8\xD0\xB3\xD1\x80\xD0\xBE\xD0\xBA\xD0\xB0 " + id + "? {D2A65E}ALT+\xD0\x9F\xD1\x80\xD0\xBE\xD0\xB1\xD0\xB5\xD0\xBB {FFFFFF}- \xD0\xBB\xD0\xB8\xD1\x88\xD0\xB8\xD1\x82\xD1\x8C, {FF6B6B}\xD0\x9F\xD1\x80\xD0\xBE\xD0\xB1\xD0\xB5\xD0\xBB {FFFFFF}- \xD0\xBE\xD1\x82\xD0\xBC\xD0\xB5\xD0\xBD\xD0\xB8\xD1\x82\xD1\x8C ({D2A65E}30 \xD1\x81\xD0\xB5\xD0\xBA{FFFFFF})";
-            RunOnMainThread([m = UTF8ToCP1251(msgUtf8.c_str())]() {
+            std::string k_c = Gui::issueFineKeyStr;
+            std::string k_x = Gui::cancelFineKeyStr;
+            std::string msgUtf8 = "{2EA043}[DURAN HELPER] {FFFFFF}\xD0\x9B\xD0\xB8\xD1\x88\xD0\xB8\xD1\x82\xD1\x8C \xD0\x92\xD0\xA3 \xD0\xB8\xD0\xB3\xD1\x80\xD0\xBE\xD0\xBA\xD0\xB0 " + id + "? {D2A65E}" + k_c + " {FFFFFF}- \xD0\xBB\xD0\xB8\xD1\x88\xD0\xB8\xD1\x82\xD1\x8C, {FF6B6B}" + k_x + " {FFFFFF}- \xD0\xBE\xD1\x82\xD0\xBC\xD0\xB5\xD0\xBD\xD0\xB8\xD1\x82\xD1\x8C ({D2A65E}30 \xD1\x81\xD0\xB5\xD0\xBA{FFFFFF})";
+            RunOnMainThread([m = UTF8ToCP1251(msgUtf8.c_str()), id, k_c, k_x]() {
                 AddLocalSAMPMessage(m.c_str());
+                if (Gui::notifyFineIssue) {
+                    std::string nMsg = "\xD0\x9B\xD0\x98\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x92\xD0\xA3 \xD0\x98\xD0\x93\xD0\xA0\xD0\x9E\xD0\x9A\xD0\x90 \xD0\xA1 ID: " + id;
+                    Gui::AddNotification("CALCULATOR", nMsg, k_c, "\xD0\xBF\xD1\x80\xD0\xB8\xD0\xBD\xD1\x8F\xD1\x82\xD1\x8C", k_x, "\xD0\xBE\xD1\x82\xD0\xBA\xD0\xBB\xD0\xBE\xD0\xBD\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(239, 68, 68, 255));
+                }
             });
 
-            // Wait for ALT+Space (confirm) or Space alone (cancel) or 30s timeout
+            // Wait for Go/Stop signals via WndProc or 30s timeout
             auto start = std::chrono::steady_clock::now();
             bool confirmed = false;
             while (true) {
-                bool altDown = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
-                bool spaceDown = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
-                if (altDown && spaceDown) { confirmed = true; break; }
-                if (!altDown && spaceDown) { confirmed = false; break; }
+                if (g_FineSequenceCancel.load()) { g_FineSequenceState.store(0); return; }
+                if (g_FineSequenceGo.load()) { confirmed = true; break; }
+                if (g_FineSequenceStop.load()) { confirmed = false; break; }
                 auto elapsed = std::chrono::steady_clock::now() - start;
                 if (std::chrono::duration_cast<std::chrono::seconds>(elapsed).count() >= 30) break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -303,10 +318,14 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
 
 
             // Wait for key release
-            while ((GetAsyncKeyState(VK_SPACE) & 0x8000) != 0)
+            RunOnMainThread([]() { Gui::ClearNotifications(); });
+            while (((GetAsyncKeyState(Gui::issueFineKey) & 0x8000) != 0) || ((GetAsyncKeyState(Gui::cancelFineKey) & 0x8000) != 0)) {
+                if (g_FineSequenceCancel.load()) { g_FineSequenceState.store(0); return; }
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
 
             if (confirmed) {
+                revoked = true;
                 RunOnMainThread([]() {
                     AddLocalSAMPMessage(UTF8ToCP1251("{2EA043}[DURAN HELPER] {D2A65E}\xD0\x9B\xD0\xB8\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\x92\xD0\xA3 \xD0\xBF\xD0\xBE\xD0\xB4\xD1\x82\xD0\xB2\xD0\xB5\xD1\x80\xD0\xB6\xD0\xB4\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
                 });
@@ -352,27 +371,34 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
             g_FineSequenceGo.store(false);
             g_FineSequenceStop.store(false);
 
-            // "Процитировать штраф? ALT+Пробел - начать, Пробел - пропустить (30 сек)"
-            std::string msgUtf8 = "{2EA043}[DURAN HELPER] {FFFFFF}\xD0\x9F\xD1\x80\xD0\xBE\xD1\x86\xD0\xB8\xD1\x82\xD0\xB8\xD1\x80\xD0\xBE\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD1\x88\xD1\x82\xD1\x80\xD0\xB0\xD1\x84? {D2A65E}ALT+\xD0\x9F\xD1\x80\xD0\xBE\xD0\xB1\xD0\xB5\xD0\xBB {FFFFFF}- \xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C, {FF6B6B}\xD0\x9F\xD1\x80\xD0\xBE\xD0\xB1\xD0\xB5\xD0\xBB {FFFFFF}- \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C ({D2A65E}30 \xD1\x81\xD0\xB5\xD0\xBA{FFFFFF})";
-            RunOnMainThread([m = UTF8ToCP1251(msgUtf8.c_str())]() {
+            std::string k_c = Gui::issueFineKeyStr;
+            std::string k_x = Gui::cancelFineKeyStr;
+            std::string msgUtf8 = "{2EA043}[DURAN HELPER] {FFFFFF}\xD0\x9F\xD1\x80\xD0\xBE\xD1\x86\xD0\xB8\xD1\x82\xD0\xB8\xD1\x80\xD0\xBE\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD1\x88\xD1\x82\xD1\x80\xD0\xB0\xD1\x84? {D2A65E}" + k_c + " {FFFFFF}- \xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C, {FF6B6B}" + k_x + " {FFFFFF}- \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C ({D2A65E}30 \xD1\x81\xD0\xB5\xD0\xBA{FFFFFF})";
+            RunOnMainThread([m = UTF8ToCP1251(msgUtf8.c_str()), k_c, k_x]() {
                 AddLocalSAMPMessage(m.c_str());
+                if (Gui::notifyFineIssue) {
+                    std::string nMsg = "\xD0\x9F\xD0\xA0\xD0\x9E\xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4?";
+                    Gui::AddNotification("CALCULATOR", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
+                }
             });
 
             auto start = std::chrono::steady_clock::now();
             bool confirmed = false;
             while (true) {
-                bool altDown = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
-                bool spaceDown = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
-                if (altDown && spaceDown) { confirmed = true; break; }
-                if (!altDown && spaceDown) { confirmed = false; break; }
+                if (g_FineSequenceCancel.load()) { g_FineSequenceState.store(0); return; }
+                if (g_FineSequenceGo.load()) { confirmed = true; break; }
+                if (g_FineSequenceStop.load()) { confirmed = false; break; }
                 auto elapsed = std::chrono::steady_clock::now() - start;
                 if (std::chrono::duration_cast<std::chrono::seconds>(elapsed).count() >= 30) break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
 
             // Wait for key release
-            while ((GetAsyncKeyState(VK_SPACE) & 0x8000) != 0)
+            RunOnMainThread([]() { Gui::ClearNotifications(); });
+            while (((GetAsyncKeyState(Gui::issueFineKey) & 0x8000) != 0) || ((GetAsyncKeyState(Gui::cancelFineKey) & 0x8000) != 0)) {
+                if (g_FineSequenceCancel.load()) { g_FineSequenceState.store(0); return; }
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
 
             if (confirmed) {
                 RunOnMainThread([]() {
@@ -381,7 +407,17 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
                 g_CancelQuote.store(false);
-                std::string cp1251 = UTF8ToCP1251(quoteText.c_str());
+                std::string finalQuote = quoteText;
+                if (!doRevoke || !revoked) {
+                    std::string revokePrefix = "\xD0\x90\xD0\xBD\xD0\xBD\xD1\x83\xD0\xBB\xD0\xB8\xD1\x80\xD0\xBE\xD0\xB2\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\x92\xD0\xA3 \xD0\xBF\xD0\xBE:";
+                    size_t rPos = finalQuote.find(revokePrefix);
+                    if (rPos != std::string::npos) {
+                        size_t endPos = finalQuote.find('\n', rPos);
+                        if (endPos != std::string::npos) finalQuote.erase(rPos, endPos - rPos + 1);
+                        else finalQuote.erase(rPos);
+                    }
+                }
+                std::string cp1251 = UTF8ToCP1251(finalQuote.c_str());
                 std::vector<std::string> lines;
                 size_t pos = 0;
                 while (pos < cp1251.length()) {
@@ -421,6 +457,152 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
         g_FineSequenceState.store(0);
     }).detach();
 }
+
+
+void ImitateKeyboardTyping(const std::string& str) {
+    for (char c : str) {
+        SHORT vkAndShift = VkKeyScan(c);
+        if (vkAndShift == -1) continue;
+        BYTE vk = vkAndShift & 0xFF;
+        bool shift = (vkAndShift >> 8) & 1;
+        
+        if (shift) keybd_event(VK_SHIFT, MapVirtualKey(VK_SHIFT, 0), 0, 0);
+        keybd_event(vk, MapVirtualKey(vk, 0), 0, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        keybd_event(vk, MapVirtualKey(vk, 0), KEYEVENTF_KEYUP, 0);
+        if (shift) keybd_event(VK_SHIFT, MapVirtualKey(VK_SHIFT, 0), KEYEVENTF_KEYUP, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
+}
+
+void StartWantedSequence(const std::string& targetId, const std::string& articleMsg, int stars, bool doQuote, const std::string& quoteText) {
+    if (g_WantedSequenceState.load() != 0 || g_FineSequenceState.load() != 0) return;
+    
+    Gui::Toggle(); // Hide overlay
+    g_WantedSequenceCancel.store(false);
+    g_WantedSequenceGo.store(false);
+    g_WantedSequenceStop.store(false);
+    
+    std::thread([targetId, articleMsg, stars, doQuote, quoteText]() {
+        g_WantedSequenceState.store(1);
+        
+        // Sequence: /su [id] [stars] -> Down -> Enter -> type articleMsg
+        std::string suCmd = "/su " + targetId + " " + std::to_string(stars);
+        RunOnMainThread([c = UTF8ToCP1251(suCmd.c_str())]() {
+            SendSAMPMessage(c.c_str());
+        });
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        
+        // Press Down
+        keybd_event(VK_DOWN, MapVirtualKey(VK_DOWN, 0), 0, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        keybd_event(VK_DOWN, MapVirtualKey(VK_DOWN, 0), KEYEVENTF_KEYUP, 0);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        
+        // Press Enter to open the text input dialog
+        keybd_event(VK_RETURN, MapVirtualKey(VK_RETURN, 0), 0, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        keybd_event(VK_RETURN, MapVirtualKey(VK_RETURN, 0), KEYEVENTF_KEYUP, 0);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(600));
+        
+        // Type articles via PostMessage (reliable, same as fine sequence)
+        std::string cp1251Article = UTF8ToCP1251(articleMsg.c_str());
+        HWND hWnd = FindWindowA("Grand theft auto San Andreas", nullptr);
+        if (hWnd) {
+            for (char c : cp1251Article) {
+                PostMessage(hWnd, WM_CHAR, (WPARAM)(unsigned char)c, 0);
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            }
+        }
+        
+        // Step 3: Quote
+        if (doQuote && !quoteText.empty()) {
+            g_WantedSequenceState.store(2);
+            g_WantedSequenceGo.store(false);
+            g_WantedSequenceStop.store(false);
+            
+            std::string k_c = Gui::issueFineKeyStr;
+            std::string k_x = Gui::cancelFineKeyStr;
+            std::string qReqStr = "{2EA043}[DURAN HELPER] {FFFFFF}Процитировать причину розыска? {D2A65E}" + k_c + " {FFFFFF}- начать, {FF6B6B}" + k_x + " {FFFFFF}- пропустить.";
+            std::string qReq = UTF8ToCP1251(qReqStr.c_str());
+            
+            RunOnMainThread([qReq, k_c, k_x]() {
+                AddLocalSAMPMessage(qReq.c_str());
+                if (Gui::notifyFineIssue) {
+                    std::string nMsg = "\xD0\x9F\xD0\xA0\xD0\x9E\xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A?";
+                    Gui::AddNotification("CALCULATOR", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
+                }
+            });
+            
+            bool qConf = false;
+            auto start = std::chrono::steady_clock::now();
+            while (true) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                if (g_WantedSequenceCancel.load()) { g_WantedSequenceState.store(0); return; }
+                if (g_WantedSequenceGo.load()) { qConf = true; break; }
+                if (g_WantedSequenceStop.load()) { qConf = false; break; }
+                auto elapsed = std::chrono::steady_clock::now() - start;
+                if (std::chrono::duration_cast<std::chrono::seconds>(elapsed).count() >= 30) break;
+            }
+            
+            RunOnMainThread([]() { Gui::ClearNotifications(); });
+            while (((GetAsyncKeyState(Gui::issueFineKey) & 0x8000) != 0) || ((GetAsyncKeyState(Gui::cancelFineKey) & 0x8000) != 0)) {
+                if (g_WantedSequenceCancel.load()) { g_WantedSequenceState.store(0); return; }
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
+            
+            if (qConf) {
+                RunOnMainThread([]() {
+                    AddLocalSAMPMessage(UTF8ToCP1251("{2EA043}[DURAN HELPER] {D2A65E}Начинаю цитирование...").c_str());
+                });
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                
+                g_CancelQuote.store(false);
+                std::string cp1251 = UTF8ToCP1251(quoteText.c_str());
+                
+                std::vector<std::string> lines;
+                size_t pos = 0;
+                while (pos < cp1251.length()) {
+                    size_t nlPos = cp1251.find('\n', pos);
+                    if (nlPos == std::string::npos) nlPos = cp1251.length();
+                    std::string segment = cp1251.substr(pos, nlPos - pos);
+                    if (!segment.empty() && segment.back() == '\r') segment.pop_back();
+                    if (segment.empty()) { pos = nlPos + 1; continue; }
+                    
+                    size_t s = 0; size_t maxLen = 83;
+                    while (s < segment.length()) {
+                        if (segment.length() - s <= maxLen) { lines.push_back(segment.substr(s)); break; }
+                        size_t end = s + maxLen;
+                        size_t spacePos = segment.rfind(' ', end);
+                        if (spacePos != std::string::npos && spacePos > s) {
+                            lines.push_back(segment.substr(s, spacePos - s)); s = spacePos + 1;
+                        } else {
+                            lines.push_back(segment.substr(s, maxLen)); s += maxLen;
+                        }
+                    }
+                    pos = nlPos + 1;
+                }
+                for (const auto& line : lines) {
+                    if (g_CancelQuote.load()) break;
+                    std::string msg = line;
+                    RunOnMainThread([msg]() { SendSAMPMessage(msg.c_str()); });
+                    for (int i = 0; i < 15 && !g_CancelQuote.load(); i++) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    }
+                }
+            } else {
+                RunOnMainThread([]() {
+                    AddLocalSAMPMessage(UTF8ToCP1251("{2EA043}[DURAN HELPER] {FF6B6B}Цитирование пропущено.").c_str());
+                });
+            }
+        }
+        
+        g_WantedSequenceState.store(0);
+    }).detach();
+}
+
 // ===== Smart Quoting =====
 void Gui::ExecuteLawQuote(const std::string& utf8text) {
     Gui::Toggle(); // Use Toggle to correctly hide overlay and restore game state
@@ -487,10 +669,13 @@ void Gui::ExecuteLawQuote(const std::string& utf8text) {
 void ExecuteBindActions(const BindItem& bind) {
     std::thread([b = bind]() {
         Log("Executing Bind: " + b.name);
+        g_CancelBind.store(false);  // reset cancel flag on each new bind
 
 
 
         for (const auto& step : b.steps) {
+            if (g_CancelBind.load()) break;  // user pressed stop-bind key
+
             if (step.action == "CHAT" || step.action == "TEXT") {
                 std::string processedText = step.value;
                 // Parse *ВРЕМЯ* built-in variable (strict uppercase) FIRST, so it doesn't get overwritten by JSON placeholder
@@ -548,8 +733,16 @@ void ExecuteBindActions(const BindItem& bind) {
                     SendInput(2, inputs, sizeof(INPUT));
                 }
             }
+            // Sleep with cancel check: check every 100ms instead of blocking for full binderDelay
             if (Gui::binderDelay > 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(Gui::binderDelay));
+                int chunks = Gui::binderDelay / 100;
+                for (int i = 0; i < chunks; i++) {
+                    if (g_CancelBind.load()) break;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+                int remainder = Gui::binderDelay % 100;
+                if (remainder > 0 && !g_CancelBind.load())
+                    std::this_thread::sleep_for(std::chrono::milliseconds(remainder));
             }
         }
     }).detach();
@@ -565,11 +758,28 @@ float radialSavedSensX = -1.0f;
 float radialSavedSensY = -1.0f;
 
 // ===== WndProc Hook =====
+// Forward declaration of the inner logic
+static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (!g_Initialized || !oWndProc) {
+        if (oWndProc) {
+            return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+        }
+        return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+    }
+
+    return WndProcInner(hWnd, uMsg, wParam, lParam);
+}
+
+static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
     // Auto-hide overlay if game loses focus (Alt-Tab, minimize)
     if (uMsg == WM_ACTIVATEAPP && wParam == FALSE) {
         if (Gui::show) Gui::Toggle();
+        Gui::ClearNotifications();
+        g_FineSequenceCancel.store(true);
+        g_WantedSequenceCancel.store(true);
         if (Gui::radialMenuOpen || Gui::radialIdInputOpen) {
             Gui::radialMenuOpen = false;
             Gui::radialIdInputOpen = false;
@@ -579,6 +789,9 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     }
     if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) {
         if (Gui::show) Gui::Toggle();
+        Gui::ClearNotifications();
+        g_FineSequenceCancel.store(true);
+        g_WantedSequenceCancel.store(true);
         if (Gui::radialMenuOpen || Gui::radialIdInputOpen) {
             Gui::radialMenuOpen = false;
             Gui::radialIdInputOpen = false;
@@ -602,11 +815,13 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         std::thread([]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             RunOnMainThread([]() {
+                Gui::LoadSettings();        // ← sync ALL system hotkeys (toggle, binder hint, issue/cancel fine, stop bind)
                 BinderManager::Get().ReloadBinds();
                 Gui::LoadLaws();
                 Gui::LoadFines();
+                Gui::LoadWanted();
                 Gui::LoadRadialConfig();
-                Log("LIVE SYNC: radial config reapplied. sectorCount=" + std::to_string(Gui::radialSectorCount));
+                Log("LIVE SYNC: complete. sectorCount=" + std::to_string(Gui::radialSectorCount));
             });
         }).detach();
         return 0;
@@ -620,18 +835,55 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     if (uMsg == WM_KEYDOWN && wParam == VK_BACK) {
         g_CancelQuote.store(true);
     }
+    bool isDown = false, isUp = false;
+    int msgVk = 0;
+    if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) { msgVk = wParam; isDown = true; }
+    else if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) { msgVk = wParam; isUp = true; }
+    else if (uMsg == WM_MBUTTONDOWN) { msgVk = VK_MBUTTON; isDown = true; }
+    else if (uMsg == WM_MBUTTONUP) { msgVk = VK_MBUTTON; isUp = true; }
+    else if (uMsg == WM_LBUTTONDOWN) { msgVk = VK_LBUTTON; isDown = true; }
+    else if (uMsg == WM_LBUTTONUP) { msgVk = VK_LBUTTON; isUp = true; }
+    else if (uMsg == WM_RBUTTONDOWN) { msgVk = VK_RBUTTON; isDown = true; }
+    else if (uMsg == WM_RBUTTONUP) { msgVk = VK_RBUTTON; isUp = true; }
+    else if (uMsg == WM_XBUTTONDOWN) { msgVk = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? VK_XBUTTON1 : VK_XBUTTON2; isDown = true; }
+    else if (uMsg == WM_XBUTTONUP) { msgVk = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? VK_XBUTTON1 : VK_XBUTTON2; isUp = true; }
 
-    bool tAltDown = (wParam == VK_MENU || wParam == VK_LMENU || wParam == VK_RMENU) ? Gui::toggleNeedsAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
-    bool tCtrlDown = (wParam == VK_CONTROL || wParam == VK_LCONTROL || wParam == VK_RCONTROL) ? Gui::toggleNeedsCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
-    bool tShiftDown = (wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT) ? Gui::toggleNeedsShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
-    if ((uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) && wParam == Gui::toggleKey && tAltDown == Gui::toggleNeedsAlt && tCtrlDown == Gui::toggleNeedsCtrl && tShiftDown == Gui::toggleNeedsShift) {
+    // Refine generic modifier keys to specific Left/Right variants for matching binds (e.g. LCTRL)
+    if (msgVk == VK_CONTROL) msgVk = (lParam & (1 << 24)) ? VK_RCONTROL : VK_LCONTROL;
+    if (msgVk == VK_SHIFT) msgVk = MapVirtualKey((lParam & 0x00ff0000) >> 16, MAPVK_VSC_TO_VK_EX);
+    if (msgVk == VK_MENU) msgVk = (lParam & (1 << 24)) ? VK_RMENU : VK_LMENU;
+
+    bool tAltDown = (msgVk == VK_MENU || msgVk == VK_LMENU || msgVk == VK_RMENU) ? Gui::toggleNeedsAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
+    bool tCtrlDown = (msgVk == VK_CONTROL || msgVk == VK_LCONTROL || msgVk == VK_RCONTROL) ? Gui::toggleNeedsCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
+    bool tShiftDown = (msgVk == VK_SHIFT || msgVk == VK_LSHIFT || msgVk == VK_RSHIFT) ? Gui::toggleNeedsShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
+
+    // Stop-Bind key: abort a running binder sequence
+    if (isDown && Gui::stopBindKey != 0 && Gui::stopBindKey == msgVk && !Gui::show) {
+        if (tAltDown == Gui::stopBindNeedsAlt && tCtrlDown == Gui::stopBindNeedsCtrl && tShiftDown == Gui::stopBindNeedsShift) {
+            g_CancelQuote.store(true);  // stops smart quote
+            extern std::atomic<bool> g_CancelBind;
+            g_CancelBind.store(true);
+        }
+    }
+
+    if (isDown && msgVk == Gui::toggleKey && tAltDown == Gui::toggleNeedsAlt && tCtrlDown == Gui::toggleNeedsCtrl && tShiftDown == Gui::toggleNeedsShift) {
         Gui::Toggle();
         return 0;
     }
 
-    if ((uMsg == WM_KEYDOWN || uMsg == WM_KEYUP) && wParam == VK_ESCAPE && Gui::show) {
-        if (uMsg == WM_KEYUP) Gui::Toggle();
+    if ((isDown || isUp) && msgVk == VK_ESCAPE && Gui::show) {
+        if (isUp) Gui::Toggle();
         return 0; // prevent game pause menu from opening
+    }
+
+    if (isDown && msgVk == Gui::binderHintKey) {
+        bool hAlt = (msgVk == VK_MENU || msgVk == VK_LMENU || msgVk == VK_RMENU) ? Gui::binderHintNeedsAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
+        bool hCtrl = (msgVk == VK_CONTROL || msgVk == VK_LCONTROL || msgVk == VK_RCONTROL) ? Gui::binderHintNeedsCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
+        bool hShift = (msgVk == VK_SHIFT || msgVk == VK_LSHIFT || msgVk == VK_RSHIFT) ? Gui::binderHintNeedsShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
+        if (hAlt == Gui::binderHintNeedsAlt && hCtrl == Gui::binderHintNeedsCtrl && hShift == Gui::binderHintNeedsShift) {
+            Gui::ToggleBinderHint();
+            return 0;
+        }
     }
 
     // ===== Radial Menu =====
@@ -645,19 +897,6 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                 break;
             }
         }
-        
-        int msgVk = 0;
-        bool isDown = false, isUp = false;
-        if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) { msgVk = wParam; isDown = true; }
-        else if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP) { msgVk = wParam; isUp = true; }
-        else if (uMsg == WM_MBUTTONDOWN) { msgVk = VK_MBUTTON; isDown = true; }
-        else if (uMsg == WM_MBUTTONUP) { msgVk = VK_MBUTTON; isUp = true; }
-        else if (uMsg == WM_LBUTTONDOWN) { msgVk = VK_LBUTTON; isDown = true; }
-        else if (uMsg == WM_LBUTTONUP) { msgVk = VK_LBUTTON; isUp = true; }
-        else if (uMsg == WM_RBUTTONDOWN) { msgVk = VK_RBUTTON; isDown = true; }
-        else if (uMsg == WM_RBUTTONUP) { msgVk = VK_RBUTTON; isUp = true; }
-        else if (uMsg == WM_XBUTTONDOWN) { msgVk = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? VK_XBUTTON1 : VK_XBUTTON2; isDown = true; }
-        else if (uMsg == WM_XBUTTONUP) { msgVk = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? VK_XBUTTON1 : VK_XBUTTON2; isUp = true; }
 
         if (msgVk == radVk) {
             bool altDown = (msgVk == VK_MENU || msgVk == VK_LMENU || msgVk == VK_RMENU) ? radAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
@@ -694,11 +933,25 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                             Gui::radialIdFocusRequest = true;
                             memset(Gui::radialIdBuffer, 0, sizeof(Gui::radialIdBuffer));
                         } else {
-                            if (radialSavedSensX >= 0.0f) *(float*)0xB6EC1C = radialSavedSensX;
-                            if (radialSavedSensY >= 0.0f) *(float*)0xB6EC18 = radialSavedSensY;
                             std::string bindId = Gui::radialGroups[Gui::radialSelectedGroup].sectors[sel].bindId;
-                            for (auto& b : BinderManager::Get().Binds) {
-                                if (b.id == bindId) { ExecuteBindActions(b); break; }
+                            if (bindId == "open_fines") {
+                                savedSensX = radialSavedSensX;
+                                savedSensY = radialSavedSensY;
+                                Gui::activeTab = 1;
+                                Gui::showSettings = false;
+                                Gui::show = true;
+                            } else if (bindId == "open_wanted") {
+                                savedSensX = radialSavedSensX;
+                                savedSensY = radialSavedSensY;
+                                Gui::activeTab = 4;
+                                Gui::showSettings = false;
+                                Gui::show = true;
+                            } else {
+                                if (radialSavedSensX >= 0.0f) *(float*)0xB6EC1C = radialSavedSensX;
+                                if (radialSavedSensY >= 0.0f) *(float*)0xB6EC18 = radialSavedSensY;
+                                for (auto& b : BinderManager::Get().Binds) {
+                                    if (b.id == bindId) { ExecuteBindActions(b); break; }
+                                }
                             }
                         }
                     } else {
@@ -714,11 +967,25 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
                             Gui::radialIdFocusRequest = true;
                             memset(Gui::radialIdBuffer, 0, sizeof(Gui::radialIdBuffer));
                         } else {
-                            if (radialSavedSensX >= 0.0f) *(float*)0xB6EC1C = radialSavedSensX;
-                            if (radialSavedSensY >= 0.0f) *(float*)0xB6EC18 = radialSavedSensY;
                             std::string bindId = Gui::radialSectors[sel].bindId;
-                            for (auto& b : BinderManager::Get().Binds) {
-                                if (b.id == bindId) { ExecuteBindActions(b); break; }
+                            if (bindId == "open_fines") {
+                                savedSensX = radialSavedSensX;
+                                savedSensY = radialSavedSensY;
+                                Gui::activeTab = 1;
+                                Gui::showSettings = false;
+                                Gui::show = true;
+                            } else if (bindId == "open_wanted") {
+                                savedSensX = radialSavedSensX;
+                                savedSensY = radialSavedSensY;
+                                Gui::activeTab = 4;
+                                Gui::showSettings = false;
+                                Gui::show = true;
+                            } else {
+                                if (radialSavedSensX >= 0.0f) *(float*)0xB6EC1C = radialSavedSensX;
+                                if (radialSavedSensY >= 0.0f) *(float*)0xB6EC18 = radialSavedSensY;
+                                for (auto& b : BinderManager::Get().Binds) {
+                                    if (b.id == bindId) { ExecuteBindActions(b); break; }
+                                }
                             }
                         }
                     } else {
@@ -882,9 +1149,36 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         }
     }
 
+    // Sequence actions via hotkey
+    if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen) {
+        if (g_FineSequenceState.load() != 0) {
+            if (msgVk == Gui::issueFineKey && tAltDown == Gui::issueFineNeedsAlt && tCtrlDown == Gui::issueFineNeedsCtrl && tShiftDown == Gui::issueFineNeedsShift) {
+                g_FineSequenceGo.store(true);
+                return 0; // block from game
+            }
+            if (msgVk == Gui::cancelFineKey && tAltDown == Gui::cancelFineNeedsAlt && tCtrlDown == Gui::cancelFineNeedsCtrl && tShiftDown == Gui::cancelFineNeedsShift) {
+                g_FineSequenceStop.store(true);
+                return 0; // block from game
+            }
+        }
+    }
+
+    if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen) {
+        if (g_WantedSequenceState.load() == 2) {
+            if (msgVk == Gui::issueFineKey && tAltDown == Gui::issueFineNeedsAlt && tCtrlDown == Gui::issueFineNeedsCtrl && tShiftDown == Gui::issueFineNeedsShift) {
+                g_WantedSequenceGo.store(true);
+                return 0; // block from game
+            }
+            if (msgVk == Gui::cancelFineKey && tAltDown == Gui::cancelFineNeedsAlt && tCtrlDown == Gui::cancelFineNeedsCtrl && tShiftDown == Gui::cancelFineNeedsShift) {
+                g_WantedSequenceStop.store(true);
+                return 0; // block from game
+            }
+        }
+    }
+
     // Binds Engine (hotkey binds — skip auto binds)
-    if ((uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen) {
-        WPARAM preciseKey = wParam;
+    if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen) {
+        WPARAM preciseKey = msgVk;
         if (preciseKey == VK_CONTROL) preciseKey = (lParam & (1 << 24)) ? VK_RCONTROL : VK_LCONTROL;
         if (preciseKey == VK_MENU)    preciseKey = (lParam & (1 << 24)) ? VK_RMENU : VK_LMENU;
         if (preciseKey == VK_SHIFT)   preciseKey = MapVirtualKey((lParam & 0x00FF0000) >> 16, MAPVK_VSC_TO_VK_EX);
@@ -958,13 +1252,46 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     }
 
     if (Gui::show) {
-        // Let voice chat key X pass through to the game
-        if ((uMsg == WM_KEYDOWN || uMsg == WM_KEYUP) && wParam == 'X') {
-            return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+        ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+
+        bool wantTextInput = false;
+        if (ImGui::GetCurrentContext() != nullptr) {
+            wantTextInput = ImGui::GetIO().WantTextInput;
         }
 
-        ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-        
+        if (!Gui::blockKeyboardInput && !wantTextInput) {
+            if (uMsg == WM_INPUT || uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || 
+                uMsg == WM_CHAR || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP) {
+                return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+            }
+        }
+
+        if (uMsg == WM_INPUT) {
+            RAWINPUT ri;
+            UINT dwSize = sizeof(RAWINPUT);
+            if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, &ri, &dwSize, sizeof(RAWINPUTHEADER)) != (UINT)-1) {
+                if (ri.header.dwType == RIM_TYPEKEYBOARD) {
+                    USHORT vKey = ri.data.keyboard.VKey;
+                    if (vKey == 'X' || vKey == VK_BACK) return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                    if (!wantTextInput && (vKey == 'W' || vKey == 'A' || vKey == 'S' || vKey == 'D' || vKey == 'F' || vKey == VK_RETURN)) {
+                        return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                    }
+                }
+            }
+        } else if (uMsg == WM_KEYDOWN || uMsg == WM_KEYUP) {
+            if (wParam == 'X' || wParam == VK_BACK) return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+            if (!wantTextInput && (wParam == 'W' || wParam == 'A' || wParam == 'S' || wParam == 'D' || wParam == 'F' || wParam == VK_RETURN)) {
+                return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+            }
+        } else if (uMsg == WM_CHAR) {
+            if (wParam == 'X' || wParam == 'x' || wParam == VK_BACK) return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+            if (!wantTextInput) {
+                if (wParam == 'W' || wParam == 'w' || wParam == 'A' || wParam == 'a' || wParam == 'S' || wParam == 's' || wParam == 'D' || wParam == 'd' || wParam == 'F' || wParam == 'f' || wParam == VK_RETURN) {
+                    return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                }
+            }
+        }
+
         switch (uMsg) {
             case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
             case WM_RBUTTONDOWN: case WM_RBUTTONUP: case WM_RBUTTONDBLCLK:
@@ -1015,15 +1342,14 @@ static HRESULT Hooked_EndScene(const kthook::kthook_simple<EndSceneFn>& hook, ID
     if (!g_Initialized) {
         Log("Hooked_EndScene: Initializing ImGui...");
         BinderManager::Get().ReloadBinds();
-        static bool wndProcHooked = false;
         D3DDEVICE_CREATION_PARAMETERS cp;
         if (SUCCEEDED(pDevice->GetCreationParameters(&cp))) {
             g_hWnd = cp.hFocusWindow;
             Log("Hooked_EndScene: Found hFocusWindow: " + std::to_string((uintptr_t)g_hWnd));
-            if (g_hWnd && !wndProcHooked) {
+            if (g_hWnd && !g_WndProcHooked) {
                 // Hook WndProc ONCE — never re-hook to avoid recursion
                 oWndProc = (WNDPROC)SetWindowLongPtrA(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
-                wndProcHooked = true;
+                g_WndProcHooked = true;
                 Log("Hooked_EndScene: WndProc successfully hooked.");
             }
         }
@@ -1043,11 +1369,20 @@ static HRESULT Hooked_EndScene(const kthook::kthook_simple<EndSceneFn>& hook, ID
 
 static HRESULT Hooked_Reset(const kthook::kthook_simple<ResetFn>& hook, IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
     Log("Hooked_Reset: Display reset requested.");
-    if (g_Initialized) ImGui_ImplDX9_InvalidateDeviceObjects();
+    if (g_Initialized) {
+        ImGui_ImplDX9_InvalidateDeviceObjects();
+        ImGui_ImplDX9_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+        g_Initialized = false;
+    }
+
     HRESULT hr = hook.get_trampoline()(pDevice, pParams);
-    if (g_Initialized && SUCCEEDED(hr)) ImGui_ImplDX9_CreateDeviceObjects();
-    if (SUCCEEDED(hr)) Log("Hooked_Reset: Reset successful.");
-    else Log("Hooked_Reset: Reset failed.");
+    if (SUCCEEDED(hr)) {
+        Log("Hooked_Reset: Reset successful.");
+    } else {
+        Log("Hooked_Reset: Reset failed.");
+    }
     return hr;
 }
 
@@ -1107,10 +1442,43 @@ static void MainThread() {
     // ===== Hook CPad::UpdatePads with kthook to prevent control conflicts =====
     hookCPadUpdate.set_cb([](const auto& hook) {
         hook.get_trampoline()(); // Let GTA SA read the hardware controller mappings
-        // Keep gameplay controls available for radial + radial ID mode.
-        // Hard-block only full overlay menu.
+        
         if (Gui::show) {
-            memset((void*)0xB73458, 0, 96); // Zero out NewState and OldState completely
+            bool wantTextInput = false;
+            if (ImGui::GetCurrentContext() != nullptr) {
+                wantTextInput = ImGui::GetIO().WantTextInput;
+            }
+            
+            if (wantTextInput || Gui::blockKeyboardInput) {
+                // Hard-block everything when typing or explicitly blocked
+                memset((void*)0xB73458, 0, 96);
+            } else {
+                // Allow WASD and F, but block mouse (camera and shooting) so clicks on overlay don't trigger game actions
+                struct CControllerState {
+                    signed short LeftStickX; signed short LeftStickY;
+                    signed short RightStickX; signed short RightStickY;
+                    signed short LeftShoulder1; signed short LeftShoulder2;
+                    signed short RightShoulder1; signed short RightShoulder2;
+                    signed short DPadUp; signed short DPadDown;
+                    signed short DPadLeft; signed short DPadRight;
+                    signed short Start; signed short Select;
+                    signed short ButtonSquare; signed short ButtonTriangle;
+                    signed short ButtonCross; signed short ButtonCircle;
+                    signed short ShockButtonL; signed short ShockButtonR;
+                    signed short m_bChatIndicated; signed short m_bPedWalk;
+                    signed short m_bVehicleMouseLook; signed short m_bRadioTrackSkip;
+                };
+                for (int i = 0; i < 2; i++) {
+                    CControllerState* state = (CControllerState*)(0xB73458 + (i * 48));
+                    state->RightStickX = 0;
+                    state->RightStickY = 0;
+                    state->ButtonCircle = 0; // Fire
+                    state->LeftShoulder1 = 0; // Aim
+                    state->LeftShoulder2 = 0;
+                    state->RightShoulder1 = 0;
+                    state->RightShoulder2 = 0;
+                }
+            }
         }
     });
     hookCPadUpdate.install();
@@ -1122,7 +1490,9 @@ static void MainThread() {
         if (getAsyncAddr) {
             hookGetAsyncKeyState.set_dest((GetAsyncKeyState_t)getAsyncAddr);
             hookGetAsyncKeyState.before += [](const auto& hook, int& vKey) -> std::optional<SHORT> {
-                if (Gui::show && (vKey == 'T' || vKey == 't' || vKey == VK_F6 || vKey == VK_F8 || vKey == VK_ESCAPE)) {
+                bool wantTextInput = false;
+                if (ImGui::GetCurrentContext() != nullptr) wantTextInput = ImGui::GetIO().WantTextInput;
+                if (Gui::show && (Gui::blockKeyboardInput || wantTextInput) && (vKey == 'T' || vKey == 't' || vKey == VK_F6 || vKey == VK_F8 || vKey == VK_ESCAPE)) {
                     return 0; // Return unpressed for specific keys
                 }
                 return std::nullopt;
@@ -1134,10 +1504,11 @@ static void MainThread() {
         if (getKeyboardStateAddr) {
             hookGetKeyboardState.set_dest((GetKeyboardState_t)getKeyboardStateAddr);
             hookGetKeyboardState.after += [](const auto& hook, BOOL& ret, PBYTE lpKeyState) {
-                if (Gui::show && ret && lpKeyState) {
+                bool wantTextInput = false;
+                if (ImGui::GetCurrentContext() != nullptr) wantTextInput = ImGui::GetIO().WantTextInput;
+                if (Gui::show && (Gui::blockKeyboardInput || wantTextInput) && ret && lpKeyState) {
                     lpKeyState['T'] = 0;
                     lpKeyState['t'] = 0;
-                    lpKeyState[VK_F6] = 0;
                     lpKeyState[VK_F8] = 0;
                     lpKeyState[VK_ESCAPE] = 0;
                 }
@@ -1157,8 +1528,11 @@ static void MainThread() {
                         if (g_chatReadyTime == 0) g_chatReadyTime = GetTickCount64();
                         if (GetTickCount64() - g_chatReadyTime > 4000) { 
                             g_chatWelcomeSent = true;
-                            std::string line1 = UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\xA3\xD1\x81\xD0\xBF\xD0\xB5\xD1\x88\xD0\xBD\xD0\xBE \xD0\xB7\xD0\xB0\xD0\xB3\xD1\x80\xD1\x83\xD0\xB6\xD0\xB5\xD0\xBD!");
-                            std::string line2 = UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\xA1\xD0\xBE\xD0\xBE\xD0\xB1\xD1\x89\xD0\xB5\xD1\x81\xD1\x82\xD0\xB2\xD0\xBE VK: {1F6FEB}vk.com/duranhelper");
+                            // Build welcome message with version and toggle key
+                            std::string ver = Gui::versionStr.empty() ? "" : (" V" + Gui::versionStr);
+                            std::string msg1 = "{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x9F\xD0\xBB\xD0\xB0\xD0\xB3\xD0\xB8\xD0\xBD \xD1\x83\xD1\x81\xD0\xBF\xD0\xB5\xD1\x88\xD0\xBD\xD0\xBE \xD0\xB7\xD0\xB0\xD0\xB3\xD1\x80\xD1\x83\xD0\xB6\xD0\xB5\xD0\xBD! \xD0\x92\xD0\xB5\xD1\x80\xD1\x81\xD0\xB8\xD1\x8F" + ver;
+                            std::string line1 = UTF8ToCP1251(msg1.c_str());
+                            std::string line2 = UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x9D\xD0\xB0\xD1\x88\xD0\xB0 \xD0\xB3\xD1\x80\xD1\x83\xD0\xBF\xD0\xBF\xD0\xB0 VK: {1F6FEB}vk.com/duranhelper");
                             RunOnMainThread([l1=line1, l2=line2]() {
                                 AddLocalSAMPMessage(l1.c_str());
                                 AddLocalSAMPMessage(l2.c_str());
@@ -1184,9 +1558,34 @@ static void MainThread() {
             if (Gui::show) {
                 if ((msg->message >= WM_KEYFIRST && msg->message <= WM_KEYLAST) || 
                     msg->message == WM_INPUT) {
-                    // Let voice chat key X pass through to SA-MP
-                    if ((msg->message == WM_KEYDOWN || msg->message == WM_KEYUP) && msg->wParam == 'X') {
-                        return std::nullopt;
+                    bool wantText = false;
+                    if (ImGui::GetCurrentContext() != nullptr) wantText = ImGui::GetIO().WantTextInput;
+
+                    if (msg->message == WM_INPUT) {
+                        RAWINPUT ri;
+                        UINT dwSize = sizeof(RAWINPUT);
+                        if (GetRawInputData((HRAWINPUT)msg->lParam, RID_INPUT, &ri, &dwSize, sizeof(RAWINPUTHEADER)) != (UINT)-1) {
+                            if (ri.header.dwType == RIM_TYPEKEYBOARD) {
+                                USHORT vKey = ri.data.keyboard.VKey;
+                                if (vKey == 'X' || vKey == VK_BACK) return std::nullopt;
+                                if (!wantText && (vKey == 'W' || vKey == 'A' || vKey == 'S' || vKey == 'D' || vKey == 'F' || vKey == VK_RETURN)) {
+                                    return std::nullopt;
+                                }
+                            }
+                        }
+                    } else if (msg->message == WM_KEYDOWN || msg->message == WM_KEYUP) {
+                        if (msg->wParam == 'X' || msg->wParam == VK_BACK) return std::nullopt;
+                        if (!wantText && (msg->wParam == 'W' || msg->wParam == 'A' || msg->wParam == 'S' || msg->wParam == 'D' || msg->wParam == 'F' || msg->wParam == VK_RETURN)) {
+                            return std::nullopt;
+                        }
+                    } else if (msg->message == WM_CHAR) {
+                        if (msg->wParam == 'X' || msg->wParam == 'x' || msg->wParam == VK_BACK) return std::nullopt;
+                        if (!wantText) {
+                            WPARAM k = msg->wParam;
+                            if (k == 'W' || k == 'w' || k == 'A' || k == 'a' || k == 'S' || k == 's' || k == 'D' || k == 'd' || k == 'F' || k == 'f' || k == VK_RETURN) {
+                                return std::nullopt;
+                            }
+                        }
                     }
                     ImGui_ImplWin32_WndProcHandler(msg->hwnd, msg->message, msg->wParam, msg->lParam);
                     MSG* m = const_cast<MSG*>(msg); m->message = WM_NULL;

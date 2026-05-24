@@ -147,8 +147,8 @@
                                             </Canvas>
                                         </Grid>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                                            <TextBlock Text="ТОЛЬКО БАЗА ШТРАФОВ" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
-                                            <TextBlock Text="Сохранит категории штрафов калькулятора." Foreground="#8b949e" FontSize="10" FontFamily="Segoe UI" Margin="0,2,0,0"/>
+                                            <TextBlock Text="ТОЛЬКО БАЗА КАЛЬКУЛЯТОРА" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
+                                            <TextBlock Text="Сохранит базу штрафов и розыска калькулятора." Foreground="#8b949e" FontSize="10" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>

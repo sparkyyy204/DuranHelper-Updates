@@ -1,4 +1,4 @@
-﻿#include "binder.h"
+#include "binder.h"
 #include "gui.h"
 #include <fstream>
 #include <iostream>
@@ -98,6 +98,29 @@ int BinderManager::StringToVK(const std::string& keyStr) {
     if (k == "numpaddot") return VK_DECIMAL;
     if (k == "numpadenter") return VK_RETURN;
 
+    // Special cases for C# WPF mappings
+    if (k == "``" || k == "`") return 0xC0; // VK_OEM_3 (Ё)
+    if (k == "appskey" || k == "apps") return VK_APPS;
+    if (k == "ctrlbreak") return VK_CANCEL;
+    if (k == "sleep") return VK_SLEEP;
+    if (k == "help") return VK_HELP;
+    if (k == "lwin") return VK_LWIN;
+    if (k == "rwin") return VK_RWIN;
+    if (k == "browser_back") return VK_BROWSER_BACK;
+    if (k == "browser_forward") return VK_BROWSER_FORWARD;
+    if (k == "browser_refresh") return VK_BROWSER_REFRESH;
+    if (k == "browser_stop") return VK_BROWSER_STOP;
+    if (k == "browser_search") return VK_BROWSER_SEARCH;
+    if (k == "browser_favorites") return VK_BROWSER_FAVORITES;
+    if (k == "browser_home") return VK_BROWSER_HOME;
+    if (k == "volume_mute") return VK_VOLUME_MUTE;
+    if (k == "volume_down") return VK_VOLUME_DOWN;
+    if (k == "volume_up") return VK_VOLUME_UP;
+    if (k == "media_next") return VK_MEDIA_NEXT_TRACK;
+    if (k == "media_prev") return VK_MEDIA_PREV_TRACK;
+    if (k == "media_stop") return VK_MEDIA_STOP;
+    if (k == "media_play_pause") return VK_MEDIA_PLAY_PAUSE;
+
     if (k.length() == 1) { // generic single character e.g. "a", "1"
         char c = k[0];
         if (c >= 'a' && c <= 'z') return c - 'a' + 'A';
@@ -137,6 +160,17 @@ void BinderManager::ParseAhkKey(BindItem& bind) {
     std::string lowerKey = key;
     std::transform(lowerKey.begin(), lowerKey.end(), lowerKey.begin(), ::tolower);
     
+    std::string prefix1 = "клавиша: ";
+    if (lowerKey.find(prefix1) == 0) {
+        key = key.substr(prefix1.length());
+        lowerKey = lowerKey.substr(prefix1.length());
+    }
+    std::string prefix2 = "клавиша:";
+    if (lowerKey.find(prefix2) == 0) {
+        key = key.substr(prefix2.length());
+        lowerKey = lowerKey.substr(prefix2.length());
+    }
+
     if (lowerKey.find("alt") != std::string::npos && lowerKey.find("alt") < lowerKey.find_last_of('+')) bind.needsAlt = true;
     if (lowerKey.find("ctrl") != std::string::npos && lowerKey.find("ctrl") < lowerKey.find_last_of('+')) bind.needsCtrl = true;
     if (lowerKey.find("shift") != std::string::npos && lowerKey.find("shift") < lowerKey.find_last_of('+')) bind.needsShift = true;
@@ -172,9 +206,9 @@ bool BindItem::Matches(int vkPressed) const {
     if (!active || vkCode == 0) return false;
     if (vkCode != vkPressed) return false;
 
-    bool isAltPressed = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
-    bool isCtrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
-    bool isShiftPressed = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+    bool isAltPressed = (vkCode == VK_MENU || vkCode == VK_LMENU || vkCode == VK_RMENU) ? needsAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
+    bool isCtrlPressed = (vkCode == VK_CONTROL || vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) ? needsCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
+    bool isShiftPressed = (vkCode == VK_SHIFT || vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) ? needsShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
 
     if (needsAlt != isAltPressed) return false;
     if (needsCtrl != isCtrlPressed) return false;

@@ -1,0 +1,156 @@
+{
+  "Binds": {
+    "716380": {
+      "id": "716380",
+      "name": "Лекция субординации армии",
+      "key": "лекция1",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/s Сейчас я проведу лекцию на тему \"Субординация\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/s Она предусматривает уважительные отношения между руководителем и подчинённым",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/s А также порядка доклада результатов выполнения распоряжения руководителей.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/s В армии правила субординации устанавливают:",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "/s Порядок соблюдения определённых традиций.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 6,
+          "action": "CHAT",
+          "value": "/s Так же для обращения к старшему по званию, нужно сказать \"т.Звание\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 7,
+          "action": "CHAT",
+          "value": "/s Примеры обращения и замены неправильных слов",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 8,
+          "action": "CHAT",
+          "value": "/s \"Здравствуйте\" на \"Здравия желаю\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 9,
+          "action": "CHAT",
+          "value": "/s \"Да\" на \"Так точно\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 10,
+          "action": "CHAT",
+          "value": "/s \"Нет\" на \"Никак нет\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 11,
+          "action": "CHAT",
+          "value": "/s \"Можно?\" на \"Разрешите?\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 12,
+          "action": "CHAT",
+          "value": "/s \"Не знаю\" - \"Не могу знать\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 13,
+          "action": "CHAT",
+          "value": "/s \"Ладно, хорошо\" на \"Есть\".",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 14,
+          "action": "CHAT",
+          "value": "/s Несоблюдение субординации - это нарушение устава, за которое вы получите наказание.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": true
+    }
+  },
+  "Groups": [],
+  "Variables": {}
+}

@@ -1,0 +1,992 @@
+[
+  {
+    "id": "bindsFSBv1",
+    "title": "Набор биндов ФСБ",
+    "description": "Набор быстрых комманд для ФСБ",
+    "server": "Все серверы",
+    "author": "Duran_Korrupcioner",
+    "type": "binds",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/bindsFSBv1"
+  },
+  {
+    "id": "bindsMVDv1",
+    "title": "Набор биндов МВД",
+    "description": "Набор быстрых комманд для МВД",
+    "server": "Все серверы",
+    "author": "Duran_Korrupcioner",
+    "type": "binds",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/bindsMVDv1"
+  },
+  {
+    "id": "LekciaSuborMO",
+    "title": "Лекция для МО",
+    "description": "Лекция на тему субординации для МО",
+    "server": "Все серверы",
+    "author": "Duran_Korrupcioner",
+    "type": "binds",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/LekciaSuborMO"
+  },
+  {
+    "id": "Calculator01",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 01",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator01.json"
+  },
+  {
+    "id": "FSIN_charter01",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 01",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter01.json"
+  },
+  {
+    "id": "MO_charter01",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 01",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter01.json"
+  },
+  {
+    "id": "mvd_charter01",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 01",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter01.json"
+  },
+  {
+    "id": "YK_KOAP01",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 01",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP01.json"
+  },
+  {
+    "id": "Calculator02",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 02",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator02.json"
+  },
+  {
+    "id": "FSIN_charter02",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 02",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter02.json"
+  },
+  {
+    "id": "MO_charter02",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 02",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter02.json"
+  },
+  {
+    "id": "mvd_charter02",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 02",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter02.json"
+  },
+  {
+    "id": "YK_KOAP02",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 02",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP02.json"
+  },
+  {
+    "id": "Calculator03",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 03",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator03.json"
+  },
+  {
+    "id": "FSIN_charter03",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 03",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter03.json"
+  },
+  {
+    "id": "MO_charter03",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 03",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter03.json"
+  },
+  {
+    "id": "mvd_charter03",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 03",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter03.json"
+  },
+  {
+    "id": "YK_KOAP03",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 03",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP03.json"
+  },
+  {
+    "id": "mvd_sobr_charter03",
+    "title": "Устав СОБР МВД",
+    "description": "Полный текст устава СОБР МВД",
+    "server": "СЕРВЕР 03",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_sobr_charter03.json"
+  },
+  {
+    "id": "Calculator04",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 04",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator04.json"
+  },
+  {
+    "id": "FSIN_charter04",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 04",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter04.json"
+  },
+  {
+    "id": "MO_charter04",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 04",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter04.json"
+  },
+  {
+    "id": "mvd_charter04",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 04",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter04.json"
+  },
+  {
+    "id": "YK_KOAP04",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 04",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP04.json"
+  },
+  {
+    "id": "Calculator05",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 05",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator05.json"
+  },
+  {
+    "id": "FSIN_charter05",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 05",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter05.json"
+  },
+  {
+    "id": "MO_charter05",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 05",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter05.json"
+  },
+  {
+    "id": "mvd_charter05",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 05",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter05.json"
+  },
+  {
+    "id": "YK_KOAP05",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 05",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP05.json"
+  },
+  {
+    "id": "Calculator06",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 06",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator06.json"
+  },
+  {
+    "id": "FSIN_charter06",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 06",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter06.json"
+  },
+  {
+    "id": "MO_charter06",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 06",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter06.json"
+  },
+  {
+    "id": "mvd_charter06",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 06",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter06.json"
+  },
+  {
+    "id": "YK_KOAP06",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 06",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP06.json"
+  },
+  {
+    "id": "Calculator07",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 07",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator07.json"
+  },
+  {
+    "id": "FSIN_charter07",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 07",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter07.json"
+  },
+  {
+    "id": "MO_charter07",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 07",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter07.json"
+  },
+  {
+    "id": "mvd_charter07",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 07",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter07.json"
+  },
+  {
+    "id": "YK_KOAP07",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 07",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP07.json"
+  },
+  {
+    "id": "Calculator08",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 08",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator08.json"
+  },
+  {
+    "id": "FSIN_charter08",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 08",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter08.json"
+  },
+  {
+    "id": "MO_charter08",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 08",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter08.json"
+  },
+  {
+    "id": "mvd_charter08",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 08",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter08.json"
+  },
+  {
+    "id": "YK_KOAP08",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 08",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP08.json"
+  },
+  {
+    "id": "FullZakon09",
+    "title": "Сборник законов",
+    "description": "Полная база: УПК, ФЗоП, ФЗоФСБ, Адв, ЗОТ, Неприкоc",
+    "server": "СЕРВЕР 09",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FullZakon09.json"
+  },
+  {
+    "id": "Calculator09",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 09",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator09.json"
+  },
+  {
+    "id": "FSIN_charter09",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 09",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter09.json"
+  },
+  {
+    "id": "MO_charter09",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 09",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter09.json"
+  },
+  {
+    "id": "mvd_charter09",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 09",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter09.json"
+  },
+  {
+    "id": "YK_KOAP09",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 09",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP09.json"
+  },
+  {
+    "id": "Calculator10",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 10",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator10.json"
+  },
+  {
+    "id": "FSIN_charter10",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 10",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter10.json"
+  },
+  {
+    "id": "MO_charter10",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 10",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter10.json"
+  },
+  {
+    "id": "mvd_charter10",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 10",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter10.json"
+  },
+  {
+    "id": "YK_KOAP10",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 10",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP10.json"
+  },
+  {
+    "id": "Calculator11",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 11",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator11.json"
+  },
+  {
+    "id": "FSIN_charter11",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 11",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter11.json"
+  },
+  {
+    "id": "MO_charter11",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 11",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter11.json"
+  },
+  {
+    "id": "mvd_charter11",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 11",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter11.json"
+  },
+  {
+    "id": "YK_KOAP11",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 11",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP11.json"
+  },
+  {
+    "id": "EYS_charter12",
+    "title": "Устав ЕУСС",
+    "description": "Полный текст устава ЕУСС",
+    "server": "СЕРВЕР 12",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/EYS_charter12.json"
+  },
+  {
+    "id": "Calculator12",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 12",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator12.json"
+  },
+  {
+    "id": "YK_KOAP12",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 12",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP12.json"
+  },
+  {
+    "id": "Calculator13",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 13",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator13.json"
+  },
+  {
+    "id": "FSIN_charter13",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 13",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter13.json"
+  },
+  {
+    "id": "MO_charter13",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 13",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter13.json"
+  },
+  {
+    "id": "mvd_charter13",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 13",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter13.json"
+  },
+  {
+    "id": "YK_KOAP13",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 13",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP13.json"
+  },
+  {
+    "id": "Calculator14",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 14",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator14.json"
+  },
+  {
+    "id": "FSIN_charter14",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 14",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter14.json"
+  },
+  {
+    "id": "MO_charter14",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 14",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter14.json"
+  },
+  {
+    "id": "mvd_charter14",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 14",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter14.json"
+  },
+  {
+    "id": "YK_KOAP14",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 14",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP14.json"
+  },
+  {
+    "id": "Calculator15",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 15",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator15.json"
+  },
+  {
+    "id": "FSIN_charter15",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 15",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter15.json"
+  },
+  {
+    "id": "MO_charter15",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 15",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter15.json"
+  },
+  {
+    "id": "mvd_charter15",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 15",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter15.json"
+  },
+  {
+    "id": "YK_KOAP15",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 15",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP15.json"
+  },
+  {
+    "id": "Calculator16",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 16",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator16.json"
+  },
+  {
+    "id": "FSIN_charter16",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 16",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter16.json"
+  },
+  {
+    "id": "MO_charter16",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 16",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter16.json"
+  },
+  {
+    "id": "mvd_charter16",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 16",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter16.json"
+  },
+  {
+    "id": "YK_KOAP16",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 16",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP16.json"
+  },
+  {
+    "id": "Calculator17",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 17",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator17.json"
+  },
+  {
+    "id": "FSIN_charter17",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 17",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter17.json"
+  },
+  {
+    "id": "MO_charter17",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 17",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter17.json"
+  },
+  {
+    "id": "mvd_charter17",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 17",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter17.json"
+  },
+  {
+    "id": "YK_KOAP17",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 17",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP17.json"
+  },
+  {
+    "id": "Calculator18",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 18",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator18.json"
+  },
+  {
+    "id": "FSIN_charter18",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 18",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter18.json"
+  },
+  {
+    "id": "MO_charter18",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 18",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter18.json"
+  },
+  {
+    "id": "mvd_charter18",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 18",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter18.json"
+  },
+  {
+    "id": "YK_KOAP18",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 18",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP18.json"
+  },
+  {
+    "id": "Calculator19",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 19",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator19.json"
+  },
+  {
+    "id": "FSIN_charter19",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 19",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter19.json"
+  },
+  {
+    "id": "MO_charter19",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 19",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter19.json"
+  },
+  {
+    "id": "mvd_charter19",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 19",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter19.json"
+  },
+  {
+    "id": "YK_KOAP19",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 19",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP19.json"
+  },
+  {
+    "id": "Calculator20",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator20.json"
+  },
+  {
+    "id": "FSIN_charter20",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter20.json"
+  },
+  {
+    "id": "MO_charter20",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter20.json"
+  },
+  {
+    "id": "mvd_charter20",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter20.json"
+  },
+  {
+    "id": "FSB_charter20",
+    "title": "Устав ФСБ",
+    "description": "Полный текст устава ФСБ",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSB_charter20.json"
+  },
+  {
+    "id": "YK_KOAP20",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP20.json"
+  },
+  {
+    "id": "DK20",
+    "title": "Дорожный кодекс",
+    "description": "Полный текст дорожного кодекса",
+    "server": "СЕРВЕР 20",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/DK20.json"
+  },
+  {
+    "id": "Calculator21",
+    "title": "Калькулятор УК+КоАП",
+    "description": "Калькулятор штрафов и розыска",
+    "server": "СЕРВЕР 21",
+    "author": "Duran_Korrupcioner",
+    "type": "fines",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator21.json"
+  },
+  {
+    "id": "FSIN_charter21",
+    "title": "Устав ФСИН",
+    "description": "Полный текст устава ФСИН",
+    "server": "СЕРВЕР 21",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter21.json"
+  },
+  {
+    "id": "MO_charter21",
+    "title": "Устав МО",
+    "description": "Полный текст устава МО",
+    "server": "СЕРВЕР 21",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter21.json"
+  },
+  {
+    "id": "mvd_charter21",
+    "title": "Устав МВД",
+    "description": "Полный текст устава МВД",
+    "server": "СЕРВЕР 21",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter21.json"
+  },
+  {
+    "id": "YK_KOAP21",
+    "title": "Кодексы УК+КоАП",
+    "description": "Полный текст Уголовного и Административного кодекса",
+    "server": "СЕРВЕР 21",
+    "author": "Duran_Korrupcioner",
+    "type": "laws",
+    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP21.json"
+  }
+]

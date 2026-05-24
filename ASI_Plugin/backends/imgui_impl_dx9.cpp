@@ -288,6 +288,8 @@ void ImGui_ImplDX9_RenderDrawData(ImDrawData* draw_data)
 
                 // Bind texture, Draw
                 const LPDIRECT3DTEXTURE9 texture = (LPDIRECT3DTEXTURE9)pcmd->GetTexID();
+                if ((intptr_t)texture == (intptr_t)-1 || texture == nullptr)
+                    continue; // Skip draw commands with invalid/uninitialized textures
                 device->SetTexture(0, texture);
                 device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, pcmd->VtxOffset + global_vtx_offset, 0, (UINT)draw_list->VtxBuffer.Size, pcmd->IdxOffset + global_idx_offset, pcmd->ElemCount / 3);
             }
@@ -420,18 +422,27 @@ void ImGui_ImplDX9_UpdateTexture(ImTextureData* tex)
         // Update selected blocks. We only ever write to textures regions which have never been used before!
         // This backend choose to use tex->Updates[] but you can use tex->UpdateRect to upload a single region.
         LPDIRECT3DTEXTURE9 backend_tex = (LPDIRECT3DTEXTURE9)(intptr_t)tex->TexID;
+        if (!backend_tex || (intptr_t)backend_tex == (intptr_t)-1)
+        {
+            tex->SetStatus(ImTextureStatus_OK);
+            return;
+        }
+
         RECT update_rect = { (LONG)tex->UpdateRect.x, (LONG)tex->UpdateRect.y, (LONG)(tex->UpdateRect.x + tex->UpdateRect.w), (LONG)(tex->UpdateRect.y + tex->UpdateRect.h) };
         D3DLOCKED_RECT locked_rect;
         if (backend_tex->LockRect(0, &locked_rect, &update_rect, 0) == D3D_OK)
+        {
             for (ImTextureRect& r : tex->Updates)
                 ImGui_ImplDX9_CopyTextureRegion(tex->UseColors, (ImU32*)tex->GetPixelsAt(r.x, r.y), tex->Width * 4,
                     (ImU32*)locked_rect.pBits + (r.x - update_rect.left) + (r.y - update_rect.top) * (locked_rect.Pitch / 4), (int)locked_rect.Pitch, r.w, r.h);
-        backend_tex->UnlockRect(0);
+            backend_tex->UnlockRect(0);
+        }
         tex->SetStatus(ImTextureStatus_OK);
     }
     else if (tex->Status == ImTextureStatus_WantDestroy)
     {
-        if (LPDIRECT3DTEXTURE9 backend_tex = (LPDIRECT3DTEXTURE9)tex->TexID)
+        LPDIRECT3DTEXTURE9 backend_tex = (LPDIRECT3DTEXTURE9)tex->TexID;
+        if (backend_tex && (intptr_t)backend_tex != (intptr_t)-1)
         {
             IM_ASSERT(tex->TexID == (ImTextureID)(intptr_t)backend_tex);
             backend_tex->Release();
