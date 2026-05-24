@@ -231,14 +231,12 @@ namespace FSB_helper_C__
                 if (scale < 0.8) scale = 0.8;
                 if (scale > 2.5) scale = 2.5;
 
-                if (RootScaleTransform != null)
-                {
-                    RootScaleTransform.ScaleX = scale;
-                    RootScaleTransform.ScaleY = scale;
-                }
+                // Viewbox handles proportional layout. Just set the window size relative to original 1116x766 base layout.
+                double targetW = 1116.0 * (scale / 0.8);
+                double targetH = 766.0 * (scale / 0.8);
 
-                this.Width = 916.0 * (scale / 0.8);
-                this.Height = 636.0 * (scale / 0.8);
+                this.Width = targetW;
+                this.Height = targetH;
             }
             catch (Exception ex)
             {

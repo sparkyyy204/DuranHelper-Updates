@@ -25,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="DuranOverlay.asi">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+
     <None Update="ConfigBase\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
