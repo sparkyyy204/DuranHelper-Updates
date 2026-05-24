@@ -31,7 +31,6 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         queries: security-extended,security-and-quality
-        config-file: ./.github/codeql-config.yml
 
     # --- Настройка и сборка C++ плагина ---
     - name: Set up MSBuild for C++
