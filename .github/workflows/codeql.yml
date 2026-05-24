@@ -1,0 +1,69 @@
+name: "CodeQL Advanced Security Analysis"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    - cron: '24 19 * * 0'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: windows-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'c-cpp', 'csharp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+
+    # --- Настройка и сборка C++ плагина ---
+    - name: Set up MSBuild for C++
+      if: matrix.language == 'c-cpp'
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Download json.hpp for C++
+      if: matrix.language == 'c-cpp'
+      run: |
+        New-Item -ItemType Directory -Force -Path ASI_Plugin\libs\json
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/nlohmann/json/v3.12.0/single_include/nlohmann/json.hpp" -OutFile "ASI_Plugin\libs\json\json.hpp"
+
+    - name: Build C++ (ASI Plugin)
+      if: matrix.language == 'c-cpp'
+      run: msbuild ASI_Plugin\DuranOverlay.sln /p:Configuration=Release /p:Platform=x86
+
+    # --- Настройка и сборка C# лаунчера ---
+    - name: Set up .NET for C#
+      if: matrix.language == 'csharp'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore C# Dependencies
+      if: matrix.language == 'csharp'
+      run: dotnet restore DuranHelper.csproj
+
+    - name: Build C# (Launcher)
+      if: matrix.language == 'csharp'
+      run: dotnet build DuranHelper.csproj --configuration Release --no-restore
+
+    # --- Запуск самого анализа CodeQL ---
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
