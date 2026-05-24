@@ -123,7 +123,7 @@ namespace FSB_helper_C__
 
     public class ProfileData { 
         public Dictionary<string, LawSection> Laws { get; set; } = new Dictionary<string, LawSection>(); 
-        public Dictionary<string, BindItem> Binds { get; set; } = new Dictionary<string, BindItem>() { { "Radial", new BindItem { id = "Radial", name = "Radial Menu", key = "B" } } }; 
+        public Dictionary<string, BindItem> Binds { get; set; } = new Dictionary<string, BindItem>() { { "Radial", new BindItem { id = "Radial", name = "Radial Menu", key = "НЕТ" } } }; 
         public List<string> Groups { get; set; } = new List<string>(); 
         public Dictionary<string, string> Variables { get; set; } = new Dictionary<string, string>(); 
         public Dictionary<string, Dictionary<string, string>> CustomThemes { get; set; } = new Dictionary<string, Dictionary<string, string>>();
