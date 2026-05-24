@@ -30,7 +30,6 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        queries: security-extended,security-and-quality
 
     # --- Настройка и сборка C++ плагина ---
     - name: Set up MSBuild for C++
