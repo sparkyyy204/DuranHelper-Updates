@@ -74,7 +74,7 @@ namespace FSB_helper_C__
             cmbCategory.SelectionChanged += Filter_Changed;
         }
 
-        public async void LoadCatalog()
+        public async Task LoadCatalogAsync()
         {
             if (_fullCatalog != null && _fullCatalog.Count > 0) 
             {
@@ -103,7 +103,7 @@ namespace FSB_helper_C__
                 if (System.IO.File.Exists(catalogPath))
                 {
                     string json = await System.IO.File.ReadAllTextAsync(catalogPath, ct);
-                    _fullCatalog = JsonConvert.DeserializeObject<List<CloudItem>>(json) ?? new List<CloudItem>();
+                    _fullCatalog = await Task.Run(() => JsonConvert.DeserializeObject<List<CloudItem>>(json)) ?? new List<CloudItem>();
                 }
                 else
                 {
@@ -140,7 +140,7 @@ namespace FSB_helper_C__
 
         private void Retry_Click(object sender, RoutedEventArgs e)
         {
-            LoadCatalog();
+            _ = LoadCatalogAsync();
         }
 
         private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
