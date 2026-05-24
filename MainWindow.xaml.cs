@@ -339,7 +339,95 @@ namespace FSB_helper_C__
             SplashStatusInit.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1.0, TimeSpan.FromSeconds(0.4)) { EasingFunction = colorEaseUpd });
             await Task.Delay(400);
 
+            // ===================================================================
+            // SYSTEM INITIALIZATION LOGIC (Moved here to prevent UI stutter)
+            // ===================================================================
 
+            // Set default gold colors for the dashes
+            var goldCol2 = ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color;
+            Dash1Brush.Color = goldCol2; Dash1Glow.Color = goldCol2;
+
+            // Pre-warm: make main UI visible at opacity 0 (behind splash) to create visual trees
+            MainBackgroundBorder.Visibility = Visibility.Visible;
+            MainBackgroundBorder.Opacity = 0;
+            await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
+
+            // Cycle tabs to pre-warm visual trees
+            int originalTab = Tabs.SelectedIndex;
+            for (int i = 0; i < Tabs.Items.Count; i++)
+            {
+                if (Tabs.Items[i] is TabItem warmTab) warmTab.Visibility = Visibility.Visible;
+                Tabs.SelectedIndex = i;
+                await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
+
+                // Laws tab is the heaviest on first open: force data/layout warm-up now.
+                if (i == 1 && _hasProfile && !string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile))
+                {
+                    UpdateLawsList();
+                    await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Loaded);
+                    await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
+                    // Prewarm first dropdown open animation in Laws tab.
+                    if (cbSections != null) {
+                        cbSections.ApplyTemplate();
+                        cbSections.UpdateLayout();
+                        bool wasOpen = cbSections.IsDropDownOpen;
+                        cbSections.IsDropDownOpen = true;
+                        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
+                        cbSections.IsDropDownOpen = wasOpen;
+                        cbSections.UpdateLayout();
+                    }
+                }
+            }
+            Tabs.SelectedIndex = originalTab;
+            for (int i = 0; i < Tabs.Items.Count; i++)
+            {
+                if (i == originalTab) continue;
+                if (Tabs.Items[i] is TabItem warmedTab) warmedTab.Visibility = Visibility.Hidden;
+            }
+            // Ensure final tab is Visible after pre-warm
+            if (originalTab >= 0 && originalTab < Tabs.Items.Count && Tabs.Items[originalTab] is TabItem finalTab)
+                finalTab.Visibility = Visibility.Visible;
+            await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
+
+            // Zero out stats before UI fades in to prevent blinking destination values
+            if (lblStatBinds != null) {
+                lblStatBinds.Text = "0";
+                lblStatSections.Text = "0";
+                lblStatLaws.Text = "0";
+            }
+
+            // Preload the laws database catalog during initialization phase before ANY animations start
+            await ViewCloud.LoadCatalogAsync();
+
+            // --- INTERNAL PROCESSES (Heavy UI logic) ---
+            if (string.IsNullOrEmpty(_lastAppliedLauncherTheme)) {
+                _lastAppliedLauncherTheme = "Default (Dark Blue)";
+                if (rbThemeBlack?.IsChecked == true) _lastAppliedLauncherTheme = "Black (AMOLED)";
+                else if (rbThemeGrey?.IsChecked == true) _lastAppliedLauncherTheme = "Grey (Sport red)";
+            }
+            // Initialize clip with matching 12px cut corners
+            const double C_init = 12;
+            var initFig = new PathFigure(new Point(270, 225 + C_init), new PathSegment[] {
+                new LineSegment(new Point(270 + C_init, 225), true),
+                new LineSegment(new Point(270 + 460 - C_init, 225), true),
+                new LineSegment(new Point(270 + 460, 225 + C_init), true),
+                new LineSegment(new Point(270 + 460, 225 + 200 - C_init), true),
+                new LineSegment(new Point(270 + 460 - C_init, 225 + 200), true),
+                new LineSegment(new Point(270 + C_init, 225 + 200), true),
+                new LineSegment(new Point(270, 225 + 200 - C_init), true)
+            }, true);
+            MainBackgroundBorder.Clip = new PathGeometry(new[] { initFig });
+            _isStartupStatsAnimating = !string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile);
+            
+            // Execute heavy logic
+            UpdateDashboardState();
+            
+            // Force shield hidden
+            canvasShieldBg.BeginAnimation(OpacityProperty, null);
+            canvasShieldBg.Opacity = 0;
+
+            // Wait for UI layout to complete
+            await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
 
                 // === ASI Local Check (Silent) ===
                 string gamePath = txtGamePath?.Text ?? "";
@@ -377,97 +465,7 @@ namespace FSB_helper_C__
             // Standard TabControl: only selected tab is rendered. 
             // No pre-warming needed — Dashboard is the only active tab during expansion.
 
-            // === Dash 2: Local Init ===
-
-            await Task.Delay(300);
-
-            // Set default gold colors for the dashes
-            var goldCol2 = ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color;
-            Dash1Brush.Color = goldCol2; Dash1Glow.Color = goldCol2;
-
-            // Pre-warm: make main UI visible at opacity 0 (behind splash) to create visual trees
-            MainBackgroundBorder.Visibility = Visibility.Visible;
-            MainBackgroundBorder.Opacity = 0;
-            await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
-
-            // Cycle tabs to pre-warm visual trees
-            int originalTab = Tabs.SelectedIndex;
-            for (int i = 0; i < Tabs.Items.Count; i++)
-            {
-                if (Tabs.Items[i] is TabItem warmTab) warmTab.Visibility = Visibility.Visible;
-                await Task.Delay(200);
-                Tabs.SelectedIndex = i;
-                await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
-
-                // Laws tab is the heaviest on first open: force data/layout warm-up now.
-                if (i == 1 && _hasProfile && !string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile))
-                {
-                    UpdateLawsList();
-                    await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Loaded);
-                    await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
-                    // Prewarm first dropdown open animation in Laws tab.
-                    if (cbSections != null) {
-                        cbSections.ApplyTemplate();
-                        cbSections.UpdateLayout();
-                        bool wasOpen = cbSections.IsDropDownOpen;
-                        cbSections.IsDropDownOpen = true;
-                        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
-                        cbSections.IsDropDownOpen = wasOpen;
-                        cbSections.UpdateLayout();
-                    }
-                }
-            }
-            Tabs.SelectedIndex = originalTab;
-            for (int i = 0; i < Tabs.Items.Count; i++)
-            {
-                if (i == originalTab) continue;
-                if (Tabs.Items[i] is TabItem warmedTab) warmedTab.Visibility = Visibility.Hidden;
-            }
-            // Ensure final tab is Visible after pre-warm (pre-warm sets tabs to Hidden)
-            if (originalTab >= 0 && originalTab < Tabs.Items.Count && Tabs.Items[originalTab] is TabItem finalTab)
-                finalTab.Visibility = Visibility.Visible;
-            await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
-
-            // Zero out stats before UI fades in to prevent blinking destination values
-            if (lblStatBinds != null) {
-                lblStatBinds.Text = "0";
-                lblStatSections.Text = "0";
-                lblStatLaws.Text = "0";
-            }
-
-            // Preload the laws database catalog during initialization phase before ANY animations start
-            ViewCloud.LoadCatalog();
-            // --- INTERNAL PROCESSES (Heavy UI logic) ---
-            // MainBackgroundBorder is already Visible+Opacity=0 from XAML (layout done at startup, zero cost here).
-            // Pre-set theme flag so UpdateDashboardState skips ApplyTheme (which would flicker splash brushes).
-            if (string.IsNullOrEmpty(_lastAppliedLauncherTheme)) {
-                _lastAppliedLauncherTheme = "Default (Dark Blue)";
-                if (rbThemeBlack?.IsChecked == true) _lastAppliedLauncherTheme = "Black (AMOLED)";
-                else if (rbThemeGrey?.IsChecked == true) _lastAppliedLauncherTheme = "Grey (Sport red)";
-            }
-            // Initialize clip with matching 12px cut corners so no sharp corners flash before expansion animation starts.
-            const double C_init = 12;
-            var initFig = new PathFigure(new Point(270, 225 + C_init), new PathSegment[] {
-                new LineSegment(new Point(270 + C_init, 225), true),
-                new LineSegment(new Point(270 + 460 - C_init, 225), true),
-                new LineSegment(new Point(270 + 460, 225 + C_init), true),
-                new LineSegment(new Point(270 + 460, 225 + 200 - C_init), true),
-                new LineSegment(new Point(270 + 460 - C_init, 225 + 200), true),
-                new LineSegment(new Point(270 + C_init, 225 + 200), true),
-                new LineSegment(new Point(270, 225 + 200 - C_init), true)
-            }, true);
-            MainBackgroundBorder.Clip = new PathGeometry(new[] { initFig });
-            _isStartupStatsAnimating = !string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile);
-            
-            // Execute heavy logic
-            UpdateDashboardState();
-            
-            // Force shield hidden (UpdateDashboardState may have faded it in)
-            canvasShieldBg.BeginAnimation(OpacityProperty, null);
-            canvasShieldBg.Opacity = 0;
-
-            // Wait for UI layout to complete
-            await Dispatcher.InvokeAsync(() => {}, System.Windows.Threading.DispatcherPriority.Render);
+            // Heavy UI logic was moved UP directly under the "Инициализация системы" splash step.
 
             // --- ANIMATION: Smooth Fade Out & Fade In (Status & Button) ---
             Color green = ((SolidColorBrush)Application.Current.Resources["GreenBrush"]).Color;
@@ -538,6 +536,11 @@ namespace FSB_helper_C__
             SplashBg.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.6)) { EasingFunction = fadeEase });
             SplashBorder.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.6)) { EasingFunction = fadeEase });
             
+            // Pre-rasterize heavy elements at 1% opacity to prevent WPF from dropping them from the render tree
+            // This completely eliminates the mid-animation stutter when their fade-in animations start.
+            if (SidebarPanel != null) SidebarPanel.Opacity = 0.01;
+            if (Tabs != null) Tabs.Opacity = 0.01;
+
             // Show main UI and expand simultaneously
             MainBackgroundBorder.Opacity = 1;
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
@@ -556,11 +559,11 @@ namespace FSB_helper_C__
             // Fade and slide in Sidebar and Content UI
             var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
             if (SidebarPanel != null && SidebarPanel_TT != null) {
-                SidebarPanel.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
+                SidebarPanel.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
                 SidebarPanel_TT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(-30, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
             }
             if (Tabs != null && Tabs_TT != null) {
-                Tabs.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.3), EasingFunction = ease });
+                Tabs.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.3), EasingFunction = ease });
                 Tabs_TT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.3), EasingFunction = ease });
             }
             // --- Version Badge Color Transition ---
@@ -774,7 +777,7 @@ namespace FSB_helper_C__
             try {
                 int profileCount = MasterData.Count;
                 int totalBinds = MasterData.Values.Sum(p => p.Binds?.Count ?? 0);
-                int activeBinds = MasterData.Values.Sum(p => p.Binds?.Values.Count(b => b.active) ?? 0);
+                int activeBinds = MasterData.Values.Sum(p => p.Binds?.Values.Count(b => b.active && b.id != "Radial") ?? 0);
                 int totalSections = MasterData.Values.Sum(p => p.Laws?.Count ?? 0);
                 int totalArticles = MasterData.Values.Sum(p => p.Laws == null ? 0 : CountRealArticles(p.Laws));
                 int totalFines = MasterData.Values.Sum(p => p.Fines?.Count ?? 0);
@@ -950,7 +953,7 @@ namespace FSB_helper_C__
             var profilesSummary = MasterData.Select(kvp => new {
                 profile = kvp.Key,
                 binds_total = kvp.Value.Binds?.Count ?? 0,
-                binds_active = kvp.Value.Binds?.Values.Count(b => b.active) ?? 0,
+                binds_active = kvp.Value.Binds?.Values.Count(b => b.active && b.id != "Radial") ?? 0,
                 laws_sections = kvp.Value.Laws?.Count ?? 0,
                 laws_articles = kvp.Value.Laws == null ? 0 : CountRealArticles(kvp.Value.Laws),
                 fines_total = kvp.Value.Fines?.Count ?? 0,
@@ -2169,7 +2172,7 @@ namespace FSB_helper_C__
             // [OLD UI] if (lblStatBinds == null || arcStatBinds == null || string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
             var profile = MasterData[CurrentProfile];
             int total = profile.Binds.Count;
-            int active = profile.Binds.Values.Count(b => b.active);
+            int active = profile.Binds.Values.Count(b => b.active && b.id != "Radial");
             lblStatBinds.Text = active.ToString();
             
             double p = total > 0 ? (double)active / total : 0;
@@ -2196,7 +2199,7 @@ namespace FSB_helper_C__
             }
 
             var profile = MasterData[CurrentProfile];
-            int tgtBinds = profile.Binds.Values.Count(b => b.active);
+            int tgtBinds = profile.Binds.Values.Count(b => b.active && b.id != "Radial");
             int totalBinds = profile.Binds.Count;
             int tgtSections = profile.Laws.Count;
             int tgtLaws = CountRealArticles(profile.Laws);
@@ -2428,7 +2431,7 @@ namespace FSB_helper_C__
             SwitchTabAnim(4);
             if (ViewCloud != null)
             {
-                ViewCloud.LoadCatalog();
+                _ = ViewCloud.LoadCatalogAsync();
             }
         }
 
@@ -3381,7 +3384,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 }
             }
 
-            if (lblStatBinds != null) lblStatBinds.Text = all.Count(b => b.active).ToString();
+            if (lblStatBinds != null) lblStatBinds.Text = all.Count(b => b.active && b.id != "Radial").ToString();
         }
         
         private void BindSearch_TextChanged(object sender, TextChangedEventArgs e) { 
@@ -3543,7 +3546,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             _tempBind.isAuto = BinderEditorControl.rbTypeAuto.IsChecked == true;
             if (_tempBind.isAuto) _tempBind.key = BinderEditorControl.txtBindAutoTrigger.Text;
             if (_tempBind.active && !string.IsNullOrEmpty(_tempBind.key)) {
-                var conflicts = MasterData[CurrentProfile].Binds.Values.Where(b => b.key == _tempBind.key && b.id != _tempBind.id && b.active).ToList(); 
+                var conflicts = MasterData[CurrentProfile].Binds.Values.Where(b => b.key == _tempBind.key && b.id != _tempBind.id && b.active && b.id != "Radial").ToList(); 
                 if (conflicts.Count > 0) { 
                     foreach(var c in conflicts) c.active = false;
                     OpenInfo("ВНИМАНИЕ", $"Прошлый бинд («{conflicts[0].name}»), назначенный на " + _tempBind.key + ", был отключен."); 
@@ -3588,7 +3591,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                         string bid = cb.Tag.ToString();
                         if (CurrentProfile != null && MasterData.ContainsKey(CurrentProfile) && MasterData[CurrentProfile].Binds.TryGetValue(bid, out var toggledBind)) {
                             if (!string.IsNullOrEmpty(toggledBind.key)) {
-                                var conflicts = MasterData[CurrentProfile].Binds.Values.Where(b => b.key == toggledBind.key && b.id != bid && b.active).ToList();
+                                var conflicts = MasterData[CurrentProfile].Binds.Values.Where(b => b.key == toggledBind.key && b.id != bid && b.active && b.id != "Radial").ToList();
                                 if (conflicts.Count > 0) {
                                     foreach (var c in conflicts) c.active = false;
                                     OpenInfo("ВНИМАНИЕ", $"Прошлый бинд («{conflicts[0].name}»), назначенный на " + toggledBind.key + ", был отключен.");
@@ -5655,7 +5658,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             dashStatsContent.Opacity = 1;
             dashStatsOverlay.Opacity = 0;
             if (!_isStartupStatsAnimating && MasterData.ContainsKey(CurrentProfile)) {
-                lblStatBinds.Text = MasterData[CurrentProfile].Binds.Values.Count(b => b.active).ToString();
+                lblStatBinds.Text = MasterData[CurrentProfile].Binds.Values.Count(b => b.active && b.id != "Radial").ToString();
                 lblStatSections.Text = MasterData[CurrentProfile].Laws.Count.ToString();
                 int arts = CountRealArticles(MasterData[CurrentProfile].Laws);
                 lblStatLaws.Text = arts.ToString();
