@@ -328,10 +328,9 @@
 
     </Window.Resources>
 
-    <Grid Margin="58">
-        <Grid.LayoutTransform>
-            <ScaleTransform x:Name="RootScaleTransform" ScaleX="0.8" ScaleY="0.8" />
-        </Grid.LayoutTransform>
+    <Viewbox Stretch="Uniform">
+        <Grid Width="1116" Height="766">
+            <Grid Margin="58">
         
         <!-- ============= EXPANDABLE CONTAINER ============= -->
         <Grid x:Name="SplashUI" Width="460" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center" 
@@ -4268,4 +4267,6 @@
             <Path x:Name="MainGoldAccent" Stroke="{DynamicResource GoldBrush}" StrokeThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
     </Grid>  <!-- Grid Margin=58 -->
+        </Grid>
+    </Viewbox>
 </Window>
