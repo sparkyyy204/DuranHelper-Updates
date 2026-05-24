@@ -543,6 +543,12 @@ namespace FSB_helper_C__
 
             // Show main UI and expand simultaneously
             MainBackgroundBorder.Opacity = 1;
+            
+            // SUPER PERFORMANCE HACK:
+            // Force the entire main UI into a single GPU texture. 
+            // This prevents WPF from walking the massive visual tree every frame while SplashUI expands over it.
+            MainBackgroundBorder.CacheMode = new BitmapCache { EnableClearType = true, RenderAtScale = 1.0, SnapsToDevicePixels = true };
+            
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
             
             var expandAnim = new DoubleAnimationUsingKeyFrames();
@@ -585,6 +591,9 @@ namespace FSB_helper_C__
             SplashUI.BeginAnimation(HeightProperty, MakeSpline(200, 650));
             
             await Task.Delay(600); // Wait for full expansion
+            
+            // Remove GPU texture cache and restore interactive visual tree
+            MainBackgroundBorder.CacheMode = null;
 
             if (VersionBadgeContainer != null) VersionBadgeContainer.Opacity = 1;
 
