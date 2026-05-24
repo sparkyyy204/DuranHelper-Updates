@@ -40,6 +40,9 @@ jobs:
     - name: Build and Publish Launcher
       run: dotnet publish "DuranHelper.csproj" -c Release -r win-x64 --self-contained true -o publish_output
 
+    - name: Inject ASI into Publish Output
+      run: copy DuranOverlay.asi publish_output\DuranOverlay.asi
+
     - name: Compile Inno Setup
       run: |
         & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" DuranHelper.iss
