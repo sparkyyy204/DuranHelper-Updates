@@ -2879,7 +2879,7 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <TextBox x:Name="txtLawID" MaxLength="5" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center" CaretBrush="White"/>
+                                                <TextBox x:Name="txtLawID" MaxLength="15" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center" CaretBrush="White"/>
                                             </Border>
                                         </StackPanel>
 
@@ -3100,7 +3100,7 @@
                                                             </Style>
                                                         </TextBlock.Style>
                                                     </TextBlock>
-                                                    <TextBox x:Name="txtFineId" MaxLength="5" Background="Transparent" Foreground="{DynamicResource TextBrush}" BorderThickness="0" FontSize="16" FontWeight="Bold" Padding="15,0" VerticalContentAlignment="Center"/>
+                                                    <TextBox x:Name="txtFineId" MaxLength="15" Background="Transparent" Foreground="{DynamicResource TextBrush}" BorderThickness="0" FontSize="16" FontWeight="Bold" Padding="15,0" VerticalContentAlignment="Center"/>
                                                 </Grid>
                                             </Border>
                                         </StackPanel>
@@ -3247,7 +3247,7 @@
                                                             </Style>
                                                         </TextBlock.Style>
                                                     </TextBlock>
-                                                    <TextBox x:Name="txtWantedId" MaxLength="5" Background="Transparent" Foreground="{DynamicResource TextBrush}" BorderThickness="0" FontSize="16" FontWeight="Bold" Padding="15,0" VerticalContentAlignment="Center"/>
+                                                    <TextBox x:Name="txtWantedId" MaxLength="15" Background="Transparent" Foreground="{DynamicResource TextBrush}" BorderThickness="0" FontSize="16" FontWeight="Bold" Padding="15,0" VerticalContentAlignment="Center"/>
                                                 </Grid>
                                             </Border>
                                         </StackPanel>
