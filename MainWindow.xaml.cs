@@ -563,15 +563,15 @@ namespace FSB_helper_C__
             }
             
             // Fade and slide in Sidebar and Content UI
-            // Sequenced AFTER the window expansion (starts at 0.5s and 0.6s)
+            // Ultra-smooth blend: Starts almost immediately (0.1s/0.2s) and fades in slowly over 0.6 seconds
             var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
             if (SidebarPanel != null && SidebarPanel_TT != null) {
-                SidebarPanel.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.5), EasingFunction = ease });
-                SidebarPanel_TT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(-30, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.5), EasingFunction = ease });
+                SidebarPanel.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.6)) { BeginTime = TimeSpan.FromSeconds(0.1), EasingFunction = ease });
+                SidebarPanel_TT.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(-30, 0, TimeSpan.FromSeconds(0.6)) { BeginTime = TimeSpan.FromSeconds(0.1), EasingFunction = ease });
             }
             if (Tabs != null && Tabs_TT != null) {
-                Tabs.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.6), EasingFunction = ease });
-                Tabs_TT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, TimeSpan.FromSeconds(0.4)) { BeginTime = TimeSpan.FromSeconds(0.6), EasingFunction = ease });
+                Tabs.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0.01, 1, TimeSpan.FromSeconds(0.6)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
+                Tabs_TT.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, TimeSpan.FromSeconds(0.6)) { BeginTime = TimeSpan.FromSeconds(0.2), EasingFunction = ease });
             }
             // --- Version Badge Color Transition ---
             if (SplashVersionBorder != null && SplashVersionText != null) {
@@ -595,6 +595,9 @@ namespace FSB_helper_C__
             
             // Remove GPU texture cache and restore interactive visual tree
             MainBackgroundBorder.CacheMode = null;
+            
+            // Start dashboard stat counting immediately after expansion finishes
+            _ = AnimateDashboardStatsAsync();
 
             if (VersionBadgeContainer != null) VersionBadgeContainer.Opacity = 1;
 
@@ -635,9 +638,8 @@ namespace FSB_helper_C__
             // Wait just slightly (150ms) so the starry night starts fading in WHILE the panels are finishing their fade-in (creates a cohesive overlapping effect)
             await Task.Delay(150); 
             
-            // Draw the starry night shield and start stats animation AFTER panels are visible
+            // Draw the starry night shield AFTER panels are visible
             AnimateShieldDraw();
-            _ = AnimateDashboardStatsAsync();
         }
 
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e) { UpdateMainBorderOverlay(); ApplyClippedCornerClip(); }
@@ -5138,7 +5140,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 if (wasMissing) {
                     ShowCustomToast("ПРОВЕРКА ФАЙЛОВ", "Проверка файлов завершена.\nСкрипт установлен в игру.", "green", null);
                 } else {
-                    ShowCustomToast("ПРОВЕРКА ФАЙЛОВ", "Проверка файлов завершена.\nВсё нормально, скрипт актуален.", "green", null);
+                    ShowCustomToast("ПРОВЕРКА ФАЙЛОВ", "Проверка файлов завершена.\nСкрипт актуален.", "green", null);
                 }
 
             } catch (Exception ex) {
