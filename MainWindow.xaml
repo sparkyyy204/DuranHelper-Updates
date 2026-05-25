@@ -207,6 +207,9 @@
                 <DataTrigger Binding="{Binding}" Value="Калькулятор штрафов 📌">
                     <Setter TargetName="ActionBtns" Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding}" Value="Калькулятор розыска 📌">
+                    <Setter TargetName="ActionBtns" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
 
