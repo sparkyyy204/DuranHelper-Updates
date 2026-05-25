@@ -652,10 +652,10 @@ namespace FSB_helper_C__
             if (w < 1 || h < 1) return;
             const double C = 12; // corner cut size, matching ASI overlay CORNER=12
             // 8-point clipped-corner polygon (ASI overlay style)
-            MainBorderPath.Data = Geometry.Parse($"M 0,{C} L {C},0 L {w-C},0 L {w},{C} L {w},{h-C} L {w-C},{h} L {C},{h} L 0,{h-C} Z");
+            MainBorderPath.Data = Geometry.Parse(System.FormattableString.Invariant($"M 0,{C} L {C},0 L {w-C},0 L {w},{C} L {w},{h-C} L {w-C},{h} L {C},{h} L 0,{h-C} Z"));
             // Gold accent: diagonal cut line + horizontal strip (~250px proportional)
             double goldLen = System.Math.Min(250, w * 0.35);
-            MainGoldAccent.Data = Geometry.Parse($"M 0,{C} L {C},0 L {goldLen},0");
+            MainGoldAccent.Data = Geometry.Parse(System.FormattableString.Invariant($"M 0,{C} L {C},0 L {goldLen},0"));
         }
 
         private void ApplyClippedCornerClip()
