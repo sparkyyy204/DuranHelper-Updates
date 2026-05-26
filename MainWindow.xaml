@@ -949,7 +949,7 @@
                                                     </StackPanel>
                                                     <StackPanel Canvas.Left="315" Canvas.Top="75" Width="200">
                                                         <TextBlock x:Name="lblStatSections" Text="0" Foreground="White" FontFamily="Segoe UI" FontSize="48" FontWeight="Black" HorizontalAlignment="Center"/>
-                                                        <TextBlock x:Name="lblStatSectionsLabel" Text="РАЗДЕЛОВ КОНФИГОВ" Foreground="#1f6feb" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
+                                                        <TextBlock x:Name="lblStatSectionsLabel" Text="РАЗДЕЛОВ ЗАКОНОВ" Foreground="#1f6feb" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
                                                     </StackPanel>
                                                     <StackPanel Canvas.Left="590" Canvas.Top="75" Width="200">
                                                         <TextBlock x:Name="lblStatLaws" Text="0" Foreground="White" FontFamily="Segoe UI" FontSize="48" FontWeight="Black" HorizontalAlignment="Center">
