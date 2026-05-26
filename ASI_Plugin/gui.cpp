@@ -29,7 +29,7 @@ bool Gui::showBinderHint = false;
 bool Gui::clearNextFrame = false;
 float Gui::alpha = 0.0f;
 int Gui::activeTab = 0;
-std::string Gui::versionStr = "?.?.?";
+std::string Gui::versionStr = "4.1.0";
 
 ImFont* Gui::fontArialBlack24 = nullptr;
 ImFont* Gui::fontSegoeBold12 = nullptr;
