@@ -1974,6 +1974,68 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
 
         cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(divX+8, nameY), C_WHITE, fi.name.c_str(), nullptr, maxNameW);
 
+        if (!sq.empty()) {
+            std::string txtLower = ToLowerUTF8(fi.name);
+            float lineY = nameY;
+            float lineH = 14.0f;
+            float scale = 1.0f;
+            size_t queryLen = sq.length();
+
+            size_t segStart = 0;
+            while (segStart <= fi.name.length()) {
+                size_t nlPos = fi.name.find('\n', segStart);
+                if (nlPos == std::string::npos) nlPos = fi.name.length();
+
+                const char* segPtr = fi.name.c_str() + segStart;
+                const char* segEnd = fi.name.c_str() + nlPos;
+
+                if (segStart < nlPos) {
+                    const char* ws = segPtr;
+                    while (ws < segEnd) {
+                        const char* wrapPos = fontSegoeBold14->CalcWordWrapPositionA(scale, ws, segEnd, maxNameW);
+                        if (!wrapPos || wrapPos <= ws) wrapPos = segEnd;
+
+                        const char* dispEnd = wrapPos;
+                        while (dispEnd > ws && (*(dispEnd - 1) == ' ')) dispEnd--;
+
+                        size_t lnStart = (size_t)(ws - fi.name.c_str());
+                        size_t lnEnd = (size_t)(dispEnd - fi.name.c_str());
+
+                        if (lnStart < lnEnd) {
+                            size_t matchPos = txtLower.find(sq, lnStart);
+                            while (matchPos != std::string::npos && matchPos < lnEnd) {
+                                size_t mEnd = matchPos + queryLen;
+                                size_t drawStart = (lnStart > matchPos) ? lnStart : matchPos;
+                                size_t drawEnd = (lnEnd < mEnd) ? lnEnd : mEnd;
+
+                                if (drawStart < drawEnd) {
+                                    std::string prefix = fi.name.substr(lnStart, drawStart - lnStart);
+                                    float xOff = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, prefix.c_str()).x;
+                                    std::string matchStr = fi.name.substr(drawStart, drawEnd - drawStart);
+                                    float mWidth = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, matchStr.c_str()).x;
+
+                                    float mx = divX+8 + xOff;
+                                    cdl->AddRectFilled(ImVec2(mx, lineY - 1), ImVec2(mx + mWidth, lineY + 15), C_GOLD_BG, 2.0f);
+                                    cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(mx, lineY), C_GOLD, matchStr.c_str());
+                                }
+
+                                if (mEnd > lnEnd) break;
+                                matchPos = txtLower.find(sq, mEnd);
+                            }
+                        }
+
+                        ws = wrapPos;
+                        while (ws < segEnd && *ws == ' ') ws++;
+                        lineY += lineH;
+                    }
+                } else {
+                    lineY += lineH;
+                }
+
+                segStart = nlPos + 1;
+            }
+        }
+
         // "Р вЂ™Р Р€" badge
         float badgeY = ry + (itemH - 20.0f) * 0.5f;
         if (fi.hasLicRevoke) {
@@ -2176,13 +2238,19 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
             // Check for any selected fines
             bool hasSelected = false;
             int totalAmt = 0;
+            bool localAnyRevoke = false;
             
             // Group articles by type for formatting
             std::map<std::string, std::vector<std::string>> groupedArticles;
+            std::map<std::string, std::vector<std::string>> groupedRevokes;
             for (auto& fi : fineItems) {
                 if (!fi.selected) continue;
                 hasSelected = true;
                 totalAmt += fi.amount;
+                if (fi.hasLicRevoke) {
+                    localAnyRevoke = true;
+                    groupedRevokes[fi.type].push_back(fi.id);
+                }
                 // Add to list for this type
                 groupedArticles[fi.type].push_back(fi.id);
             }
@@ -2201,6 +2269,16 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
                     articlesStr += " " + type;
                 }
 
+                std::string revokeArticlesStr;
+                for (auto const& [type, ids] : groupedRevokes) {
+                    if (!revokeArticlesStr.empty()) revokeArticlesStr += ", ";
+                    for (size_t i = 0; i < ids.size(); i++) {
+                        revokeArticlesStr += ids[i];
+                        if (i < ids.size() - 1) revokeArticlesStr += " + ";
+                    }
+                    revokeArticlesStr += " " + type;
+                }
+
                 if (totalAmt > 25000) totalAmt = 25000;
 
                 std::string cmd = "/ticket " + idStr + " " + std::to_string(totalAmt) + " " + articlesStr;
@@ -2212,38 +2290,24 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
                 });
                 
                 // Build quote text if quoting is enabled
-                
-                // Build quote text if quoting is enabled
                 std::string quoteStr;
                 if (quoteFines) {
                     quoteStr = "\xD0\x92\xD1\x8B\xD0\xBF\xD0\xB8\xD1\x81\xD0\xB0\xD0\xBD \xD1\x88\xD1\x82\xD1\x80\xD0\xB0\xD1\x84 \xD0\xBF\xD0\xBE: " + articlesStr + "\n";
-                    std::map<std::string, std::vector<std::string>> groupedRevokes;
                     for (auto& fi : fineItems) {
                         if (!fi.selected) continue;
                         quoteStr += fi.id + " " + fi.type + " - " + fi.name + " - " + std::to_string(fi.amount) + " \xD1\x80\xD1\x83\xD0\xB1.\n";
-                        if (fi.hasLicRevoke) {
-                            groupedRevokes[fi.type].push_back(fi.id);
-                        }
                     }
                     if (!groupedRevokes.empty()) {
-                        std::string revokeArticlesStr;
-                        for (auto const& [type, ids] : groupedRevokes) {
-                            if (!revokeArticlesStr.empty()) revokeArticlesStr += ", ";
-                            for (size_t i = 0; i < ids.size(); i++) {
-                                revokeArticlesStr += ids[i];
-                                if (i < ids.size() - 1) revokeArticlesStr += " + ";
-                            }
-                            revokeArticlesStr += " " + type;
-                        }
                         quoteStr += "\xD0\x90\xD0\xBD\xD0\xBD\xD1\x83\xD0\xBB\xD0\xB8\xD1\x80\xD0\xBE\xD0\xB2\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\x92\xD0\xA3 \xD0\xBF\xD0\xBE: " + revokeArticlesStr + "\n";
                     }
                     quoteStr += "\xD0\x98\xD1\x82\xD0\xBE\xD0\xB3\xD0\xBE: " + std::to_string(totalAmt) + " \xD1\x80\xD1\x83\xD0\xB1.";
                 }
                 
-                StartFineSequence(idStr, articlesStr, fineWithRevoke, quoteFines, quoteStr);
+                StartFineSequence(idStr, revokeArticlesStr, localAnyRevoke && fineWithRevoke, quoteFines, quoteStr);
                 
                 for (auto& fi : fineItems) fi.selected = false;
                 memset(fineIdBuf, 0, sizeof(fineIdBuf));
+                fineWithRevoke = false;
             }
         }
     }
@@ -2439,7 +2503,67 @@ void Gui::RenderWantedTab(ImDrawList* dl, ImVec2 o) {
 
         cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(divX+8, nameY), C_WHITE, fi.name.c_str(), nullptr, maxNameW);
 
+        if (!sq.empty()) {
+            std::string txtLower = ToLowerUTF8(fi.name);
+            float lineY = nameY;
+            float lineH = 14.0f;
+            float scale = 1.0f;
+            size_t queryLen = sq.length();
 
+            size_t segStart = 0;
+            while (segStart <= fi.name.length()) {
+                size_t nlPos = fi.name.find('\n', segStart);
+                if (nlPos == std::string::npos) nlPos = fi.name.length();
+
+                const char* segPtr = fi.name.c_str() + segStart;
+                const char* segEnd = fi.name.c_str() + nlPos;
+
+                if (segStart < nlPos) {
+                    const char* ws = segPtr;
+                    while (ws < segEnd) {
+                        const char* wrapPos = fontSegoeBold14->CalcWordWrapPositionA(scale, ws, segEnd, maxNameW);
+                        if (!wrapPos || wrapPos <= ws) wrapPos = segEnd;
+
+                        const char* dispEnd = wrapPos;
+                        while (dispEnd > ws && (*(dispEnd - 1) == ' ')) dispEnd--;
+
+                        size_t lnStart = (size_t)(ws - fi.name.c_str());
+                        size_t lnEnd = (size_t)(dispEnd - fi.name.c_str());
+
+                        if (lnStart < lnEnd) {
+                            size_t matchPos = txtLower.find(sq, lnStart);
+                            while (matchPos != std::string::npos && matchPos < lnEnd) {
+                                size_t mEnd = matchPos + queryLen;
+                                size_t drawStart = (lnStart > matchPos) ? lnStart : matchPos;
+                                size_t drawEnd = (lnEnd < mEnd) ? lnEnd : mEnd;
+
+                                if (drawStart < drawEnd) {
+                                    std::string prefix = fi.name.substr(lnStart, drawStart - lnStart);
+                                    float xOff = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, prefix.c_str()).x;
+                                    std::string matchStr = fi.name.substr(drawStart, drawEnd - drawStart);
+                                    float mWidth = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, matchStr.c_str()).x;
+
+                                    float mx = divX+8 + xOff;
+                                    cdl->AddRectFilled(ImVec2(mx, lineY - 1), ImVec2(mx + mWidth, lineY + 15), C_GOLD_BG, 2.0f);
+                                    cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(mx, lineY), C_GOLD, matchStr.c_str());
+                                }
+
+                                if (mEnd > lnEnd) break;
+                                matchPos = txtLower.find(sq, mEnd);
+                            }
+                        }
+
+                        ws = wrapPos;
+                        while (ws < segEnd && *ws == ' ') ws++;
+                        lineY += lineH;
+                    }
+                } else {
+                    lineY += lineH;
+                }
+
+                segStart = nlPos + 1;
+            }
+        }
 
         // Amount
         float amtY = ry + (itemH - 14.0f) * 0.5f;
@@ -2851,6 +2975,22 @@ void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
 
         // Name - SVG: x=70 y=27 font-size=12
         cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(cx2+10+kbW+10, cy2+14), hover ? C_GOLD : C_WHITE, b.name.c_str());
+        
+        if (!bsq.empty()) {
+            std::string txtLower = ToLowerUTF8(b.name);
+            size_t matchPos = txtLower.find(bsq);
+            while (matchPos != std::string::npos) {
+                size_t mEnd = matchPos + bsq.length();
+                std::string prefix = b.name.substr(0, matchPos);
+                float xOff = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, prefix.c_str()).x;
+                std::string matchStr = b.name.substr(matchPos, bsq.length());
+                float mWidth = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, matchStr.c_str()).x;
+                float mx = cx2+10+kbW+10 + xOff;
+                cdlb->AddRectFilled(ImVec2(mx, cy2+13), ImVec2(mx + mWidth, cy2+14+15), C_GOLD_BG, 2.0f);
+                cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(mx, cy2+14), C_GOLD, matchStr.c_str());
+                matchPos = txtLower.find(bsq, mEnd);
+            }
+        }
 
         // Play icon - clean triangle with circle
         float px2 = cx2 + cardW - 25, py2 = cy2 + cardH/2;
