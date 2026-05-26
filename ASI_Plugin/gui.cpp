@@ -3725,54 +3725,75 @@ void DrawClippedGridLine(ImDrawList* dl, ImVec2 p1, ImVec2 p2, float cx, float c
     float dy = p2.y - p1.y;
     float len = sqrtf(dx*dx + dy*dy);
     if (len < 0.1f) return;
-    
     dx /= len;
     dy /= len;
-    
-    bool inSegment = false;
-    ImVec2 segStart;
-    
-    float step = 0.5f; // Extremely precise sub-pixel step to avoid any edge bleeding
-    for (float dist = 0.0f; dist <= len; dist += step) {
-        float px = p1.x + dx * dist;
-        float py = p1.y + dy * dist;
-        
-        float rx = px - cx;
-        float ry = py - cy;
-        float r2 = rx*rx + ry*ry;
-        
-        bool inside = false;
-        if (r2 >= rIn*rIn && r2 <= rOut*rOut) {
-            float a = atan2f(ry, rx) * 180.0f / 3.14159265f;
-            float diff1 = a - a1;
-            while (diff1 < 0.0f) diff1 += 360.0f;
-            while (diff1 >= 360.0f) diff1 -= 360.0f;
-            
-            float diff2 = a2 - a1;
-            while (diff2 < 0.0f) diff2 += 360.0f;
-            while (diff2 >= 360.0f) diff2 -= 360.0f;
-            
-            if (diff1 <= diff2) {
-                inside = true;
-            }
-        }
-        
-        if (inside) {
-            if (!inSegment) {
-                inSegment = true;
-                segStart = ImVec2(px, py);
-            }
-        } else {
-            if (inSegment) {
-                inSegment = false;
-                // Clip exactly to the last known inside point instead of overshooting
-                ImVec2 segEnd(px - dx * step, py - dy * step);
-                dl->AddLine(segStart, segEnd, col, 1.0f);
-            }
-        }
+
+    std::vector<float> ts;
+    ts.push_back(0.0f);
+    ts.push_back(len);
+
+    float P0x = p1.x - cx;
+    float P0y = p1.y - cy;
+
+    float B = P0x*dx + P0y*dy;
+    float C_rOut = P0x*P0x + P0y*P0y - rOut*rOut;
+    float deltaOut = B*B - C_rOut;
+    if (deltaOut > 0) {
+        float sqrtDelta = sqrtf(deltaOut);
+        float t1 = -B - sqrtDelta;
+        float t2 = -B + sqrtDelta;
+        if (t1 > 0 && t1 < len) ts.push_back(t1);
+        if (t2 > 0 && t2 < len) ts.push_back(t2);
     }
-    if (inSegment) {
-        dl->AddLine(segStart, ImVec2(p1.x + dx * (len - step), p1.y + dy * (len - step)), col, 1.0f);
+    
+    float C_rIn = P0x*P0x + P0y*P0y - rIn*rIn;
+    float deltaIn = B*B - C_rIn;
+    if (deltaIn > 0) {
+        float sqrtDelta = sqrtf(deltaIn);
+        float t1 = -B - sqrtDelta;
+        float t2 = -B + sqrtDelta;
+        if (t1 > 0 && t1 < len) ts.push_back(t1);
+        if (t2 > 0 && t2 < len) ts.push_back(t2);
+    }
+
+    auto addRayIntersection = [&](float angle) {
+        float rad = angle * 3.14159265f / 180.0f;
+        float dirX = cosf(rad);
+        float dirY = sinf(rad);
+        float det = -dirX*dy + dirY*dx;
+        if (fabsf(det) > 1e-5f) {
+            float t = (-dirX*P0y + dirY*P0x) / det;
+            float k = (-P0x*dy + P0y*dx) / det;
+            if (k > 0 && t > 0 && t < len) ts.push_back(t);
+        }
+    };
+    addRayIntersection(a1);
+    addRayIntersection(a2);
+
+    std::sort(ts.begin(), ts.end());
+
+    auto isInside = [&](float t) {
+        float px = P0x + t*dx;
+        float py = P0y + t*dy;
+        float r2 = px*px + py*py;
+        if (r2 < rIn*rIn - 2.0f || r2 > rOut*rOut + 2.0f) return false;
+        float a = atan2f(py, px) * 180.0f / 3.14159265f;
+        float diff1 = a - a1;
+        while (diff1 < 0.0f) diff1 += 360.0f;
+        while (diff1 >= 360.0f) diff1 -= 360.0f;
+        float diff2 = a2 - a1;
+        while (diff2 < 0.0f) diff2 += 360.0f;
+        while (diff2 >= 360.0f) diff2 -= 360.0f;
+        return diff1 <= diff2;
+    };
+
+    for (size_t i = 0; i < ts.size() - 1; i++) {
+        if (ts[i+1] - ts[i] < 0.5f) continue;
+        float midT = (ts[i] + ts[i+1]) * 0.5f;
+        if (isInside(midT)) {
+            dl->AddLine(ImVec2(p1.x + dx*ts[i], p1.y + dy*ts[i]), 
+                        ImVec2(p1.x + dx*ts[i+1], p1.y + dy*ts[i+1]), col, 1.0f);
+        }
     }
 }
 
@@ -3793,30 +3814,45 @@ void DrawClippedBoxGridLine(ImDrawList* dl, ImVec2 p1, ImVec2 p2, float bx, floa
     dx /= len;
     dy /= len;
     
-    bool inSegment = false;
-    ImVec2 segStart;
-    float step = 0.5f; // Extremely precise sub-pixel step to avoid any edge bleeding
-    for (float dist = 0.0f; dist <= len; dist += step) {
-        float px = p1.x + dx * dist;
-        float py = p1.y + dy * dist;
-        
-        bool inside = IsPointInsidePoly8(ImVec2(px, py), bx, by, boxW, boxH, CORNER);
-        if (inside) {
-            if (!inSegment) {
-                inSegment = true;
-                segStart = ImVec2(px, py);
-            }
-        } else {
-            if (inSegment) {
-                inSegment = false;
-                // Clip exactly to the last known inside point instead of overshooting
-                ImVec2 segEnd(px - dx * step, py - dy * step);
-                dl->AddLine(segStart, segEnd, col, 1.0f);
+    std::vector<float> ts;
+    ts.push_back(0.0f);
+    ts.push_back(len);
+
+    ImVec2 poly[8] = {
+        ImVec2(bx + CORNER, by),
+        ImVec2(bx + boxW - CORNER, by),
+        ImVec2(bx + boxW, by + CORNER),
+        ImVec2(bx + boxW, by + boxH - CORNER),
+        ImVec2(bx + boxW - CORNER, by + boxH),
+        ImVec2(bx + CORNER, by + boxH),
+        ImVec2(bx, by + boxH - CORNER),
+        ImVec2(bx, by + CORNER)
+    };
+
+    for (int i = 0; i < 8; i++) {
+        ImVec2 A = poly[i];
+        ImVec2 B = poly[(i+1)%8];
+        float sx = B.x - A.x;
+        float sy = B.y - A.y;
+        float det = -dx*sy + dy*sx;
+        if (fabsf(det) > 1e-5f) {
+            float t = (sx*(p1.y - A.y) - sy*(p1.x - A.x)) / det;
+            float u = (dx*(p1.y - A.y) - dy*(p1.x - A.x)) / det;
+            if (t > 0 && t < len && u >= 0 && u <= 1.0f) {
+                ts.push_back(t);
             }
         }
     }
-    if (inSegment) {
-        dl->AddLine(segStart, ImVec2(p1.x + dx * (len - step), p1.y + dy * (len - step)), col, 1.0f);
+
+    std::sort(ts.begin(), ts.end());
+
+    for (size_t i = 0; i < ts.size() - 1; i++) {
+        if (ts[i+1] - ts[i] < 0.5f) continue;
+        float midT = (ts[i] + ts[i+1]) * 0.5f;
+        if (IsPointInsidePoly8(ImVec2(p1.x + dx*midT, p1.y + dy*midT), bx, by, boxW, boxH, CORNER)) {
+            dl->AddLine(ImVec2(p1.x + dx*ts[i], p1.y + dy*ts[i]), 
+                        ImVec2(p1.x + dx*ts[i+1], p1.y + dy*ts[i+1]), col, 1.0f);
+        }
     }
 }
 
