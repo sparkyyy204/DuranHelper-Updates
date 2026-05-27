@@ -1326,9 +1326,6 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                 if (!law.id.empty()) {
                     cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cp.x, blockCenterY - 6.0f), C_GOLD, law.id.c_str());
                 }
-                // Draw full text in white first (preserves exact layout/wrapping)
-                cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cp.x + idW, y), C_WHITE, law.txt.c_str(), nullptr, maxTxtW);
-                
                 // Overlay matching substrings in gold on top (no layout impact)
                 {
                     std::string txtLower = ToLowerUTF8(law.txt);
@@ -1360,6 +1357,8 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                                 size_t lnStart = (size_t)(ws - law.txt.c_str());
                                 size_t lnEnd = (size_t)(dispEnd - law.txt.c_str());
                                 
+                                cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cp.x + idW, lineY), C_WHITE, law.txt.c_str() + lnStart, law.txt.c_str() + lnEnd);
+
                                 if (lnStart < lnEnd) {
                                     size_t matchPos = txtLower.find(sq, lnStart);
                                     while (matchPos != std::string::npos && matchPos < lnEnd) {
@@ -1972,9 +1971,9 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
         
         cdl->AddLine(ImVec2(divX, ry+12), ImVec2(divX, ry+itemH-12), C_LINE, 1.5f);
 
-        cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(divX+8, nameY), C_WHITE, fi.name.c_str(), nullptr, maxNameW);
-
-        if (!sq.empty()) {
+        if (sq.empty()) {
+            cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(divX+8, nameY), C_WHITE, fi.name.c_str(), nullptr, maxNameW);
+        } else {
             std::string txtLower = ToLowerUTF8(fi.name);
             float lineY = nameY;
             float lineH = 14.0f;
@@ -2000,6 +1999,8 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
 
                         size_t lnStart = (size_t)(ws - fi.name.c_str());
                         size_t lnEnd = (size_t)(dispEnd - fi.name.c_str());
+
+                        cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(divX+8, lineY), C_WHITE, fi.name.c_str() + lnStart, fi.name.c_str() + lnEnd);
 
                         if (lnStart < lnEnd) {
                             size_t matchPos = txtLower.find(sq, lnStart);
