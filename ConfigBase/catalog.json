@@ -3453,7 +3453,7 @@
     "description": "Базовые бинды для сотрудников ФСБ",
     "server": "Все серверы",
     "type": "binds",
-    "author": "Duran"
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "bindsMVDv1",
@@ -3461,7 +3461,7 @@
     "description": "Базовые бинды для сотрудников МВД",
     "server": "Все серверы",
     "type": "binds",
-    "author": "Duran"
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "LekciaSuborMO",
@@ -3469,6 +3469,6 @@
     "description": "Шпаргалки и лекции для Мин. Обороны",
     "server": "Все серверы",
     "type": "binds",
-    "author": "Duran"
+    "author": "Duran_Korrupcioner"
   }
 ]

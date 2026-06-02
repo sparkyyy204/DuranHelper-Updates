@@ -3,14 +3,23 @@
     "Radial": {
       "id": "Radial",
       "name": "Radial Menu",
+      "key": "НЕТ",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [],
+      "isAuto": false
+    },
+    "89e127": {
+      "id": "89e127",
+      "name": "Radial Menu",
       "key": "B",
       "active": true,
       "group": "ВСЕ",
       "steps": [],
       "isAuto": false
     },
-    "684adf": {
-      "id": "684adf",
+    "e1b961": {
+      "id": "e1b961",
       "name": "Представится",
       "key": "Alt + Q",
       "active": true,
@@ -49,8 +58,8 @@
       ],
       "isAuto": false
     },
-    "013800": {
-      "id": "013800",
+    "2b9571": {
+      "id": "2b9571",
       "name": "Запрос документов.",
       "key": "Alt + E",
       "active": true,
@@ -69,8 +78,8 @@
       ],
       "isAuto": false
     },
-    "512a76": {
-      "id": "512a76",
+    "576be3": {
+      "id": "576be3",
       "name": "Наручники",
       "key": "Alt + 1",
       "active": true,
@@ -99,8 +108,8 @@
       ],
       "isAuto": false
     },
-    "1dbbb7": {
-      "id": "1dbbb7",
+    "3eb348": {
+      "id": "3eb348",
       "name": "Рация с тегом",
       "key": "RShift",
       "active": true,
@@ -119,8 +128,8 @@
       ],
       "isAuto": false
     },
-    "e0c404": {
-      "id": "e0c404",
+    "5d5b38": {
+      "id": "5d5b38",
       "name": "Конвоирование",
       "key": "Alt + 2",
       "active": true,
@@ -149,8 +158,8 @@
       ],
       "isAuto": false
     },
-    "d86a26": {
-      "id": "d86a26",
+    "b79444": {
+      "id": "b79444",
       "name": "Поиск по лицу",
       "key": "Alt + 3",
       "active": true,
@@ -199,8 +208,8 @@
       ],
       "isAuto": false
     },
-    "1e7753": {
-      "id": "1e7753",
+    "6441ec": {
+      "id": "6441ec",
       "name": "Обыск",
       "key": "Alt + 4",
       "active": true,
@@ -239,8 +248,8 @@
       ],
       "isAuto": false
     },
-    "16ce4a": {
-      "id": "16ce4a",
+    "b60309": {
+      "id": "b60309",
       "name": "Выдать розыск",
       "key": "Alt + 5",
       "active": true,
@@ -299,8 +308,8 @@
       ],
       "isAuto": false
     },
-    "390972": {
-      "id": "390972",
+    "49aeff": {
+      "id": "49aeff",
       "name": "Сорвать маску",
       "key": "Alt + F",
       "active": true,
@@ -339,8 +348,8 @@
       ],
       "isAuto": false
     },
-    "102e86": {
-      "id": "102e86",
+    "152985": {
+      "id": "152985",
       "name": "Выбросить с авто",
       "key": "Numpad1",
       "active": true,
@@ -379,8 +388,8 @@
       ],
       "isAuto": false
     },
-    "26e643": {
-      "id": "26e643",
+    "3dd627": {
+      "id": "3dd627",
       "name": "Првоерка тонировки",
       "key": "Numpad2",
       "active": true,
@@ -419,8 +428,8 @@
       ],
       "isAuto": false
     },
-    "6a6dd9": {
-      "id": "6a6dd9",
+    "5ca005": {
+      "id": "5ca005",
       "name": "Ориентировка розыска",
       "key": "Numpad3",
       "active": true,
@@ -469,8 +478,8 @@
       ],
       "isAuto": false
     },
-    "76d461": {
-      "id": "76d461",
+    "6d9b3c": {
+      "id": "6d9b3c",
       "name": "Миранда",
       "key": "Numpad5",
       "active": true,
@@ -534,13 +543,13 @@
     "SectorCount": 8,
     "Sectors": [
       {
-        "BindId": "684adf",
+        "BindId": "e1b961",
         "BindName": "Представится",
         "Icon": "document",
         "RequiresId": true
       },
       {
-        "BindId": "013800",
+        "BindId": "2b9571",
         "BindName": "Запрос документов.",
         "Icon": "document",
         "RequiresId": false
@@ -552,31 +561,31 @@
         "RequiresId": false
       },
       {
-        "BindId": "76d461",
+        "BindId": "6d9b3c",
         "BindName": "Миранда",
         "Icon": "document",
         "RequiresId": false
       },
       {
-        "BindId": "1e7753",
+        "BindId": "6441ec",
         "BindName": "Обыск",
         "Icon": "star",
         "RequiresId": false
       },
       {
-        "BindId": "102e86",
+        "BindId": "152985",
         "BindName": "Выбросить с авто",
         "Icon": "lightning",
-        "RequiresId": true
+        "RequiresId": false
       },
       {
-        "BindId": "e0c404",
+        "BindId": "5d5b38",
         "BindName": "Конвоирование",
         "Icon": "lightning",
         "RequiresId": true
       },
       {
-        "BindId": "512a76",
+        "BindId": "576be3",
         "BindName": "Наручники",
         "Icon": "lightning",
         "RequiresId": true
