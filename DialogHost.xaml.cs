@@ -12,6 +12,7 @@ namespace FSB_helper_C__
     {
         // ── Callbacks ──
         private Action _alertConfirmAction;
+        private Action _alertExitAction;
         private Action<string> _inputSubmitAction;
         private Func<string, string> _inputValidator;
         private int _inputMaxLength = 25;
@@ -70,9 +71,17 @@ namespace FSB_helper_C__
         public void ShowAlert(string title, string message, Action onConfirm)
         {
             _alertConfirmAction = onConfirm;
+            _alertExitAction = null;
             lblAlertTitle.Text = title;
             lblAlertMsg.Text = message;
             ShowDialog(WinAlert);
+        }
+
+        public void ShowUnsavedChanges(Action onSave, Action onExit)
+        {
+            _alertConfirmAction = onSave;
+            _alertExitAction = onExit;
+            ShowDialog(WinUnsaved);
         }
 
         // ═══════════════════════════════════════
@@ -129,7 +138,9 @@ namespace FSB_helper_C__
             WinInfo.Visibility = Visibility.Collapsed;
             WinAlert.Visibility = Visibility.Collapsed;
             WinInputDlg.Visibility = Visibility.Collapsed;
+            WinUnsaved.Visibility = Visibility.Collapsed;
             _alertConfirmAction = null;
+            _alertExitAction = null;
             _inputSubmitAction = null;
             _inputValidator = null;
         }
@@ -144,6 +155,7 @@ namespace FSB_helper_C__
         {
             WinInfo.Visibility = Visibility.Collapsed;
             WinAlert.Visibility = Visibility.Collapsed;
+            WinUnsaved.Visibility = Visibility.Collapsed;
             WinInputDlg.Visibility = Visibility.Collapsed;
 
             win.Visibility = Visibility.Visible;
@@ -166,6 +178,24 @@ namespace FSB_helper_C__
         }
 
         private void AlertNo_Click(object sender, RoutedEventArgs e) => CloseDialog();
+
+        private async void UnsavedSave_Click(object sender, RoutedEventArgs e)
+        {
+            var action = _alertConfirmAction;
+            CloseDialog();
+            await Task.Delay(160);
+            action?.Invoke();
+        }
+
+        private async void UnsavedExit_Click(object sender, RoutedEventArgs e)
+        {
+            var action = _alertExitAction;
+            CloseDialog();
+            await Task.Delay(160);
+            action?.Invoke();
+        }
+
+        private void UnsavedCancel_Click(object sender, RoutedEventArgs e) => CloseDialog();
 
         private void InputOk_Click(object sender, RoutedEventArgs e)
         {

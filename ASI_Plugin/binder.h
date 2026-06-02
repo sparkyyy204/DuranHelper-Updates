@@ -8,7 +8,7 @@
 using json = nlohmann::ordered_json;
 
 // Helper: Get Settings/Profiles path from AppData\Roaming\DuranHelper
-std::string GetAppDataPath();
+std::wstring GetAppDataPath();
 
 struct BindStep {
     std::string action; // "text", "delay", "command"

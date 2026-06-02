@@ -368,6 +368,8 @@
                     </TextBlock>
                 </Border>
             </Grid>
+            
+
                   
             <Border x:Name="SplashCard" Background="Transparent" BorderThickness="0" Panel.ZIndex="5">
                 <Border.Clip>
@@ -705,7 +707,7 @@
                         </Grid>
                     </Border>
 
-                    <TabControl x:Name="Tabs" Grid.Column="1" Grid.Row="1" Background="Transparent" BorderThickness="0" Padding="0" Opacity="0">
+                    <TabControl x:Name="Tabs" Grid.Column="1" Grid.Row="1" Background="Transparent" BorderThickness="0" Padding="0" Opacity="0" CacheMode="BitmapCache">
                         <TabControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Grid />
@@ -763,15 +765,6 @@
                                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <Ellipse x:Name="dashProfileDot" Width="8" Height="8" Fill="{DynamicResource GoldBrush}" Margin="0,0,5,0">
                                                                     <Ellipse.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="12" Color="#d2a65e" ShadowDepth="0" Opacity="0.8"/></Ellipse.Effect>
-                                                                    <Ellipse.Triggers>
-                                                                        <EventTrigger RoutedEvent="Loaded">
-                                                                            <BeginStoryboard>
-                                                                                <Storyboard RepeatBehavior="Forever">
-                                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1.0" To="0.2" Duration="0:0:0.8" AutoReverse="True"/>
-                                                                                </Storyboard>
-                                                                            </BeginStoryboard>
-                                                                        </EventTrigger>
-                                                                    </Ellipse.Triggers>
                                                                 </Ellipse>
                                                                 <TextBlock x:Name="dashProfileBadgeText" Text="АКТИВЕН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
                                                             </StackPanel>
@@ -856,7 +849,6 @@
                                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <Ellipse Width="8" Height="8" Fill="{DynamicResource GreenBrush}" Margin="0,0,5,0">
                                                                     <Ellipse.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="12" Color="#2ea043" ShadowDepth="0" Opacity="0.6"/></Ellipse.Effect>
-                                                                    <Ellipse.Triggers><EventTrigger RoutedEvent="Loaded"><BeginStoryboard><Storyboard RepeatBehavior="Forever"><DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.3" Duration="0:0:0.8" AutoReverse="True"><DoubleAnimation.EasingFunction><SineEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></BeginStoryboard></EventTrigger></Ellipse.Triggers>
                                                                 </Ellipse>
                                                                 <TextBlock Text="ИНТЕГРИРОВАНО" Foreground="{DynamicResource GreenBrush}" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
                                                             </StackPanel>
@@ -887,7 +879,7 @@
                                                             <Button.Template><ControlTemplate TargetType="Button"><Border x:Name="bg" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" CornerRadius="6"><TextBlock Text="ПРОВЕРКА ФАЙЛОВ СКРИПТА" Foreground="White" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bg" Property="Background" Value="{DynamicResource DeepBgBrush}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Button.Template>
                                                         </Button>
                                                         <!-- BTN: Install Plugin (NoASI) -->
-                                                        <Button x:Name="btnInstallPlugin" Visibility="Collapsed" Click="InstallPlugin_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,155,0,0" Width="350" Height="30" Style="{StaticResource BaseBtn}" Cursor="Hand">
+                                                        <Button x:Name="btnInstallPlugin" Visibility="Collapsed" Click="InstallPlugin_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,155,0,0" Width="350" Height="30" Cursor="Hand">
                                                             <Button.Template><ControlTemplate TargetType="Button"><Border x:Name="bg" Background="#1c0f12" BorderBrush="{DynamicResource RedBrush}" BorderThickness="1.5" CornerRadius="6"><TextBlock Text="УСТАНОВИТЬ ПЛАГИН" Foreground="{DynamicResource RedBrush}" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bg" Property="Background" Value="#2d1618"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Button.Template>
                                                         </Button>
                                                     </Grid>
@@ -1062,11 +1054,11 @@
                             <Grid Margin="15,10,15,10">
                                 <Grid x:Name="lblNoProfLaws" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Border Width="80" Height="80" CornerRadius="40" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                            <TextBlock Text="⚠" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
+                                        <Border Width="70" Height="70" CornerRadius="35" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
+                                            <TextBlock Text="⚠" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
                                         </Border>
-                                        <TextBlock Text="ПРОФИЛЬ НЕ ВЫБРАН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.7"/>
-                                        <TextBlock Text="Создайте или выберите профиль на главной" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.5"/>
+                                        <TextBlock Text="ПРОФИЛЬ НЕ ВЫБРАН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
+                                        <TextBlock Text="Создайте или выберите профиль на главной" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.4"/>
                                     </StackPanel>
                                 </Grid>
                                 <Grid x:Name="gridLawsContent" Margin="15,15,0,0">
@@ -1111,7 +1103,15 @@
                                         <Border Background="{DynamicResource SidebarBrush}" BorderThickness="0" CornerRadius="12">
 <Border.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="12" ShadowDepth="8" Opacity="0.3" Color="Black"/></Border.Effect>
                                             <Grid>
-                                            <TextBlock x:Name="lblNoLaws" Text="Пусто... : (" Foreground="{DynamicResource GrayBrush}" Opacity="0.3" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                            <Grid x:Name="lblNoLaws" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
+                                                    <Border Width="70" Height="70" CornerRadius="35" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
+                                                        <TextBlock Text="?" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
+                                                    </Border>
+                                                    <TextBlock Text="ПУСТО" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
+                                                    <TextBlock Text="Здесь будет список законов" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.4"/>
+                                                </StackPanel>
+                                            </Grid>
                                             <Grid Margin="0,0,0,0">
                                                                                 <Grid x:Name="pnlFineCalcList" Visibility="Collapsed" Margin="0,0,0,0">
                                                     <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
@@ -1306,15 +1306,15 @@
                                                                                     </Grid>
                                                                                 </Border>
                                                                             </DataTemplate>
-                                                                        </ListBox.ItemTemplate>
-                                                                    </ListBox>
+                                                                </ListBox.ItemTemplate>
+                                                            </ListBox>
 
                                                             <!-- Empty State Message -->
                                                             <Grid Grid.Row="1" x:Name="txtEmptyFines" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
                                                                     <!-- Decorative circle with scales icon -->
                                                                     <Border Width="70" Height="70" CornerRadius="35" Background="#152ea043" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                                                        <Viewbox Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <Viewbox Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                             <Path Data="M12,2 L12,14 M8,14 L16,14 M4,4 L20,4 M4,4 L2,8 L6,8 Z M20,4 L18,8 L22,8 Z" Stroke="#2ea043" StrokeThickness="1.6" StrokeLineJoin="Round" Fill="Transparent" Opacity="0.6"/>
                                                                         </Viewbox>
                                                                     </Border>
@@ -1476,14 +1476,14 @@
                                                                                     </Grid>
                                                                                 </Border>
                                                                             </DataTemplate>
-                                                                        </ListBox.ItemTemplate>
-                                                                    </ListBox>
+                                                                </ListBox.ItemTemplate>
+                                                            </ListBox>
 
                                                             <!-- Empty State Message -->
                                                             <Grid Grid.Row="1" x:Name="txtEmptyWanted" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
                                                                     <Border Width="70" Height="70" CornerRadius="35" Background="#15e74c3c" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                                                        <Viewbox Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <Viewbox Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                             <Path Data="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z" Stroke="#e74c3c" StrokeThickness="1.6" Fill="Transparent" Opacity="0.6"/>
                                                                         </Viewbox>
                                                                     </Border>
@@ -1718,11 +1718,11 @@
                             <Grid Margin="20,20,20,15">
                                 <Grid x:Name="lblNoProfBinds" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Border Width="80" Height="80" CornerRadius="40" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                            <TextBlock Text="⚠" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
+                                        <Border Width="70" Height="70" CornerRadius="35" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
+                                            <TextBlock Text="⚠" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
                                         </Border>
-                                        <TextBlock Text="ПРОФИЛЬ НЕ ВЫБРАН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.7"/>
-                                        <TextBlock Text="Создайте или выберите профиль на главной" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.5"/>
+                                        <TextBlock Text="ПРОФИЛЬ НЕ ВЫБРАН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
+                                        <TextBlock Text="Создайте или выберите профиль на главной" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.4"/>
                                     </StackPanel>
                                 </Grid>
                                 <Grid x:Name="gridBindsContent" Margin="10,5,0,0">
@@ -1836,9 +1836,8 @@
                                                 <Border Grid.Row="2" Background="{DynamicResource SideBrush}" CornerRadius="0,0,11,11"/>
                                                 <Grid x:Name="pnlNoBinds" Grid.Row="2" Visibility="Collapsed">
                                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
-                                                        <!-- Decorative circle with keyboard icon (matches fines empty state) -->
-                                                        <Border Width="70" Height="70" CornerRadius="35" Background="#15d2a65e" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                                            <Viewbox Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <Border Width="70" Height="70" CornerRadius="35" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
+                                                            <Viewbox Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <Canvas Width="24" Height="16">
                                                                     <Rectangle Width="24" Height="16" Stroke="#d2a65e" StrokeThickness="1.6" RadiusX="2" RadiusY="2" Fill="Transparent" Opacity="0.6"/>
                                                                     <Rectangle Canvas.Left="3" Canvas.Top="3" Width="4" Height="4" Fill="#d2a65e" RadiusX="0.8" RadiusY="0.8" Opacity="0.6"/>
@@ -1849,7 +1848,7 @@
                                                             </Viewbox>
                                                         </Border>
                                                         <TextBlock x:Name="lblNoBindsTitle" Text="БИНДЫ НЕ НАСТРОЕНЫ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
-                                                        <TextBlock x:Name="lblNoBindsDesc" Text="Создайте новый бинд или скачайте готовый&#x0a;набор из облачного каталога." Foreground="#8b949e" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,8,0,0" Opacity="0.4" TextWrapping="Wrap"/>
+                                                        <TextBlock x:Name="lblNoBindsDesc" Text="Создайте новый бинд или скачайте готовый&#x0a;набор из облачного каталога." Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,8,0,0" Opacity="0.4" TextWrapping="Wrap"/>
                                                     </StackPanel>
                                                 </Grid>
                                                 
@@ -2041,7 +2040,7 @@
                                                 
                                                 <StackPanel Grid.Row="0" Margin="10,10,10,5">
                                                     <TextBlock Text="ВАШИ ГРУППЫ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" Margin="5,0,0,8"/>
-                                                    <Rectangle Height="1.5" Stroke="{DynamicResource LineBrush}" StrokeThickness="1.5" StrokeDashArray="4 4" SnapsToDevicePixels="True"/>
+                                                    <Rectangle Height="1.5" Fill="{DynamicResource LineBrush}" SnapsToDevicePixels="True"/>
                                                 </StackPanel>
                                                 
                                                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" PreviewMouseWheel="Groups_Scroll_PreviewMouseWheel">
@@ -2249,11 +2248,11 @@
                                 <!-- No profile warning -->
                                 <Grid x:Name="lblNoProfRadial" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Border Width="80" Height="80" CornerRadius="40" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                            <TextBlock Text="⚠" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
+                                        <Border Width="70" Height="70" CornerRadius="35" Background="{DynamicResource GoldBrushTransparent}" HorizontalAlignment="Center" Margin="0,0,0,15">
+                                            <TextBlock Text="⚠" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource GoldBrush}" Opacity="0.6" Margin="0,0,0,5"/>
                                         </Border>
-                                        <TextBlock Text="ПРОФИЛЬ НЕ ВЫБРАН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.7"/>
-                                        <TextBlock Text="Создайте или выберите профиль на главной" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.5"/>
+                                        <TextBlock Text="ПРОФИЛЬ НЕ ВЫБРАН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
+                                        <TextBlock Text="Создайте или выберите профиль на главной" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.4"/>
                                     </StackPanel>
                                 </Grid>
 
@@ -2319,6 +2318,8 @@
                                             </RadioButton>
                                         </Grid>
                                     </Border>
+                                    
+
 
                                     <!-- LEFT: Preview -->
                                     <Border Canvas.Left="0" Canvas.Top="45" Width="460" Height="455" CornerRadius="12" Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
@@ -2550,7 +2551,7 @@
                                 <ScrollViewer x:Name="svOptions" Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,-20,0" Padding="0,0,20,0">
                                     <StackPanel>
                                         <!-- 1. VK Community Banner (800x60) -->
-                                        <Border CornerRadius="10" BorderBrush="#003d99" BorderThickness="1" Padding="20,0" Height="60" Margin="0,0,0,20" Width="800" HorizontalAlignment="Left">
+                                        <Border CornerRadius="10" BorderBrush="#003d99" BorderThickness="1" Padding="20,0" Height="60" Margin="0,0,0,10" Width="800" HorizontalAlignment="Left">
                                             <Border.Style><Style TargetType="Border"><Setter Property="Background" Value="#051024"/><Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#0a1a38"/></Trigger></Style.Triggers></Style></Border.Style>
                                             <Grid>
                                                 <StackPanel VerticalAlignment="Center">
@@ -2565,12 +2566,28 @@
                                             </Grid>
                                         </Border>
 
+                                        <!-- GitHub Banner (800x60) -->
+                                        <Border CornerRadius="10" BorderBrush="#30363d" BorderThickness="1" Padding="20,0" Height="60" Margin="0,0,0,20" Width="800" HorizontalAlignment="Left">
+                                            <Border.Style><Style TargetType="Border"><Setter Property="Background" Value="#0d1117"/><Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#161b22"/></Trigger></Style.Triggers></Style></Border.Style>
+                                            <Grid>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <TextBlock Text="ОФИЦИАЛЬНЫЙ РЕПОЗИТОРИЙ НА GITHUB" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Foreground="#c9d1d9"/>
+                                                    <TextBlock Text="Отслеживайте исходный код, следите за релизами и безопасностью скрипта" FontFamily="Segoe UI" FontSize="11" Foreground="#8b949e" Margin="0,5,0,0"/>
+                                                </StackPanel>
+                                                <Button Width="140" Height="40" Background="#21262d" BorderBrush="#30363d" BorderThickness="1" Foreground="#c9d1d9" HorizontalAlignment="Right" Cursor="Hand" Click="Open_GitHub">
+                                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                    <TextBlock Text="Перейти на GitHub" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+
                                         <!-- SYSTEM TOGGLES PANEL -->
                                         <Border CornerRadius="12" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Padding="20,16" Width="800" HorizontalAlignment="Left" Margin="0,0,0,20">
                                             <Grid>
-                                                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                                 <StackPanel>
                                                     <TextBlock Text="🔧 СИСТЕМА ОВЕРЛЕЯ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,10"/>
+                                                    <TextBlock Text="Вы можете отключить определенную функцию хелпера, если она вам не нужна." Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="11" Margin="0,-5,0,10" Opacity="0.8"/>
                                                     <Line X1="0" Y1="0" X2="760" Y2="0" Stroke="{DynamicResource GrayBrush}" StrokeThickness="1.3" StrokeDashArray="5 3" Opacity="0.4" Margin="0,0,0,15"/>
                                                 </StackPanel>
                                                 <Grid Grid.Row="1">
@@ -2609,7 +2626,7 @@
                                                         </Grid>
                                                     </Border>
                                                 </Grid>
-                                            </Grid>
+                                                </Grid>
                                         </Border>
 
 
@@ -2672,42 +2689,54 @@
                                                         <TextBlock Text="💾 БАЗА ДАННЫХ И КОНФИГИ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" Margin="0,0,0,10"/>
                                                         <Line X1="0" Y1="0" X2="350" Y2="0" Stroke="{DynamicResource GrayBrush}" StrokeThickness="1.3" StrokeDashArray="5 3" Opacity="0.4" Margin="0,0,0,15"/>
 
-                                                        <Grid>
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition Height="Auto"/>
-                                                                <RowDefinition Height="Auto"/>
-                                                            </Grid.RowDefinitions>
-                                                            <Grid Grid.Row="0">
-                                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="14"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                                            <!-- Import Button -->
-                                                            <Button Height="45" Background="#0c182e" BorderBrush="#1f6feb" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ImportData_Click"> 
-                                                                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
-                                                                <StackPanel VerticalAlignment="Center">
-                                                                    <TextBlock Text="⬇ ИМПОРТ ДАННЫХ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#1f6feb" HorizontalAlignment="Center"/>
-                                                                    <TextBlock Text="Загрузить профиль / конфиг" FontFamily="Segoe UI" FontSize="9" Foreground="#1f6feb" Opacity="0.7" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                                                                </StackPanel>
-                                                            </Button>
-
-                                                            <!-- Export Button -->
-                                                            <Button Grid.Column="2" Height="45" Background="#0c182e" BorderBrush="#1f6feb" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ExportData_Click"> 
-                                                                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
-                                                                <StackPanel VerticalAlignment="Center">
-                                                                    <TextBlock Text="⬆ ЭКСПОРТ ДАННЫХ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#1f6feb" HorizontalAlignment="Center"/>
-                                                                    <TextBlock Text="Сохранить резервную копию" FontFamily="Segoe UI" FontSize="9" Foreground="#1f6feb" Opacity="0.7" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                                                                </StackPanel>
-                                                            </Button>
-                                                            </Grid>
-                                                            <Button Grid.Row="1" Margin="0,15,0,0" Height="45" Background="#1c0a0a" BorderBrush="#e83f3f" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ReplaceConfigBase_Click">
-                                                                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
-                                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,2">
-                                                                        <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="13" FontWeight="Bold" Foreground="#e83f3f" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                                                        <TextBlock Text="ЗАМЕНИТЬ БАЗУ КОНФИГОВ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#e83f3f" VerticalAlignment="Center"/>
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+                                                                <Grid Grid.Row="0">
+                                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="14"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                                <!-- Import Button -->
+                                                                <Button Height="45" Background="#0c182e" BorderBrush="#1f6feb" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ImportData_Click"> 
+                                                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Text="⬇ ИМПОРТ ДАННЫХ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#1f6feb" HorizontalAlignment="Center"/>
+                                                                        <TextBlock Text="Загрузить профиль / конфиг" FontFamily="Segoe UI" FontSize="9" Foreground="#1f6feb" Opacity="0.7" HorizontalAlignment="Center" Margin="0,2,0,0"/>
                                                                     </StackPanel>
-                                                                    <TextBlock Text="Открыть папку ConfigBase в проводнике" FontFamily="Segoe UI" FontSize="9" Foreground="#e83f3f" Opacity="0.7" HorizontalAlignment="Center"/>
-                                                                </StackPanel>
-                                                            </Button>
-                                                        </Grid>
+                                                                </Button>
+
+                                                                <!-- Export Button -->
+                                                                <Button Grid.Column="2" Height="45" Background="#0c182e" BorderBrush="#1f6feb" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ExportData_Click"> 
+                                                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Text="⬆ ЭКСПОРТ ДАННЫХ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#1f6feb" HorizontalAlignment="Center"/>
+                                                                        <TextBlock Text="Сохранить резервную копию" FontFamily="Segoe UI" FontSize="9" Foreground="#1f6feb" Opacity="0.7" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                </Grid>
+                                                                <Button Grid.Row="1" Margin="0,15,0,0" Height="45" Background="#1c0a0a" BorderBrush="#e83f3f" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ReplaceConfigBase_Click">
+                                                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,2">
+                                                                            <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="13" FontWeight="Bold" Foreground="#e83f3f" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                                            <TextBlock Text="ЗАМЕНИТЬ БАЗУ КОНФИГОВ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#e83f3f" VerticalAlignment="Center"/>
+                                                                        </StackPanel>
+                                                                        <TextBlock Text="Открыть папку ConfigBase в проводнике" FontFamily="Segoe UI" FontSize="9" Foreground="#e83f3f" Opacity="0.7" HorizontalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                
+                                                                <Button Grid.Row="2" Margin="0,15,0,0" Height="45" Background="#0f291e" BorderBrush="#2ea043" BorderThickness="1" Style="{StaticResource FlatBtn}" Click="ImportAhk_Click">
+                                                                    <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,2">
+                                                                            <TextBlock Text="H" FontFamily="Consolas" FontSize="16" FontWeight="Bold" Foreground="#2ea043" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                                            <TextBlock Text="ИМПОРТ ИЗ AUTOHOTKEY" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#2ea043" VerticalAlignment="Center"/>
+                                                                        </StackPanel>
+                                                                        <TextBlock Text="Сконвертировать скрипт .ahk в бинды" FontFamily="Segoe UI" FontSize="9" Foreground="#2ea043" Opacity="0.7" HorizontalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                </Button>
+                                                            </Grid>
                                                     </StackPanel>
                                                 </Border>
                                             </Grid>
@@ -2722,7 +2751,7 @@
                                                     <!-- Overlay toggle key -->
                                                     <Grid Margin="0,0,0,12">
                                                         <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="Клавиша вызова меню" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Открыть основное меню" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                                             <TextBlock Text="Назначьте кнопку для открытия оверлея" FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <Button x:Name="btnKeyToggle" Content="F9" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="Toggle">
@@ -2733,7 +2762,7 @@
                                                     <!-- Radial menu key -->
                                                     <Grid Margin="0,0,0,12">
                                                         <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="Клавиша кругового меню" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Открыть круговое меню" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                                             <TextBlock Text="Кнопка активации радиального меню" FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <Button x:Name="btnRadialKey" Content="B" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="Radial" Cursor="Hand">
@@ -2741,10 +2770,11 @@
                                                         </Button>
                                                     </Grid>
 
+
                                                     <!-- Binder hint key -->
                                                     <Grid Margin="0,0,0,12">
                                                         <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="Клавиша подсказки биндера" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Открыть подсказку по биндам" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                                             <TextBlock Text="Кнопка отображения подсказок биндера" FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <Button x:Name="btnBinderHintKey" Content="F4" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="BinderHint" Cursor="Hand">
@@ -2752,10 +2782,12 @@
                                                         </Button>
                                                     </Grid>
 
+
+
                                                     <!-- Issue fine key -->
                                                     <Grid Margin="0,0,0,12">
                                                         <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="Клавиша принятия действия" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Принять действие" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                                             <TextBlock Text="Кнопка для принятия действия" FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <Button x:Name="btnIssueFineKey" Content="Up" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="IssueFine" Cursor="Hand">
@@ -2766,7 +2798,7 @@
                                                     <!-- Cancel fine key -->
                                                     <Grid Margin="0,0,0,12">
                                                         <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="Клавиша отмены действия" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Отменить действие" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                                             <TextBlock Text="Кнопка для отмены действия" FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <Button x:Name="btnCancelFineKey" Content="Down" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="CancelFine" Cursor="Hand">
@@ -2775,12 +2807,23 @@
                                                     </Grid>
 
                                                     <!-- Stop Bind key -->
-                                                    <Grid>
+                                                    <Grid Margin="0,0,0,12">
                                                         <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="Клавиша остановки бинда" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Остановить бинд/цитирование" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                                             <TextBlock Text="Мгновенно прерывает выполнение бинда" FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
                                                         </StackPanel>
                                                         <Button x:Name="btnStopBindKey" Content="Нет" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="StopBind" Cursor="Hand">
+                                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                        </Button>
+                                                    </Grid>
+
+                                                    <!-- Toggle Script key -->
+                                                    <Grid>
+                                                        <StackPanel VerticalAlignment="Center">
+                                                            <TextBlock Text="Отключить скрипт в игре" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                                            <TextBlock Text="Отключить хелпер в игре." FontFamily="Segoe UI" FontSize="11.5" Foreground="{DynamicResource GrayBrush}" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                        <Button x:Name="btnKeyToggleScript" Content="Нет" Width="100" Height="30" HorizontalAlignment="Right" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontFamily="Segoe UI" FontSize="14" FontWeight="Black" Click="OptKey_Click" Tag="ToggleScript" Cursor="Hand">
                                                             <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                                                         </Button>
                                                     </Grid>
@@ -2788,34 +2831,60 @@
                                             </Border>
                                         </Grid>
 
-                                        <!-- 5. Terminal Log -->
-                                        <Border CornerRadius="12" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Padding="15,10" Width="800" HorizontalAlignment="Left" Height="145">
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
-                                                <TextBlock Text="🕒 ПОСЛЕДНИЕ ДЕЙСТВИЯ (ЛОГ ТЕРМИНАЛА)" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" Margin="0,0,0,10"/>
-                                                <Border Grid.Row="1" CornerRadius="6" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
-                                                    <ScrollViewer x:Name="svLogs" VerticalScrollBarVisibility="Auto" Margin="0" Padding="15">
-                                                        <ItemsControl x:Name="icLogs" VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="True">
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <Grid Margin="0,0,0,8">
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="80"/>
-                                                                            <ColumnDefinition Width="*"/>
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <TextBlock Text="{Binding Timestamp, StringFormat=[HH:mm:ss]}" FontFamily="Consolas" FontSize="12" Foreground="#8b949e" VerticalAlignment="Top" Margin="0,1,0,0"/>
-                                                                        <TextBlock Grid.Column="1" Text="{Binding Message}" FontFamily="Segoe UI" FontSize="13" Foreground="{Binding ColorBrush}" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                                                                    </Grid>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
-                                                    </ScrollViewer>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
+                                        <!-- 5. Bottom Row -->
+                                        <Grid Width="800" HorizontalAlignment="Left" Margin="0,0,0,20">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Left: Uninstall Script -->
+                                            <Border Grid.Column="0" CornerRadius="12" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Padding="15,15" Height="145">
+                                                <Grid>
+                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                                                            <Path Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4Z" Fill="#f85149" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                                            <TextBlock Text="УДАЛЕНИЕ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#f85149" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="Удалить плагин хелпера&#x0a;из папки игры" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="11" TextAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                                                        <Button Width="140" Height="35" Background="#da3633" Foreground="White" BorderThickness="0" Cursor="Hand" Click="UninstallScript_Click">
+                                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                            <TextBlock Text="УДАЛИТЬ ПЛАГИН" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Right: Terminal Log -->
+                                            <Border Grid.Column="2" CornerRadius="12" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Padding="15,10" Height="145">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Text="🕒 ПОСЛЕДНИЕ ДЕЙСТВИЯ (ЛОГ ТЕРМИНАЛА)" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" Margin="0,0,0,10"/>
+                                                    <Border Grid.Row="1" CornerRadius="6" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
+                                                        <ScrollViewer x:Name="svLogs" VerticalScrollBarVisibility="Auto" Margin="0" Padding="15">
+                                                            <ItemsControl x:Name="icLogs" VirtualizingStackPanel.IsVirtualizing="True" ScrollViewer.CanContentScroll="True">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Grid Margin="0,0,0,8">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="80"/>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <TextBlock Text="{Binding Timestamp, StringFormat=[HH:mm:ss]}" FontFamily="Consolas" FontSize="12" Foreground="#8b949e" VerticalAlignment="Top" Margin="0,1,0,0"/>
+                                                                            <TextBlock Grid.Column="1" Text="{Binding Message}" FontFamily="Segoe UI" FontSize="13" Foreground="{Binding ColorBrush}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                                                                        </Grid>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </ScrollViewer>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </Grid>
 
 
                                         <StackPanel Visibility="Collapsed">
@@ -2839,13 +2908,13 @@
                     </TabControl>
 
 
-                    <Border x:Name="OverlayContainer" Grid.ColumnSpan="2" Grid.RowSpan="2" Visibility="Collapsed" Background="#D9000000" CornerRadius="0,16,0,16" Panel.ZIndex="999">
+                    <Border x:Name="OverlayContainer" Grid.Column="1" Grid.Row="1" Visibility="Collapsed" Background="#D9000000" CornerRadius="0,0,0,0" Panel.ZIndex="999">
                         <Grid>
 
                             
 
 
-                            <local:BinderEditor x:Name="BinderEditorControl" Visibility="Collapsed" Panel.ZIndex="999" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,75,0,0"/>
+                            <local:BinderEditor x:Name="BinderEditorControl" Visibility="Collapsed" Panel.ZIndex="999" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"/>
                             
                             <Border x:Name="WinLawEdit" Visibility="Collapsed" Width="400" Background="{DynamicResource SidebarBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <Border.Effect>
@@ -2903,7 +2972,7 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <TextBox x:Name="txtLawText" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" CaretBrush="White"/>
+                                                <TextBox x:Name="txtLawText" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" CaretBrush="White" MinLines="15" MaxLines="15"/>
                                             </Border>
                                         </StackPanel>
 
@@ -2924,7 +2993,7 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <TextBox x:Name="txtLawPunish" AcceptsReturn="True" TextWrapping="Wrap" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10,8" VerticalContentAlignment="Top" CaretBrush="White"/>
+                                                <TextBox x:Name="txtLawPunish" AcceptsReturn="True" TextWrapping="Wrap" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10,8" VerticalContentAlignment="Top" CaretBrush="White" MinLines="15" MaxLines="15" VerticalScrollBarVisibility="Auto"/>
                                             </Border>
                                         </StackPanel>
 
@@ -3410,34 +3479,160 @@
                                 </Grid>
                             </Border>
 
-                            <Border x:Name="WinGuide" Visibility="Collapsed" Width="550" MaxHeight="550" Background="{DynamicResource SidebarBrush}" CornerRadius="10" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center" Panel.ZIndex="10">
-                                <Grid Margin="20">
-                                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                                    <Grid Margin="0,0,0,15">
-                                        <TextBlock Text="ИНСТРУКЦИЯ ПО БИНДАМ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="18"/>
-                                        <Button Content="×" HorizontalAlignment="Right" Style="{StaticResource StepDeleteBtn}" FontSize="24" Margin="0,-5,-5,0" Click="Dialog_Close"/>
-                                    </Grid>
-                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                        <StackPanel Margin="0,0,10,0">
-                                            <TextBlock Text="ТИПЫ АКТИВАЦИИ:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-                                            <TextBlock Text="• Горячая клавиша: Блок срабатывает по нажатию конкретной кнопки (например, Alt+1)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                            <TextBlock Text="• Автозамена: Вы печатаете слово в чате (например, /rep, патруль1 или привет), и скрипт автоматически стирает его и выполняет ваши действия." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                            <Border x:Name="WinGuide" Visibility="Collapsed" Width="600" MaxHeight="550" Background="{DynamicResource SidebarBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Panel.ZIndex="10">
+                                <Grid Margin="0">
+                                    <!-- Header -->
+                                    <Border Background="{DynamicResource SideBrush}" CornerRadius="11,11,0,0" Padding="20,12" VerticalAlignment="Top" Height="55">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="📖" FontSize="20" Margin="0,0,10,0"/>
+                                                <TextBlock Text="ПОДРОБНАЯ ИНСТРУКЦИЯ ПО БИНДАМ" Foreground="{DynamicResource GoldBrush}" FontWeight="ExtraBold" FontSize="16" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <Button Content="×" HorizontalAlignment="Right" Style="{StaticResource StepDeleteBtn}" FontSize="24" Margin="0,-5,0,0" Click="Dialog_Close"/>
+                                        </Grid>
+                                    </Border>
+                                    
+                                    <!-- Content -->
+                                    <ScrollViewer Margin="0,55,0,70" VerticalScrollBarVisibility="Auto" Padding="20,15,20,15">
+                                        <StackPanel>
                                             
-                                            <TextBlock Text="БЛОК ЧАТА:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-                                            <TextBlock Text="• Отправить: Скрипт сам откроет чат, напишет ваш текст и нажмет Enter." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                            <TextBlock Text="• Ждать: Скрипт впишет текст, но оставит чат открытым, чтобы вы могли дописать ID игрока." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                            <TextBlock Text="• Умный пробел: Если в конце текста поставить пробел (например: «/cuff »), скрипт автоматически нажмет его за вас в игре." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                                            <!-- АКТИВАЦИЯ -->
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                        <TextBlock Text="🚀" FontSize="16" Margin="0,0,8,0"/>
+                                                        <TextBlock Text="ТИПЫ АКТИВАЦИИ МАКРОСА" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    
+                                                    <Grid Margin="0,0,0,10">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <Border Background="{DynamicResource BgBrush}" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" CornerRadius="4" Padding="6,3" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <Grid Width="10" Height="10" Margin="0,0,6,0">
+                                                                    <Ellipse Stroke="{DynamicResource GoldBrush}" StrokeThickness="2" Fill="Transparent"/>
+                                                                    <Ellipse Width="4" Height="4" Fill="{DynamicResource GoldBrush}"/>
+                                                                </Grid>
+                                                                <TextBlock Text="Горячая клавиша" Foreground="{DynamicResource GrayBrush}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </Border>
+                                                        <TextBlock Grid.Column="1" Text="Блок срабатывает по нажатию конкретной кнопки или комбинации (например, Alt+1)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                    
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <Border Background="{DynamicResource BgBrush}" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" CornerRadius="4" Padding="6,3" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <Grid Width="10" Height="10" Margin="0,0,6,0">
+                                                                    <Ellipse Stroke="{DynamicResource GoldBrush}" StrokeThickness="2" Fill="Transparent"/>
+                                                                    <Ellipse Width="4" Height="4" Fill="{DynamicResource GoldBrush}"/>
+                                                                </Grid>
+                                                                <TextBlock Text="Автозамена" Foreground="{DynamicResource GrayBrush}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </Border>
+                                                        <TextBlock Grid.Column="1" Text="Вы печатаете триггер в любом чате игры (например: привет), и скрипт автоматически стирает его, заменяя на ваши действия." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
 
-                                            <TextBlock Text="ПЕРЕМЕННЫЕ:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-                                            <TextBlock Text="Вы можете использовать теги прямо в тексте (например, *ИМЯ*, *ТЕГ*). При срабатывании бинда они заменятся на значения из меню переменных." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                            <TextBlock Text="💡 Подсказка: Правильно написанная переменная автоматически подсветится золотым цветом прямо в строке!" Foreground="{DynamicResource GoldBrush}" TextWrapping="Wrap" Margin="0,5,0,5"/>
+                                            <!-- ШАГИ И ЧАТ -->
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                        <TextBlock Text="💬" FontSize="16" Margin="0,0,8,0"/>
+                                                        <TextBlock Text="РАБОТА С БЛОКАМИ ЧАТА" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    
+                                                    <Grid Margin="0,0,0,10">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <Border Background="{DynamicResource GoldBrush}" CornerRadius="4" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                            <TextBlock Text="Enter" Foreground="#0a0d12" FontSize="11" FontWeight="Bold"/>
+                                                        </Border>
+                                                        <TextBlock Grid.Column="1" Text="Скрипт сам откроет чат, моментально впишет текст и нажмет Enter." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                    
+                                                    <Grid Margin="0,0,0,10">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <Border Background="{DynamicResource LineBrush}" CornerRadius="4" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                            <TextBlock Text="Ждать" Foreground="{DynamicResource GrayBrush}" FontSize="11" FontWeight="Bold"/>
+                                                        </Border>
+                                                        <TextBlock Grid.Column="1" Text="Скрипт впишет текст, но оставит строку чата открытой (удобно для ручного ввода ID/суммы)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                    
+                                                    <Border Background="{DynamicResource BgBrush}" BorderBrush="#3b82f6" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,5,0,0">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="💡" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                                            <StackPanel Width="470">
+                                                                <TextBlock Text="УМНЫЙ ПРОБЕЛ" Foreground="#3b82f6" FontWeight="Bold" FontSize="11" Margin="0,0,0,3"/>
+                                                                <TextBlock Text="Если в блоке «ЖДАТЬ» поставить пробел в конце (например: «/cuff »), скрипт сам нажмет пробел в игре!" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="15"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- ПЕРЕМЕННЫЕ -->
+                                            <Border Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                        <TextBlock Text="🔄" FontSize="16" Margin="0,0,8,0"/>
+                                                        <TextBlock Text="ПЕРЕМЕННЫЕ И ТЕГОВ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    
+                                                    <TextBlock Text="Пользовательские переменные (создаются на Главной):" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="Вы можете сами придумывать любые переменные, например *ЗВАНИЕ*, *ИМЯ*, *ТЕГ*. Добавьте их в настройках профиля (на главной странице), укажите их значения. Затем просто пишите эти теги в тексте бинда, обязательно оборачивая их в звездочки. Скрипт автоматически заменит их на ваши значения при срабатывании." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,12"/>
+                                                    
+                                                    <TextBlock Text="Системные переменные:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" Margin="0,0,0,5"/>
+                                                    <Grid Margin="0,0,0,10">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="65"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <TextBlock Text="*id*" Foreground="{DynamicResource RedBrush}" FontWeight="ExtraBold" FontSize="14" VerticalAlignment="Top"/>
+                                                        <TextBlock Grid.Column="1" Text="Эта переменная предназначена для умного кругового меню. По умолчанию ввод ID в меню дописывает его в конец текста. Но если вы поставите *id* в любой части строки, то круговое меню впишет ID именно туда (Например: /medhelp *id* 500)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="65"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <TextBlock Text="*time*" Foreground="{DynamicResource GoldBrush}" FontWeight="ExtraBold" FontSize="13" VerticalAlignment="Top"/>
+                                                        <TextBlock Grid.Column="1" Text="Мгновенно подставляет системное время вашего ПК в формате ЧЧ:ММ:СС." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- ГРУППЫ -->
+                                            <Border Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15">
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                        <TextBlock Text="📁" FontSize="16" Margin="0,0,8,0"/>
+                                                        <TextBlock Text="ГРУППИРОВКА И УПРАВЛЕНИЕ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    
+                                                    <Grid Margin="0,0,0,6">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <TextBlock Text="1." Foreground="{DynamicResource GoldBrush}" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="Создавайте группы в боковой панели для сортировки по смыслу." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                    <Grid Margin="0,0,0,6">
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <TextBlock Text="2." Foreground="{DynamicResource GoldBrush}" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="Отключенная группа полностью деактивирует все свои бинды (очень удобно при смене ролей или фракций!)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                        <TextBlock Text="3." Foreground="{DynamicResource GoldBrush}" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Column="1" Text="Просто зажмите ЛКМ на бинде и перетащите его в другую группу." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
                                         </StackPanel>
                                     </ScrollViewer>
-                                    <Button Grid.Row="2" Content="ПОНЯТНО" Height="40" Margin="0,15,0,0" Style="{StaticResource FlatBtn}" Background="{DynamicResource GreenBrush}" Click="Dialog_Close"/>
+                                    
+                                    <!-- Footer / Button -->
+                                    <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,11,11" VerticalAlignment="Bottom" Padding="15">
+                                        <Button Content="ПОНЯТНО, СПАСИБО!" Height="38" Style="{StaticResource FlatBtn}" Background="{DynamicResource GreenBrush}" Foreground="White" FontWeight="Bold" FontSize="12" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </Border>
                                 </Grid>
                             </Border>
 
-                            <Border x:Name="WinSectionGuide" Visibility="Collapsed" Width="550" MaxHeight="550" Background="{DynamicResource SidebarBrush}" CornerRadius="10" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center" Panel.ZIndex="10">
+                            <Border x:Name="WinSectionGuide" Visibility="Collapsed" Width="550" MaxHeight="550" Background="{DynamicResource BgBrush}" CornerRadius="10" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center" Panel.ZIndex="10">
                                 <Grid Margin="20">
                                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                     <Grid Margin="0,0,0,15">
@@ -3596,10 +3791,8 @@
                     </Grid>
 
                     <!-- IMPORT LAWS -->
-                    <Border x:Name="WinImportLaws" Visibility="Collapsed" Width="450" Height="500" Background="{DynamicResource SidebarBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1104">
-                        <Border.Effect>
-                            <DropShadowEffect RenderingBias="Performance" Color="Black" Direction="270" ShadowDepth="15" BlurRadius="20" Opacity="0.6"/>
-                        </Border.Effect>
+                    <Border x:Name="WinImportLaws" Visibility="Collapsed" Width="450" Height="500" Background="{DynamicResource SidebarBrush}" CornerRadius="14" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1104">
+                        
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="55"/>
@@ -3647,7 +3840,8 @@
                                     </Border>
 
                                     <!-- List -->
-                                    <ScrollViewer Grid.Row="2" Margin="25,0,25,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <Border Grid.Row="2" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" CornerRadius="8" Margin="25,0,25,0" Padding="5">
+                                        <ScrollViewer Margin="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                         <ItemsControl x:Name="icImportLawsList">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -3704,26 +3898,23 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
                                     </ScrollViewer>
+                                    </Border>
 
                                     <!-- Footer -->
-                                    <Grid Grid.Row="3">
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" VerticalAlignment="Top"/>
-                                        <Grid Margin="25,20,25,20">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="220"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="170"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" x:Name="btnImportLawsConfirm" Content="ИМПОРТИРОВАТЬ" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource GreenBrush}" Click="ImportLaws_Confirm_Click"/>
-                                            <Button Grid.Column="2" Content="ОТМЕНА" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Click="Dialog_Close"/>
-                                        </Grid>
-                                    </Grid>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="25,20,25,20">
+                                        <Button x:Name="btnImportLawsConfirm" Content="ИМПОРТИРОВАТЬ" Width="160" Height="36" Background="{DynamicResource GoldBrushTransparent}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="ImportLaws_Confirm_Click" Margin="0,0,10,0">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                        <Button Content="ОТМЕНА" Width="120" Height="36" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <!-- IMPORT BINDS -->
-                            <Border x:Name="WinImportBinds" Visibility="Collapsed" Width="600" Height="500" Background="{DynamicResource SidebarBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1105">
-<Border.Effect><DropShadowEffect RenderingBias="Performance" Color="Black" Direction="270" ShadowDepth="15" BlurRadius="20" Opacity="0.6"/></Border.Effect>
+                            <Border x:Name="WinImportBinds" Visibility="Collapsed" Width="600" Height="500" Background="{DynamicResource SidebarBrush}" CornerRadius="14" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1105">
+
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="55"/>
@@ -3767,7 +3958,8 @@
                                     </Border>
 
                                     <!-- List -->
-                                    <ScrollViewer Grid.Row="2" Margin="25,0,25,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <Border Grid.Row="2" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" CornerRadius="8" Margin="25,0,25,0" Padding="5">
+                                        <ScrollViewer Margin="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                         <ItemsControl x:Name="icImportBindsList">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -3861,33 +4053,24 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
                                     </ScrollViewer>
+                                    </Border>
 
                                     <!-- Footer -->
-                                    <Grid Grid.Row="3">
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" VerticalAlignment="Top"/>
-                                        <Grid Margin="25,20,25,20">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="220"/>
-                                                <ColumnDefinition Width="15"/>
-                                                <ColumnDefinition Width="100"/>
-                                            </Grid.ColumnDefinitions>
-                                            
-                                            <TextBlock Grid.Column="0" VerticalAlignment="Center">
-                                                <Run Text="Выбрано биндов с конфликтами: " Foreground="{DynamicResource GrayBrush}" FontSize="11"/>
-                                                <Run x:Name="lblImportBindsConflictCount" Text="0" Foreground="{DynamicResource RedBrush}" FontWeight="Bold" FontSize="11"/>
-                                            </TextBlock>
-
-                                            <Button Grid.Column="1" x:Name="btnImportBindsConfirm" Content="ИМПОРТИРОВАТЬ" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource GreenBrush}" Click="ImportBinds_Confirm_Click"/>
-                                            <Button Grid.Column="3" Content="ОТМЕНА" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Click="Dialog_Close"/>
-                                        </Grid>
-                                    </Grid>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="25,20,25,20">
+                                        <Button x:Name="btnImportBindsConfirm" Content="ИМПОРТИРОВАТЬ" Width="160" Height="36" Background="{DynamicResource GoldBrushTransparent}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="ImportBinds_Confirm_Click" Margin="0,0,10,0">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+<TextBlock x:Name="lblImportBindsConflictCount" Visibility="Collapsed"/>
+                                        <Button Content="ОТМЕНА" Width="120" Height="36" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <!-- IMPORT PROFILES -->
-                            <Border x:Name="WinImportProfiles" Visibility="Collapsed" Width="700" Height="570" Background="{DynamicResource BgBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1106">
-<Border.Effect><DropShadowEffect RenderingBias="Performance" Color="Black" Direction="270" ShadowDepth="15" BlurRadius="20" Opacity="0.6"/></Border.Effect>
+                            <Border x:Name="WinImportProfiles" Visibility="Collapsed" Width="700" Height="570" Background="{DynamicResource BgBrush}" CornerRadius="14" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1106">
+
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="55"/>
@@ -4035,16 +4218,15 @@
                                         </Border>
                                     </Grid>
 
-                                    <!-- Footer -->
-                                    <Grid Grid.Row="3">
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" VerticalAlignment="Top"/>
-                                        <Grid Margin="25,20,25,20">
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button x:Name="btnImportProfileConfirm" Content="СОХРАНИТЬ ПРОФИЛЬ" Style="{StaticResource FlatBtn}" Width="260" Height="40" Background="{DynamicResource GreenBrush}" Click="ImportProfile_Confirm_Click"/>
-                                                <Button Content="ОТМЕНА" Style="{StaticResource FlatBtn}" Width="150" Height="40" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Margin="10,0,0,0" Click="Dialog_Close"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Grid>
+                                                                        <!-- Footer -->
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="25,20,25,20">
+                                        <Button x:Name="btnImportProfileConfirm" Content="ИМПОРТИРОВАТЬ" Width="160" Height="36" Background="{DynamicResource GoldBrushTransparent}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="ImportProfile_Confirm_Click" Margin="0,0,10,0">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                        <Button Content="ОТМЕНА" Width="120" Height="36" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
@@ -4062,22 +4244,27 @@
                             </Border>
 
                             <!-- EXPORT LAWS -->
-                            <Border x:Name="WinExportLaws" Visibility="Collapsed" Width="450" Height="500" Background="{DynamicResource BgBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1104">
-                                <Border.Effect><DropShadowEffect RenderingBias="Performance" Color="Black" Direction="270" ShadowDepth="15" BlurRadius="20" Opacity="0.6"/></Border.Effect>
+                            <Border x:Name="WinExportLaws" Visibility="Collapsed" Width="450" Height="500" Background="{DynamicResource BgBrush}" CornerRadius="14" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1104">
+                                
                                 <Grid>
                                     <Grid.RowDefinitions><RowDefinition Height="55"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <TextBlock Text="ЭКСПОРТ КОНФИГУРАЦИЙ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" FontSize="16" FontFamily="Segoe UI" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                                        <TextBlock Text="×" Foreground="{DynamicResource RedBrush}" FontWeight="Bold" FontSize="20" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0" Cursor="Hand" MouseLeftButtonDown="Dialog_Close"/>
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" VerticalAlignment="Bottom"/>
-                                    </Grid>
+                                    <Border Grid.Row="0" Background="{DynamicResource SideBrush}" CornerRadius="12,12,0,0">                   <Grid Margin="20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0">
+                            <TextBlock Text="L" FontFamily="Consolas" Foreground="{DynamicResource GoldBrush}" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                            <TextBlock Text="ЭКСПОРТ БАЗЫ ЗАКОНОВ" Foreground="White" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource ModalCloseBtn}" Click="Dialog_Close"/>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="0" Height="1" VerticalAlignment="Bottom" Background="#30363d"/>
                                     <Border Grid.Row="1" Margin="25,20,25,15" Height="40" Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="6">
                                         <Grid>
                                             <TextBlock Text="ВЫБРАТЬ ВСЕ РАЗДЕЛЫ" Foreground="{DynamicResource TextBrush}" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Margin="15,0,0,0"/>
                                             <CheckBox x:Name="chkExportLawsAll" Click="ExportLawsAll_Click" IsChecked="True" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0"><CheckBox.Resources><Style TargetType="CheckBox"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox"><Grid Width="36" Height="20"><Border Background="{DynamicResource GoldBrush}" Opacity="0.2" CornerRadius="10"/><Border BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" CornerRadius="10"/><Ellipse x:Name="Handle" Width="14" Height="14" Fill="{DynamicResource GrayBrush}" HorizontalAlignment="Left" Margin="3,0,0,0"/></Grid><ControlTemplate.Triggers><Trigger Property="IsChecked" Value="True"><Setter TargetName="Handle" Property="HorizontalAlignment" Value="Right"/><Setter TargetName="Handle" Property="Margin" Value="0,0,3,0"/><Setter TargetName="Handle" Property="Fill" Value="{DynamicResource GoldBrush}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter></Style></CheckBox.Resources></CheckBox>
                                         </Grid>
                                     </Border>
-                                    <ScrollViewer Grid.Row="2" Margin="25,0,25,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <Border Grid.Row="2" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" CornerRadius="8" Margin="25,0,25,0" Padding="5">
+                                        <ScrollViewer Margin="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                         <ItemsControl x:Name="icExportLawsList">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -4094,34 +4281,40 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
                                     </ScrollViewer>
-                                    <Grid Grid.Row="3">
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" VerticalAlignment="Top"/>
-                                        <Grid Margin="25,20,25,20">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/><ColumnDefinition Width="170"/></Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Content="ЭКСПОРТИРОВАТЬ" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource GreenBrush}" Click="ExportLaws_Confirm_Click"/>
-                                            <Button Grid.Column="2" Content="ОТМЕНА" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Click="Dialog_Close"/>
-                                        </Grid>
-                                    </Grid>
+                                    </Border>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="25,20,25,20">
+                                        <Button Content="ЭКСПОРТИРОВАТЬ" Width="160" Height="36" Background="{DynamicResource GoldBrushTransparent}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="ExportLaws_Confirm_Click" Margin="0,0,10,0">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                        <Button Content="ОТМЕНА" Width="120" Height="36" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <!-- EXPORT BINDS -->
-                            <Border x:Name="WinExportBinds" Visibility="Collapsed" Width="450" Height="500" Background="{DynamicResource BgBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1105">
-                                <Border.Effect><DropShadowEffect RenderingBias="Performance" Color="Black" Direction="270" ShadowDepth="15" BlurRadius="20" Opacity="0.6"/></Border.Effect>
+                            <Border x:Name="WinExportBinds" Visibility="Collapsed" Width="450" Height="500" Background="{DynamicResource BgBrush}" CornerRadius="14" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1105">
+                                
                                 <Grid>
                                     <Grid.RowDefinitions><RowDefinition Height="55"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <TextBlock Text="ЭКСПОРТ БИНДОВ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" FontSize="16" FontFamily="Segoe UI" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                                        <TextBlock Text="×" Foreground="{DynamicResource RedBrush}" FontWeight="Bold" FontSize="20" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0" Cursor="Hand" MouseLeftButtonDown="Dialog_Close"/>
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" VerticalAlignment="Bottom"/>
-                                    </Grid>
+                                    <Border Grid.Row="0" Background="{DynamicResource SideBrush}" CornerRadius="12,12,0,0">                   <Grid Margin="20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0">
+                            <TextBlock Text="B" FontFamily="Consolas" Foreground="{DynamicResource GoldBrush}" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                            <TextBlock Text="ЭКСПОРТ ИГРОВЫХ БИНДОВ" Foreground="White" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource ModalCloseBtn}" Click="Dialog_Close"/>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="0" Height="1" VerticalAlignment="Bottom" Background="#30363d"/>
                                     <Border Grid.Row="1" Margin="25,20,25,15" Height="40" Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="6">
                                         <Grid>
                                             <TextBlock Text="ВЫБРАТЬ ВСЕ МАКРОСЫ" Foreground="{DynamicResource TextBrush}" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Margin="15,0,0,0"/>
                                             <CheckBox x:Name="chkExportBindsAll" Click="ExportBindsAll_Click" IsChecked="True" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0"><CheckBox.Resources><Style TargetType="CheckBox"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox"><Grid Width="36" Height="20"><Border Background="{DynamicResource GoldBrush}" Opacity="0.2" CornerRadius="10"/><Border BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" CornerRadius="10"/><Ellipse x:Name="Handle" Width="14" Height="14" Fill="{DynamicResource GrayBrush}" HorizontalAlignment="Left" Margin="3,0,0,0"/></Grid><ControlTemplate.Triggers><Trigger Property="IsChecked" Value="True"><Setter TargetName="Handle" Property="HorizontalAlignment" Value="Right"/><Setter TargetName="Handle" Property="Margin" Value="0,0,3,0"/><Setter TargetName="Handle" Property="Fill" Value="{DynamicResource GoldBrush}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter></Style></CheckBox.Resources></CheckBox>
                                         </Grid>
                                     </Border>
-                                    <ScrollViewer Grid.Row="2" Margin="25,0,25,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <Border Grid.Row="2" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" CornerRadius="8" Margin="25,0,25,0" Padding="5">
+                                        <ScrollViewer Margin="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                         <ItemsControl x:Name="icExportBindsList">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -4138,28 +4331,33 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
                                     </ScrollViewer>
-                                    <Grid Grid.Row="3">
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" VerticalAlignment="Top"/>
-                                        <Grid Margin="25,20,25,20">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/><ColumnDefinition Width="170"/></Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Content="ЭКСПОРТИРОВАТЬ" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource GreenBrush}" Click="ExportBinds_Confirm_Click"/>
-                                            <Button Grid.Column="2" Content="ОТМЕНА" Style="{StaticResource FlatBtn}" Height="40" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Click="Dialog_Close"/>
-                                        </Grid>
-                                    </Grid>
+                                    </Border>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="25,20,25,20">
+                                        <Button Content="ЭКСПОРТИРОВАТЬ" Width="160" Height="36" Background="{DynamicResource GoldBrushTransparent}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="ExportBinds_Confirm_Click" Margin="0,0,10,0">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                        <Button Content="ОТМЕНА" Width="120" Height="36" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <!-- EXPORT PROFILES -->
-                            <Border x:Name="WinExportProfiles" Visibility="Collapsed" Width="700" Height="570" Background="{DynamicResource BgBrush}" CornerRadius="12" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1106">
-                                <Border.Effect><DropShadowEffect RenderingBias="Performance" Color="Black" Direction="270" ShadowDepth="15" BlurRadius="20" Opacity="0.6"/></Border.Effect>
+                            <Border x:Name="WinExportProfiles" Visibility="Collapsed" Width="700" Height="570" Background="{DynamicResource BgBrush}" CornerRadius="14" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.RowSpan="2" Panel.ZIndex="1106">
+                                
                                 <Grid>
                                     <Grid.RowDefinitions><RowDefinition Height="55"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                     
-                                    <Grid Grid.Row="0">
-                                        <TextBlock Text="ЭКСПОРТ ПРОФИЛЯ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" FontSize="16" FontFamily="Segoe UI" VerticalAlignment="Center" Margin="25,0,0,0"/>
-                                        <TextBlock Text="×" Foreground="{DynamicResource RedBrush}" FontWeight="Bold" FontSize="20" FontFamily="Segoe UI" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0" Cursor="Hand" MouseLeftButtonDown="Dialog_Close"/>
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" VerticalAlignment="Bottom"/>
-                                    </Grid>
+                                    <Border Grid.Row="0" Background="{DynamicResource SideBrush}" CornerRadius="12,12,0,0">                   <Grid Margin="20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0">
+                            <TextBlock Text="P" FontFamily="Consolas" Foreground="{DynamicResource GoldBrush}" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                            <TextBlock Text="ЭКСПОРТ ПРОФИЛЕЙ" Foreground="White" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource ModalCloseBtn}" Click="Dialog_Close"/>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="0" Height="1" VerticalAlignment="Bottom" Background="#30363d"/>
 
                                     <Grid Grid.Row="1" Margin="25,15,25,15">
                                         <TextBlock Text="Выберите данные для экспорта. Будет сгенерирован файл с настройками." Foreground="{DynamicResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
@@ -4223,15 +4421,14 @@
                                         </Border>
                                     </Grid>
 
-                                    <Grid Grid.Row="3">
-                                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" VerticalAlignment="Top"/>
-                                        <Grid Margin="25,20,25,20">
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button Content="СОХРАНИТЬ ПРОФИЛЬ В ФАЙЛ" Style="{StaticResource FlatBtn}" Width="260" Height="40" Background="{DynamicResource GreenBrush}" Click="ExportProfile_Confirm_Click"/>
-                                                <Button Content="ОТМЕНА" Style="{StaticResource FlatBtn}" Width="150" Height="40" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Margin="10,0,0,0" Click="Dialog_Close"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Grid>
+                                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="25,20,25,20">
+                                        <Button Content="ЭКСПОРТИРОВАТЬ" Width="160" Height="36" Background="{DynamicResource GoldBrushTransparent}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="ExportProfile_Confirm_Click" Margin="0,0,10,0">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                        <Button Content="ОТМЕНА" Width="120" Height="36" Background="{DynamicResource DeepBgBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5" Style="{StaticResource FlatBtn}" FontSize="12" FontWeight="Bold" Cursor="Hand" Click="Dialog_Close">
+                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
@@ -4241,11 +4438,24 @@
                             <Grid Width="60" Height="60" HorizontalAlignment="Center">
                                 <Ellipse x:Name="saveGlobalSpin" Width="60" Height="60" Stroke="{DynamicResource GoldBrush}" StrokeThickness="4" StrokeDashArray="2 2" RenderTransformOrigin="0.5,0.5">
                                     <Ellipse.RenderTransform><RotateTransform Angle="0"/></Ellipse.RenderTransform>
-                                    <Ellipse.Triggers>
-                                        <EventTrigger RoutedEvent="Loaded">
-                                            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="saveGlobalSpin" Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" From="0" To="360" Duration="0:0:1" RepeatBehavior="Forever"/></Storyboard></BeginStoryboard>
-                                        </EventTrigger>
-                                    </Ellipse.Triggers>
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsVisible" Value="True">
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard Name="spin3">
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)" From="0" To="360" Duration="0:0:1" RepeatBehavior="Forever"/>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+                                                    <Trigger.ExitActions>
+                                                        <StopStoryboard BeginStoryboardName="spin3"/>
+                                                    </Trigger.ExitActions>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
                                 </Ellipse>
                                 <TextBlock Text="D" Foreground="{DynamicResource GoldBrush}" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,2"/>
                             </Grid>

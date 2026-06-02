@@ -30,9 +30,9 @@ namespace FSB_helper_C__
         {
             if (_parent.MasterData.ContainsKey(_activeProfile))
             {
-                // load variables excluding the system *ВРЕМЯ* property (which we showcase fixed in UI)
+                // load variables excluding the system *ВРЕМЯ* and *ID* property (which we showcase fixed in UI)
                 _tempVars = _parent.MasterData[_activeProfile].Variables
-                    .Where(kv => kv.Key != "*ВРЕМЯ*")
+                    .Where(kv => kv.Key != "*ВРЕМЯ*" && kv.Key != "*ID*")
                     .Select(kv => new EditableVarItem { Key = kv.Key, Value = kv.Value, OriginalKey = kv.Key })
                     .ToList();
                 RefreshList();
@@ -118,13 +118,18 @@ namespace FSB_helper_C__
 
             if (_parent.MasterData.ContainsKey(_activeProfile))
             {
-                // retain the built-in time
+                // retain the built-in variables
                 string timeVal = "Часы:Минуты:Секунды";
                 if (_parent.MasterData[_activeProfile].Variables.ContainsKey("*ВРЕМЯ*"))
                     timeVal = _parent.MasterData[_activeProfile].Variables["*ВРЕМЯ*"];
+                
+                string idVal = "Введенный ID";
+                if (_parent.MasterData[_activeProfile].Variables.ContainsKey("*ID*"))
+                    idVal = _parent.MasterData[_activeProfile].Variables["*ID*"];
 
                 _parent.MasterData[_activeProfile].Variables.Clear();
                 _parent.MasterData[_activeProfile].Variables["*ВРЕМЯ*"] = timeVal;
+                _parent.MasterData[_activeProfile].Variables["*ID*"] = idVal;
 
                 foreach (var v in _tempVars)
                 {

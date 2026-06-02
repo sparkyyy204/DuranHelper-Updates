@@ -79,8 +79,9 @@ namespace FSB_helper_C__
             if (_fullCatalog != null && _fullCatalog.Count > 0) 
             {
                 var main = Application.Current.MainWindow as MainWindow;
-                if (main != null && _lastCloudProfile != main.CurrentProfile) {
-                    RefreshState();
+                if (main != null) {
+                    UpdateInstallStates();
+                    ApplyFilters();
                 }
                 return; // Уже загружено
             }
@@ -93,6 +94,7 @@ namespace FSB_helper_C__
             txtLoadingDesc.Text = "Синхронизация локального каталога...";
             LoadingOverlay.Visibility = Visibility.Visible;
             ErrorView.Visibility = Visibility.Collapsed;
+            EmptyStateView.Visibility = Visibility.Collapsed;
             icCloudList.Visibility = Visibility.Collapsed;
 
             try
@@ -110,7 +112,7 @@ namespace FSB_helper_C__
                     throw new Exception("Файл ConfigBase/catalog.json не найден.");
                 }
 
-                RefreshState();
+                ApplyFilters();
                 icCloudList.Visibility = Visibility.Visible;
             }
             catch (OperationCanceledException)
@@ -146,22 +148,200 @@ namespace FSB_helper_C__
         private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             txtSearchHint.Visibility = string.IsNullOrWhiteSpace(txtSearch.Text) ? Visibility.Visible : Visibility.Collapsed;
-            RefreshState();
+            ApplyFilters();
         }
 
         private void Filter_Changed(object sender, SelectionChangedEventArgs e)
         {
-            RefreshState();
+            ApplyFilters();
         }
 
         public void RefreshState()
         {
+            UpdateInstallStates();
+            ApplyFilters();
+        }
+
+        public void UpdateInstallStates()
+        {
             if (_fullCatalog == null) return;
             
-            // Reset all IsInstalled flags first
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main == null) return;
+
+            _lastCloudProfile = main.CurrentProfile;
+            
             foreach (var item in _fullCatalog)
                 item.IsInstalled = false;
-            
+
+            foreach (var item in _fullCatalog)
+            {
+                if (item.Type == "profile")
+                {
+                    item.IsInstalled = main.MasterData.ContainsKey(item.Title);
+                }
+                else if (!string.IsNullOrEmpty(main.CurrentProfile) && main.MasterData.ContainsKey(main.CurrentProfile))
+                {
+                    var p = main.MasterData[main.CurrentProfile];
+                    if (p.InstalledCloudIds == null) p.InstalledCloudIds = new List<string>();
+                    
+                    if (p.InstalledCloudIds.Contains(item.Id))
+                    {
+                        bool dataExists = true;
+                        if (item.Type == "laws" && (p.Laws == null || p.Laws.Count == 0))
+                        {
+                            dataExists = false;
+                        }
+                        else if (item.Type == "laws")
+                        {
+                            try
+                            {
+                                string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                                if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+                                string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                string fileName = item.Id;
+                                if (!fileName.EndsWith(".json")) fileName += ".json";
+                                string fp = string.IsNullOrEmpty(srvNum) 
+                                    ? System.IO.Path.Combine(appDir, "ConfigBase", fileName) 
+                                    : System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                                    
+                                if (System.IO.File.Exists(fp))
+                                {
+                                    string json = System.IO.File.ReadAllText(fp);
+                                    var lawsMap = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, LawSection>>(json);
+                                    if (lawsMap != null)
+                                    {
+                                        foreach (var k in lawsMap.Keys)
+                                        {
+                                            if (!p.Laws.ContainsKey(k)) { dataExists = false; break; }
+                                        }
+                                    }
+                                }
+                            }
+                            catch { }
+                        }
+                        else if (item.Type == "fines")
+                        {
+                            if ((p.Fines == null || p.Fines.Count == 0) && (p.Wanted == null || p.Wanted.Count == 0))
+                            {
+                                dataExists = false;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                                    if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+                                    string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                    string fileName = item.Id;
+                                    if (!fileName.EndsWith(".json")) fileName += ".json";
+                                    string fp = string.IsNullOrEmpty(srvNum) 
+                                        ? System.IO.Path.Combine(appDir, "ConfigBase", fileName) 
+                                        : System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                                        
+                                    if (System.IO.File.Exists(fp))
+                                    {
+                                        string jsonFile = System.IO.File.ReadAllText(fp);
+                                        var jObj = Newtonsoft.Json.Linq.JToken.Parse(jsonFile);
+                                        List<FineArticle> finesToCheck = null;
+                                        List<WantedArticle> wantedToCheck = null;
+                                        if (jObj is Newtonsoft.Json.Linq.JArray)
+                                        {
+                                            finesToCheck = JsonConvert.DeserializeObject<List<FineArticle>>(jsonFile);
+                                        }
+                                        else
+                                        {
+                                            if (jObj["fines"] != null) finesToCheck = jObj["fines"].ToObject<List<FineArticle>>();
+                                            if (jObj["wanted"] != null) wantedToCheck = jObj["wanted"].ToObject<List<WantedArticle>>();
+                                        }
+                                        
+                                        bool anyExists = false;
+                                        if (finesToCheck != null && finesToCheck.Count > 0 && p.Fines != null)
+                                        {
+                                            foreach (var f in finesToCheck)
+                                            {
+                                                if (p.Fines.Any(existing => existing.id == f.id && existing.name == f.name))
+                                                {
+                                                    anyExists = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!anyExists && wantedToCheck != null && wantedToCheck.Count > 0 && p.Wanted != null)
+                                        {
+                                            foreach (var w in wantedToCheck)
+                                            {
+                                                if (p.Wanted.Any(existing => existing.id == w.id && existing.name == w.name))
+                                                {
+                                                    anyExists = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!anyExists) dataExists = false;
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+                        else if (item.Type == "binds")
+                        {
+                            if (p.Binds == null || p.Binds.Count == 0)
+                            {
+                                dataExists = false;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                    string fileName = item.Id;
+                                    string fp = System.IO.Path.Combine(appDir, "ConfigBase", fileName);
+                                    if (!System.IO.File.Exists(fp) && !fileName.EndsWith(".json")) fp += ".json";
+                                    if (System.IO.File.Exists(fp))
+                                    {
+                                        string jsonFile = System.IO.File.ReadAllText(fp);
+                                        var exportData = JsonConvert.DeserializeObject<ExportBindsData>(jsonFile);
+                                        if (exportData != null && exportData.Binds != null && exportData.Binds.Count > 0)
+                                        {
+                                            bool anyBindExists = false;
+                                            foreach (var b in exportData.Binds.Values)
+                                            {
+                                                if (p.Binds.Values.Any(existing => existing.name == b.name))
+                                                {
+                                                    anyBindExists = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!anyBindExists) dataExists = false;
+                                        }
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+
+                        if (!dataExists)
+                        {
+                            p.InstalledCloudIds.Remove(item.Id);
+                            item.IsInstalled = false;
+                        }
+                        else
+                        {
+                            item.IsInstalled = true;
+                        }
+                    }
+                    else
+                    {
+                        item.IsInstalled = false;
+                    }
+                }
+            }
+        }
+
+        public void ApplyFilters()
+        {
+            if (_fullCatalog == null) return;
             var query = _fullCatalog.AsEnumerable();
 
             if (cmbServer.SelectedIndex > 0)
@@ -186,55 +366,45 @@ namespace FSB_helper_C__
             if (!string.IsNullOrWhiteSpace(txtSearch.Text))
             {
                 string term = txtSearch.Text.ToLower();
-                query = query.Where(i => i.Title.ToLower().Contains(term) || i.Author.ToLower().Contains(term));
+                query = query.Where(i => i.Title.ToLower().Contains(term) || (i.Author != null && i.Author.ToLower().Contains(term)));
             }
 
-            var main = Application.Current.MainWindow as MainWindow;
-            if (main != null)
+            // Global sorting: put "Все серверы" first
+            query = query.OrderByDescending(i => i.Server == "Все серверы").ThenBy(i => i.Server);
+
+            var resultList = query.ToList();
+            icCloudList.ItemsSource = resultList;
+
+            if (resultList.Count == 0)
             {
-                _lastCloudProfile = main.CurrentProfile;
-                foreach (var item in _fullCatalog)
+                if (!string.IsNullOrWhiteSpace(txtSearch.Text))
                 {
-                    if (item.Type == "profile")
-                    {
-                        item.IsInstalled = main.MasterData.ContainsKey(item.Title);
-                    }
-                    else if (!string.IsNullOrEmpty(main.CurrentProfile) && main.MasterData.ContainsKey(main.CurrentProfile))
-                    {
-                        var p = main.MasterData[main.CurrentProfile];
-                        if (p.InstalledCloudIds == null) p.InstalledCloudIds = new List<string>();
-                        
-                        if (p.InstalledCloudIds.Contains(item.Id))
-                        {
-                            // Validate that actual data still exists in profile
-                            bool dataExists = true;
-                            if (item.Type == "laws" && (p.Laws == null || p.Laws.Count == 0))
-                                dataExists = false;
-                            else if (item.Type == "fines" && (p.Fines == null || p.Fines.Count == 0))
-                                dataExists = false;
-                            else if (item.Type == "binds" && (p.Binds == null || p.Binds.Count == 0))
-                                dataExists = false;
-                            
-                            if (!dataExists)
-                            {
-                                p.InstalledCloudIds.Remove(item.Id);
-                                item.IsInstalled = false;
-                            }
-                            else
-                            {
-                                item.IsInstalled = true;
-                            }
-                        }
-                        else
-                        {
-                            item.IsInstalled = false;
-                        }
-                    }
+                    EmptyStateTitle.Text = "НИЧЕГО НЕ НАЙДЕНО";
+                    EmptyStateTitle.Foreground = (System.Windows.Media.Brush)FindResource("GrayBrush");
+                    EmptyStateDesc.Text = "По вашему запросу ничего не найдено.";
+                    EmptyStateIconSearch.Visibility = Visibility.Collapsed;
+                    EmptyStateIconBg.Visibility = Visibility.Collapsed;
+                    EmptyStateIconNotFound.Visibility = Visibility.Visible;
+                    EmptyStateIconStrike.Visibility = Visibility.Visible;
                 }
+                else
+                {
+                    EmptyStateTitle.Text = "ДАННАЯ КАТЕГОРИЯ ПУСТА";
+                    EmptyStateTitle.Foreground = (System.Windows.Media.Brush)FindResource("GoldBrush");
+                    EmptyStateDesc.Text = "В этой категории пока нет конфигураций.";
+                    EmptyStateIconSearch.Visibility = Visibility.Visible;
+                    EmptyStateIconBg.Visibility = Visibility.Visible;
+                    EmptyStateIconNotFound.Visibility = Visibility.Collapsed;
+                    EmptyStateIconStrike.Visibility = Visibility.Collapsed;
+                }
+                EmptyStateView.Visibility = Visibility.Visible;
+                icCloudList.Visibility = Visibility.Collapsed;
             }
-
-            icCloudList.ItemsSource = null;
-            icCloudList.ItemsSource = query.ToList();
+            else
+            {
+                EmptyStateView.Visibility = Visibility.Collapsed;
+                icCloudList.Visibility = Visibility.Visible;
+            }
         }
 
         public List<string> GetBindTypeCloudIds() {
@@ -282,10 +452,203 @@ namespace FSB_helper_C__
         {
             if (sender is Border btn && btn.Tag is CloudItem item)
             {
-                if (string.IsNullOrWhiteSpace(item.FileUrl) || item.IsInstalled) return;
-                
                 var main = Application.Current.MainWindow as MainWindow;
                 if (main == null) return;
+
+                if (item.IsInstalled)
+                {
+                    main._dialogHost.ShowAlert(
+                        "УДАЛЕНИЕ КОНФИГУРАЦИИ",
+                        $"Вы действительно хотите удалить '{item.Title}'?",
+                        async () =>
+                        {
+                            txtLoadingTitle.Text = "УДАЛЕНИЕ КОНФИГУРАЦИИ";
+                            txtLoadingDesc.Text = "Удаление файлов конфигурации...";
+                            LoadingOverlay.Visibility = Visibility.Visible;
+                            
+                            try
+                            {
+                                bool shouldSave = false;
+                                bool shouldRefreshUi = false;
+
+                                if (item.Type == "profile")
+                                {
+                                    if (main.MasterData.ContainsKey(item.Title))
+                                    {
+                                        if (main.CurrentProfile == item.Title)
+                                        {
+                                            main.MasterData.Remove(item.Title);
+                                            main.CurrentProfile = main.MasterData.Count > 0 ? main.MasterData.Keys.First() : "";
+                                        }
+                                        else
+                                        {
+                                            main.MasterData.Remove(item.Title);
+                                        }
+                                        shouldSave = true;
+                                        shouldRefreshUi = true;
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(main.CurrentProfile) && main.MasterData.ContainsKey(main.CurrentProfile))
+                                {
+                                    var p = main.MasterData[main.CurrentProfile];
+                                    
+                                    if (item.Type == "laws")
+                                    {
+                                        try
+                                        {
+                                            string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                                            if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+                                            string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                            string fileName = item.Id;
+                                            if (!fileName.EndsWith(".json")) fileName += ".json";
+                                            string fp = string.IsNullOrEmpty(srvNum) 
+                                                ? System.IO.Path.Combine(appDir, "ConfigBase", fileName) 
+                                                : System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                                                
+                                            if (System.IO.File.Exists(fp))
+                                            {
+                                                string jsonFile = System.IO.File.ReadAllText(fp);
+                                                var lawsMap = JsonConvert.DeserializeObject<Dictionary<string, LawSection>>(jsonFile);
+                                                if (lawsMap != null)
+                                                {
+                                                    foreach (var k in lawsMap.Keys)
+                                                    {
+                                                        if (p.Laws.ContainsKey(k))
+                                                            p.Laws.Remove(k);
+                                                        
+                                                        var copies = p.Laws.Keys.Where(x => x.StartsWith(k + " (") && x.EndsWith(")")).ToList();
+                                                        foreach (var copy in copies)
+                                                            p.Laws.Remove(copy);
+                                                    }
+                                                    shouldSave = true;
+                                                    shouldRefreshUi = true;
+                                                }
+                                            }
+                                        }
+                                        catch { }
+                                    }
+                                    else if (item.Type == "fines")
+                                    {
+                                        try
+                                        {
+                                            string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                                            if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+                                            string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                            string fileName = item.Id;
+                                            if (!fileName.EndsWith(".json")) fileName += ".json";
+                                            string fp = string.IsNullOrEmpty(srvNum) 
+                                                ? System.IO.Path.Combine(appDir, "ConfigBase", fileName) 
+                                                : System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                                                
+                                            if (System.IO.File.Exists(fp))
+                                            {
+                                                string jsonFile = System.IO.File.ReadAllText(fp);
+                                                var jObj = Newtonsoft.Json.Linq.JToken.Parse(jsonFile);
+                                                
+                                                List<FineArticle> finesToRemove = null;
+                                                List<WantedArticle> wantedToRemove = null;
+                                                
+                                                if (jObj is Newtonsoft.Json.Linq.JArray)
+                                                {
+                                                    finesToRemove = JsonConvert.DeserializeObject<List<FineArticle>>(jsonFile);
+                                                }
+                                                else
+                                                {
+                                                    if (jObj["fines"] != null) finesToRemove = jObj["fines"].ToObject<List<FineArticle>>();
+                                                    if (jObj["wanted"] != null) wantedToRemove = jObj["wanted"].ToObject<List<WantedArticle>>();
+                                                }
+                                                
+                                                if (finesToRemove != null && p.Fines != null)
+                                                {
+                                                    foreach (var f in finesToRemove)
+                                                    {
+                                                        p.Fines.RemoveAll(existing => existing.id == f.id && existing.name == f.name);
+                                                    }
+                                                }
+                                                if (wantedToRemove != null && p.Wanted != null)
+                                                {
+                                                    foreach (var w in wantedToRemove)
+                                                    {
+                                                        p.Wanted.RemoveAll(existing => existing.id == w.id && existing.name == w.name);
+                                                    }
+                                                }
+                                                shouldSave = true;
+                                                shouldRefreshUi = true;
+                                            }
+                                        }
+                                        catch { }
+                                    }
+                                    else if (item.Type == "binds")
+                                    {
+                                        try
+                                        {
+                                            string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                            string fileName = item.Id;
+                                            string fp = System.IO.Path.Combine(appDir, "ConfigBase", fileName);
+                                            if (!System.IO.File.Exists(fp) && !fileName.EndsWith(".json")) fp += ".json";
+                                            if (System.IO.File.Exists(fp))
+                                            {
+                                                string jsonFile = System.IO.File.ReadAllText(fp);
+                                                var exportData = JsonConvert.DeserializeObject<ExportBindsData>(jsonFile);
+                                                if (exportData != null && exportData.Binds != null)
+                                                {
+                                                    foreach (var eb in exportData.Binds.Values)
+                                                    {
+                                                        var keysToRemove = p.Binds.Where(kv => kv.Value.name == eb.name).Select(kv => kv.Key).ToList();
+                                                        foreach (var k in keysToRemove)
+                                                        {
+                                                            p.Binds.Remove(k);
+                                                        }
+                                                    }
+                                                    if (exportData.Variables != null)
+                                                    {
+                                                        foreach (var v in exportData.Variables.Keys)
+                                                        {
+                                                            p.Variables.Remove(v);
+                                                        }
+                                                    }
+                                                    if (exportData.Groups != null)
+                                                    {
+                                                        foreach (var g in exportData.Groups)
+                                                        {
+                                                            p.Groups.Remove(g);
+                                                        }
+                                                    }
+                                                    
+                                                    shouldSave = true;
+                                                    main.UpdateBindGroups();
+                                                    main.UpdateBindsList();
+                                                }
+                                            }
+                                        }
+                                        catch { }
+                                    }
+
+                                    if (p.InstalledCloudIds != null && p.InstalledCloudIds.Contains(item.Id))
+                                    {
+                                        p.InstalledCloudIds.Remove(item.Id);
+                                        shouldSave = true;
+                                    }
+                                }
+
+                                if (shouldSave) main.SaveData();
+                                if (shouldRefreshUi) main.RefreshUI();
+
+                                await Dispatcher.InvokeAsync(() => RefreshState(), System.Windows.Threading.DispatcherPriority.Render);
+                            }
+                            catch (Exception ex)
+                            {
+                                main.OpenInfo("ОШИБКА УДАЛЕНИЯ", "Произошла ошибка при удалении: " + ex.Message);
+                            }
+                            finally
+                            {
+                                LoadingOverlay.Visibility = Visibility.Collapsed;
+                            }
+                        }
+                    );
+                    return;
+                }
+                
                 bool shouldSave = false;
                 bool shouldRefreshUi = false;
                 
@@ -298,8 +661,22 @@ namespace FSB_helper_C__
                 try
                 {
                     string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
-                    string fileName = System.IO.Path.GetFileName(item.FileUrl);
-                    string filePath = System.IO.Path.Combine(appDir, "ConfigBase", fileName);
+                    
+                    string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                    if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+
+                    string fileName = item.Id;
+                    if (item.Type == "laws" || item.Type == "fines") {
+                        if (!fileName.EndsWith(".json")) fileName += ".json";
+                    }
+
+                    string filePath;
+                    if (!string.IsNullOrEmpty(srvNum)) {
+                        filePath = System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                    } else {
+                        filePath = System.IO.Path.Combine(appDir, "ConfigBase", fileName);
+                        if (!System.IO.File.Exists(filePath) && !fileName.EndsWith(".json")) filePath += ".json";
+                    }
 
                     if (!System.IO.File.Exists(filePath))
                     {
@@ -313,6 +690,36 @@ namespace FSB_helper_C__
                         var pf = JsonConvert.DeserializeObject<ProfileData>(json);
                         if (pf != null)
                         {
+                            var sysKeys = new List<string> {
+                                main.btnKeyToggle.Content?.ToString(),
+                                main.btnKeyToggleScript.Content?.ToString(),
+                                main.btnKeyPrev.Content?.ToString(),
+                                main.btnKeyNext.Content?.ToString(),
+                                main.btnRadialKey.Content?.ToString(),
+                                main.btnBinderHintKey.Content?.ToString(),
+                                main.btnIssueFineKey.Content?.ToString(),
+                                main.btnCancelFineKey.Content?.ToString(),
+                                main.btnStopBindKey.Content?.ToString()
+                            }.Where(k => !string.IsNullOrEmpty(k) && k != "КЛАВИША: НЕТ" && k.ToUpper() != "НЕТ").ToList();
+
+                            int conflicts = 0;
+                            if (pf.Binds != null) {
+                                foreach(var b in pf.Binds.Values) {
+                                    if (b.active && !string.IsNullOrEmpty(b.key) && sysKeys.Contains(b.key)) {
+                                        b.active = false;
+                                        conflicts++;
+                                    }
+                                }
+                            }
+                            if (pf.Laws != null) {
+                                foreach(var l in pf.Laws.Values) {
+                                    if (!string.IsNullOrEmpty(l.Hotkey) && sysKeys.Contains(l.Hotkey)) {
+                                        l.Hotkey = "";
+                                        conflicts++;
+                                    }
+                                }
+                            }
+
                             int idx = 1;
                             string pName = item.Title;
                             while (main.MasterData.ContainsKey(pName))
@@ -324,6 +731,10 @@ namespace FSB_helper_C__
                             main.CurrentProfile = pName;
                             shouldSave = true;
                             shouldRefreshUi = true;
+                            
+                            if (conflicts > 0) {
+                                main.OpenInfo("ИМПОРТ ПРОФИЛЯ", $"Профиль импортирован, но {conflicts} биндов/законов конфликтовали с системными клавишами. Конфликтующие бинды были отключены (убрана галочка активности).", true);
+                            }
                             // Notifications disabled by request
                         }
                     }
@@ -398,12 +809,30 @@ namespace FSB_helper_C__
                             var p = main.MasterData[main.CurrentProfile];
                             int conflictsResolved = 0;
                             var idMap = new Dictionary<string, string>(); // oldId -> newId
+
+                            var sysKeys = new List<string> {
+                                main.btnKeyToggle.Content?.ToString(),
+                                main.btnKeyToggleScript.Content?.ToString(),
+                                main.btnKeyPrev.Content?.ToString(),
+                                main.btnKeyNext.Content?.ToString(),
+                                main.btnRadialKey.Content?.ToString(),
+                                main.btnBinderHintKey.Content?.ToString(),
+                                main.btnIssueFineKey.Content?.ToString(),
+                                main.btnCancelFineKey.Content?.ToString(),
+                                main.btnStopBindKey.Content?.ToString()
+                            }.Where(k => !string.IsNullOrEmpty(k) && k != "КЛАВИША: НЕТ" && k.ToUpper() != "НЕТ").ToList();
+
                             if (exportData.Binds != null)
                             {
                                 foreach (var b in exportData.Binds)
                                 {
                                     if (b.Value.active && !string.IsNullOrEmpty(b.Value.key))
                                     {
+                                        if (sysKeys.Contains(b.Value.key)) {
+                                            b.Value.active = false;
+                                            conflictsResolved++;
+                                        }
+
                                         var conflicts = p.Binds.Values.Where(existing => existing.key == b.Value.key && existing.active).ToList();
                                         if (conflicts.Count > 0)
                                         {
@@ -463,6 +892,10 @@ namespace FSB_helper_C__
                             shouldSave = true;
                             main.UpdateBindGroups();
                             main.UpdateBindsList();
+                            
+                            if (conflictsResolved > 0) {
+                                main.OpenInfo("ИМПОРТ БИНДОВ", $"Бинды установлены, но {conflictsResolved} из них конфликтовали с системными клавишами или другими биндами. Конфликтующие бинды были отключены.", true);
+                            }
                             // Notifications disabled by request
                         }
                     }

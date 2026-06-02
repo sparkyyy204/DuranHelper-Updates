@@ -1,992 +1,3474 @@
 [
   {
-    "id": "bindsFSBv1",
-    "title": "Набор биндов ФСБ",
-    "description": "Набор быстрых комманд для ФСБ",
-    "server": "Все серверы",
-    "author": "Duran_Korrupcioner",
-    "type": "binds",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/bindsFSBv1"
-  },
-  {
-    "id": "bindsMVDv1",
-    "title": "Набор биндов МВД",
-    "description": "Набор быстрых комманд для МВД",
-    "server": "Все серверы",
-    "author": "Duran_Korrupcioner",
-    "type": "binds",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/bindsMVDv1"
-  },
-  {
-    "id": "LekciaSuborMO",
-    "title": "Лекция для МО",
-    "description": "Лекция на тему субординации для МО",
-    "server": "Все серверы",
-    "author": "Duran_Korrupcioner",
-    "type": "binds",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/LekciaSuborMO"
-  },
-  {
-    "id": "Calculator01",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
+    "id": "OGR01",
+    "title": "Общий государственный регламент",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
     "server": "СЕРВЕР 01",
-    "author": "Duran_Korrupcioner",
-    "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator01.json"
-  },
-  {
-    "id": "FSIN_charter01",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 01",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter01.json"
-  },
-  {
-    "id": "MO_charter01",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 01",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter01.json"
-  },
-  {
-    "id": "mvd_charter01",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 01",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter01.json"
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP01",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 01",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP01.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator02",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 02",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator01",
+    "title": "Калькулятор 01",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 01.",
+    "server": "СЕРВЕР 01",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator02.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter02",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 02",
-    "author": "Duran_Korrupcioner",
+    "id": "ProcessualCode01",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 01",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter02.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter02",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 02",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution_NO01",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 01",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter02.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter02",
+    "id": "PDD01",
+    "title": "Правила дорожного движения",
+    "description": "Правила дорожного движения, обязательные для всех участников дорожного движения.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law01",
+    "title": "Закон «О контртеррористических операциях»",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law01",
+    "title": "Закон «О неприкосновенности»",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories01",
+    "title": "Закон «О закрытых и охраняемых территориях»",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law01",
+    "title": "Закон «Об адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law01",
+    "title": "Закон «О федеральной службе безопасности»",
+    "description": "Федеральный закон, регулирующий деятельность и полномочия Федеральной службы безопасности.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Police_law01",
+    "title": "Закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_Nizhny01",
+    "title": "Закон «О правительстве Нижегородской области»",
+    "description": "Закон, определяющий структуру, полномочия и порядок деятельности Правительства области.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Army_law01",
+    "title": "Закон «Об армии и военной службе»",
+    "description": "Федеральный закон, регулирующий вопросы военной службы и обороны государства.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_law01",
+    "title": "Закон «О министерстве здравоохранения»",
+    "description": "Закон, регулирующий сферу здравоохранения и деятельность медицинских учреждений.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SMI_law01",
+    "title": "Закон «О средствах массовой информации»",
+    "description": "Закон о средствах массовой информации, регулирующий деятельность прессы и телерадиовещания.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_law01",
+    "title": "Закон «О федеральной службе исполнения наказаний»",
+    "description": "Федеральный закон, определяющий задачи и полномочия органов уголовно-исполнительной системы.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter01",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 02",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 01",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter02.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter01",
+    "title": "Устав внутренней службы Министерства Обороны",
+    "description": "Свод правил и обязанностей военнослужащих Министерства Обороны.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_guard_charter01",
+    "title": "Устав караульной службы Министерства Обороны",
+    "description": "Регламент несения караульной службы и охраны военных объектов.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter01",
+    "title": "Внутренний устав ФСБ",
+    "description": "Свод служебных правил и стандартов поведения сотрудников Федеральной службы безопасности.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter01",
+    "title": "Устав ФСИН",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "UIK_FSIN01",
+    "title": "Уголовно-исполнительный кодекс ФСИН",
+    "description": "Уголовно-исполнительный кодекс исправительной колонии Нижегородской области.",
+    "server": "СЕРВЕР 01",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Gov_Docs02",
+    "title": "Документооборот Правительства",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_Deprivation02",
+    "title": "Заявление на лишение неприкосновенности неприкосновенных лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "JudicialCode02",
+    "title": "Судебный кодекс",
+    "description": "Судебный кодекс, устанавливающий порядок ведения судебных заседаний и вынесения приговоров.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP02",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 02",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP02.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator03",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 03",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator02",
+    "title": "Калькулятор 02",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 02.",
+    "server": "СЕРВЕР 02",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator03.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter03",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 03",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution_NNov02",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 02",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter03.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter03",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 03",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code02",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 02",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter03.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter03",
+    "id": "KTO_law02",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law02",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter02",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law02",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MZ_charter02",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter02",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law02",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_law02",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories02",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law02",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law02",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter02",
+    "title": "Внутренний устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter02",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 03",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 02",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter03.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter02",
+    "title": "Устав УФСБ России",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter02",
+    "title": "Устав ФСИН",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP02",
+    "title": "Кодекс о Тюремных Правонарушениях",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 02",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Hierarchy03",
+    "title": "Иерархия государственных организаций",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code03",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP03",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 03",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP03.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_sobr_charter03",
-    "title": "Устав СОБР МВД",
-    "description": "Полный текст устава СОБР МВД",
+    "id": "Calculator03",
+    "title": "Калькулятор наказаний",
+    "description": "Автоматический подсчет розыска и штрафов для 03 сервера.",
     "server": "СЕРВЕР 03",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_sobr_charter03.json"
-  },
-  {
-    "id": "Calculator04",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 04",
-    "author": "Duran_Korrupcioner",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator04.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter04",
+    "id": "Constitution_NN03",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Order_regulations03",
+    "title": "Регламент издания приказов",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MChs_charter03",
+    "title": "Закон об организации МЧС",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code_interrogation03",
+    "title": "Процессуальный кодекс проведения допроса",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law03",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law03",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter03",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law03",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter03",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Ritm_charter03",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law03",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law03",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter03",
+    "title": "Устав ФСБ",
+    "description": "Внутренний устав и кодекс поведения сотрудников Федеральной службы безопасности.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter03",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SOBR_charter03",
+    "title": "Устав спец. отряда СОБР",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_FZoP03",
+    "title": "Федеральный закон о полиции",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_BASTION_charter03",
+    "title": "ФСИН Устав \"БАСТИОН\"",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 03",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter03",
     "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 04",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 03",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter04.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter04",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 04",
-    "author": "Duran_Korrupcioner",
+    "id": "FSIN_KoTP03",
+    "title": "Кодекс о Тюремных Правонарушениях",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 03",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter04.json"
-  },
-  {
-    "id": "mvd_charter04",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 04",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter04.json"
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP04",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 04",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP04.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator05",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 05",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator04",
+    "title": "Калькулятор 04",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 04.",
+    "server": "СЕРВЕР 04",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator05.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter05",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 05",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code04",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 04",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter05.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter05",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 05",
-    "author": "Duran_Korrupcioner",
+    "id": "ClosedTerritories04",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 04",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter05.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter05",
+    "id": "Advocacy_law04",
+    "title": "Закон об адвокатуре",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter04",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter04",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law04",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter04",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter04",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law04",
+    "title": "Закон «О неприкосновенности»",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law04",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law04",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law04",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Constitution_NN04",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter04",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 05",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 04",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter05.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter04",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP04",
+    "title": "Кодекс о тюремных правонарушениях (КоТП) — ФСИН",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter04",
+    "title": "Устав Федеральной Службы Безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 04",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP05",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 05",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP05.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator06",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 06",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator05",
+    "title": "Калькулятор 05",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 05.",
+    "server": "СЕРВЕР 05",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator06.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter06",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 06",
-    "author": "Duran_Korrupcioner",
+    "id": "FSB_law05",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter06.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter06",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 06",
-    "author": "Duran_Korrupcioner",
+    "id": "FSB_recruitment05",
+    "title": "Регламент проведения вербовок ФСБ",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 05",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter06.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter06",
+    "id": "KTO_law05",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law05",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law05",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories05",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law05",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law05",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter05",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter05",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law05",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_law05",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code05",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter05",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 06",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 05",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter06.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter05",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_KPP_charter05",
+    "title": "Устав МО дежурного по КПП",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter05",
+    "title": "Устав ФСИН",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP05",
+    "title": "Кодекс о тюремных правонарушениях",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter05",
+    "title": "Устав Федеральной Службы Безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 05",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP06",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 06",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP06.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator07",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 07",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator06",
+    "title": "Калькулятор 06",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 06.",
+    "server": "СЕРВЕР 06",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator07.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter07",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 07",
-    "author": "Duran_Korrupcioner",
+    "id": "Interview_reglament06",
+    "title": "Регламент проведения собеседования",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 06",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter07.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter07",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 07",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code06",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 06",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter07.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter07",
+    "id": "KTO_law06",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law06",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter06",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter06",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter06",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law06",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter06",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law06",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law06",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law06",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter06",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter06",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 07",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 06",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter07.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_drill_charter06",
+    "title": "Строевой устав МВД",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SOBR_charter06",
+    "title": "Устав СОБР",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter06",
+    "title": "Устав Федеральной Службы Безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP_KoIT_06",
+    "title": "ФСИН — Кодекс о Тюремных Нарушениях и Кодекс об Исправительном Труде",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 06",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_Application07",
+    "title": "Заявление на лишение неприкосновенности неприкосновенных лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "UPK_07",
+    "title": "Уголовно-Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories07",
+    "title": "Федеральный закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP07",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 07",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP07.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator08",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 08",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator07",
+    "title": "Калькулятор 07",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 07.",
+    "server": "СЕРВЕР 07",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator08.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter08",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 08",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution_NN07",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 07",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter08.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter08",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 08",
-    "author": "Duran_Korrupcioner",
+    "id": "AntiTerror_law07",
+    "title": "Федеральный закон «О противодействии терроризму»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 07",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter08.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter08",
+    "id": "Police_Law07",
+    "title": "Федеральный закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Labor_code07",
+    "title": "Трудовой кодекс",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Ethics_Law07",
+    "title": "Федеральный Закон об этике сотрудников государственных структур",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law07",
+    "title": "Федеральный закон об Федеральной Службе Безопасности",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law07",
+    "title": "Федеральный закон об «Адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law07",
+    "title": "Федеральный закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law07",
+    "title": "Федеральный закон о Правительстве",
+    "description": "Закон, определяющий структуру, полномочия и порядок деятельности Правительства области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law07",
+    "title": "Федеральный закон о Министерстве Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_07",
+    "title": "Федеральный закон о Министерстве Здравоохранения",
+    "description": "Закон, регулирующий сферу здравоохранения и деятельность медицинских учреждений.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter07",
+    "title": "Федеральный закон о ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law07",
+    "title": "Федеральный закон о Министерстве Внутренних Дел",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter07",
+    "title": "Федеральный закон о Федеральной Службе Исполнения Наказаний",
+    "description": "Федеральный закон, определяющий задачи и полномочия органов уголовно-исполнительной системы.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter07",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 08",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 07",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter08.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter07",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter07",
+    "title": "Устав ФСБ",
+    "description": "Внутренний устав и кодекс поведения сотрудников Федеральной службы безопасности.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Prison_codex07",
+    "title": "Тюремный кодекс ФСИН",
+    "description": "Свод внутренних правил и наказаний для заключенных в исправительной колонии 07 сервера.",
+    "server": "СЕРВЕР 07",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law08",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Constitution_NN08",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code08",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP08",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 08",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP08.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FullZakon09",
-    "title": "Сборник законов",
-    "description": "Полная база: УПК, ФЗоП, ФЗоФСБ, Адв, ЗОТ, Неприкоc",
-    "server": "СЕРВЕР 09",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FullZakon09.json"
-  },
-  {
-    "id": "Calculator09",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 09",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator08",
+    "title": "Калькулятор 08",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 08.",
+    "server": "СЕРВЕР 08",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator09.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter09",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 09",
-    "author": "Duran_Korrupcioner",
+    "id": "FSB_law08",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter09.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter09",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 09",
-    "author": "Duran_Korrupcioner",
+    "id": "FSIN_charter08",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter09.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter09",
+    "id": "MVD_law08",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter08",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter08",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law08",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter08",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law08",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law08",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law08",
+    "title": "Закон о «Адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Police_law08",
+    "title": "Федеральный закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SOBR_charter08",
+    "title": "Устав СОБР",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter08",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 09",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 08",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter09.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSИН_КоТП_08",
+    "title": "Кодекс о тюремных правонарушениях",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter08",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter08",
+    "title": "Устав ФСБ",
+    "description": "Внутренний устав и кодекс поведения сотрудников Федеральной службы безопасности.",
+    "server": "СЕРВЕР 08",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "UPK_09",
+    "title": "Уголовно-процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP09",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 09",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP09.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator10",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 10",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator09",
+    "title": "Калькулятор 09",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 09.",
+    "server": "СЕРВЕР 09",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator10.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter10",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 10",
-    "author": "Duran_Korrupcioner",
+    "id": "KTO_law09",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 09",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter10.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter10",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 10",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution_NN09",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 09",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter10.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter10",
+    "id": "FSB_law09",
+    "title": "Федеральный Закон «О Федеральной службе безопасности»",
+    "description": "Федеральный закон, регулирующий деятельность и полномочия Федеральной службы безопасности.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Police_law09",
+    "title": "Федеральный Закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter09",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law09",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter09",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter09",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law09",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter09",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law09",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law09",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocatura_law09",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter09",
+    "title": "Устав Федеральной службы безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter09",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_UIK_09",
+    "title": "Уголовно-Исполнительный Кодекс ФСИН",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 09",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter09",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 10",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 09",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter10.json"
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP10",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 10",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP10.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator11",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 11",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code10",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Calculator10",
+    "title": "Калькулятор 10",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 10.",
+    "server": "СЕРВЕР 10",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator11.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter11",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 11",
-    "author": "Duran_Korrupcioner",
+    "id": "Immunity_law10",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 10",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter11.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter11",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 11",
-    "author": "Duran_Korrupcioner",
+    "id": "FSB_law10",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter11.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter11",
+    "id": "State_Secret_Law10",
+    "title": "Федеральный закон «О государственной тайне»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Hierarchy_law10",
+    "title": "Закон об иерархической структуре в органах власти",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "PDД_10",
+    "title": "Правила дорожного движения",
+    "description": "Правила дорожного движения, обязательные для всех участников дорожного движения.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law10",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law10",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law10",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law10",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter10",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter10",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter10",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinOborony_law10",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law10",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter10",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter10",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 11",
-    "author": "Duran_Korrupcioner",
+    "description": "Свод служебных правил и регламентов для сотрудников Министерства внутренних дел 10 сервера.",
+    "server": "СЕРВЕР 10",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter11.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "UIK_FSIN10",
+    "title": "Уголовно-исполнительный кодекс ФСИН ИК №7",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 10",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP11",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 11",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP11.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "EYS_charter12",
-    "title": "Устав ЕУСС",
-    "description": "Полный текст устава ЕУСС",
-    "server": "СЕРВЕР 12",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/EYS_charter12.json"
-  },
-  {
-    "id": "Calculator12",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 12",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator11",
+    "title": "Калькулятор 11",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 11.",
+    "server": "СЕРВЕР 11",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator12.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Search_Inspection_law11",
+    "title": "Основания и порядок производства обыска и досмотров",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Interview_regulations11",
+    "title": "Регламент проведения собеседования",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law11",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Lawyer_schedule11",
+    "title": "График посещения адвокатов (ФСИН & МВД) — Сервер 11",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law11",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law11",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code11",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter11",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter11",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter11",
+    "title": "Закон об организации Министерство Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MOZ_charter11",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter11",
+    "title": "Закон об организации Министерства Внутренних Дел",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter11",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter11",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law11",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_drill_charter11",
+    "title": "Строевой устав МВД",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "NG_charter11",
+    "title": "Устав Национальной Гвардии",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_UIK_11",
+    "title": "Уголовно-исполнительный кодекс ФСИН",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 11",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code12",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "EUSS_charter12",
+    "title": "Единый Устав Силовых Структур",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law12",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP12",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 12",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP12.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator13",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 13",
-    "author": "Duran_Korrupcioner",
-    "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator13.json"
+    "id": "EUVS_charter12",
+    "title": "Единый устав вспомогательных структур",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter13",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 13",
-    "author": "Duran_Korrupcioner",
+    "id": "Advocacy_law12",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 12",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter13.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter13",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 13",
-    "author": "Duran_Korrupcioner",
+    "id": "Immunity_law12",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 12",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter13.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter13",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 13",
-    "author": "Duran_Korrupcioner",
+    "id": "ZOT_law12",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 12",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter13.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter12",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law12",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter12",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter12",
+    "title": "Закон об организации Теле-Радио-Компании «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law12",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter12",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law12",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "EUSS_12",
+    "title": "Единый Устав Силовых Структур",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP_12",
+    "title": "Кодекс Тюремных Правонарушений",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_MVD_rules12",
+    "title": "ФСИН — Правила посещения для сотрудников МВД",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_UDO12",
+    "title": "Регламент о порядке сокращения сроков (УДО) ФСИН",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 12",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP13",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 13",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP13.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator14",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 14",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator13",
+    "title": "Калькулятор 13",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 13.",
+    "server": "СЕРВЕР 13",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator14.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter14",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 14",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code13",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 13",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter14.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter14",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 14",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution_NN13",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 13",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter14.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter14",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 14",
-    "author": "Duran_Korrupcioner",
+    "id": "KTO_law13",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 13",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter14.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law13",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Police_Law13",
+    "title": "Федеральный закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law13",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law13",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TerritoryLaw13",
+    "title": "Закон «О статусе территорий и особых объектах»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law13",
+    "title": "Закон об организации Правительства",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law13",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MZ_law13",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter13",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law13",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter13",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter13",
+    "title": "Устав Министерства Обороны Нижегородской области",
+    "description": "Свод обязанностей и внутренний порядок для военнослужащих Министерства обороны 13 сервера.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter13",
+    "title": "Устав МВД Нижегородской области",
+    "description": "Регламент несения службы сотрудниками Министерства внутренних дел для 13 сервера.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SOBR_charter13",
+    "title": "Устав СОБР",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP13",
+    "title": "Кодекс о Тюремных Правонарушениях (ФСИН)",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter13",
+    "title": "Устав ФСБ",
+    "description": "Внутренний устав и кодекс поведения сотрудников Федеральной службы безопасности.",
+    "server": "СЕРВЕР 13",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "PDD_14",
+    "title": "Правила дорожного движения",
+    "description": "Правила дорожного движения, обязательные для всех участников дорожного движения.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ProcessualCode14",
+    "title": "Процессуальный кодекс Нижегородской области",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Ethics_code14",
+    "title": "Кодекс этики и служебного поведения государственных служащих",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Constitution_NO_14",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law14",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP14",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 14",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP14.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator15",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 15",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator14",
+    "title": "Калькулятор 14",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 14.",
+    "server": "СЕРВЕР 14",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator15.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter15",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 15",
-    "author": "Duran_Korrupcioner",
+    "id": "TrudKodeks14",
+    "title": "Трудовой кодекс Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 14",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter15.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter15",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 15",
-    "author": "Duran_Korrupcioner",
+    "id": "GosTajna14",
+    "title": "Закон Нижегородской области «О государственной тайне»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 14",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter15.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter15",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 15",
-    "author": "Duran_Korrupcioner",
+    "id": "GosSlujba14",
+    "title": "Федеральный закон «О государственной службе Нижегородской области»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 14",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter15.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories14",
+    "title": "Федеральный закон «О закрытых и охраняемых территориях Нижегородской области»",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter14",
+    "title": "Устав Министерства Обороны Нижегородской области",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter14",
+    "title": "Устав Министерства Внутренних Дел",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_OROR_charter14",
+    "title": "Устав ФСИН ОРОР",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter14",
+    "title": "Устав ФСИН Нижегородской области",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_OSN_SHTURM_charter14",
+    "title": "Устав ФСИН ОСН ШТУРМ",
+    "description": "Внутренний регламент сотрудников Федеральной службы исполнения наказаний.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTPiP14",
+    "title": "Кодекс о тюремных правонарушениях и поощрениях (ФСИН)",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter14",
+    "title": "Устав Федеральной службы безопасности по Нижегородской области",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 14",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP15",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 15",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP15.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator16",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 16",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator15",
+    "title": "Калькулятор 15",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 15.",
+    "server": "СЕРВЕР 15",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator16.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter16",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 16",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code15",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 15",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter16.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter16",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 16",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution_Nizhny15",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 15",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter16.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter16",
+    "id": "FSB_law15",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law15",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter15",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law15",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter15",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_law15",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinObor_law15",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law15",
+    "title": "Закон об организации Правительства",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law15",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law15",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law15",
+    "title": "Закон об Адвокатуре",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Police_law15",
+    "title": "Федеральный закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter15",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter15",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 16",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 15",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter16.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_Stroevoy_ustav15",
+    "title": "Строевой устав МВД",
+    "description": "Строевой устав органов внутренних дел, регламентирующий приемы и строевую подготовку личного состава 15 сервера.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP15",
+    "title": "Кодекс о тюремном поведении ФСИН",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter15",
+    "title": "Устав Федеральной службы безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 15",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP16",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 16",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP16.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator17",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 17",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator16",
+    "title": "Калькулятор 16",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 16.",
+    "server": "СЕРВЕР 16",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator17.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter17",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 17",
-    "author": "Duran_Korrupcioner",
+    "id": "FZoP_16",
+    "title": "Федеральный закон о полиции",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 16",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter17.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter17",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 17",
-    "author": "Duran_Korrupcioner",
+    "id": "GovHierarchy16",
+    "title": "Постановление Губернатора №1 — Система государственной иерархии",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 16",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter17.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter17",
+    "id": "Constitution_NNov16",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Judicial_System16",
+    "title": "Система судебной власти, статус судей и регламент судопроизводства в Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_charter16",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law16",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter16",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter16",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law16",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter16",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law16",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law16",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law16",
+    "title": "Закон о «Адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law16",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law16",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_drill_charter16",
+    "title": "Строевой устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter16",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter16",
     "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 17",
-    "author": "Duran_Korrupcioner",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 16",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter17.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP16",
+    "title": "Кодекс о тюремных правонарушениях ФСИН",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter16",
+    "title": "Устав Федеральной Службы Безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 16",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP17",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 17",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP17.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator18",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 18",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator17",
+    "title": "Калькулятор 17",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 17.",
+    "server": "СЕРВЕР 17",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator18.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter18",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 18",
-    "author": "Duran_Korrupcioner",
+    "id": "Procedural_code17",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 17",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter18.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter18",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 18",
-    "author": "Duran_Korrupcioner",
+    "id": "Constitution17",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 17",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter18.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter18",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 18",
-    "author": "Duran_Korrupcioner",
+    "id": "FSIN_law17",
+    "title": "Закон «Об организации Федеральной Службы Исполнения Наказаний»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter18.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law17",
+    "title": "Закон «Об организации Министерства Внутренних Дел»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter17",
+    "title": "Закон «Об организации Теле-Радио Компании «Ритм»»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MZ_law17",
+    "title": "Закон «Об организации Министерства Здравоохранения»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law17",
+    "title": "Закон «Об организации Министерства Обороны»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law17",
+    "title": "Закон «Об организации Правительства»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law17",
+    "title": "Закон «О закрытых и охраняемых территориях»",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law17",
+    "title": "Закон «О неприкосновенности лиц»",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law17",
+    "title": "Закон «Об адвокатской деятельности и адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law17",
+    "title": "Закон «Об организации Федеральная Служба Безопасности»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law17",
+    "title": "Закон «о Контртеррористических Операциях (КТО)»",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "StateSecret17",
+    "title": "Закон «О государственной тайне»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter17",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter17",
+    "title": "Устав Федеральной Службы Безопасности Нижегородской Области",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter17",
+    "title": "Единый устав полиции",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FZoP17",
+    "title": "Федеральный закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter17",
+    "title": "Устав Федеральной службы исполнения наказаний",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP17",
+    "title": "Кодекс о Тюремных Правонарушениях",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 17",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP18",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 18",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP18.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator19",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 19",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator18",
+    "title": "Калькулятор 18",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 18.",
+    "server": "СЕРВЕР 18",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator19.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code18",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Constitution_NO_18",
+    "title": "Конституция Нижегородской области",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter18",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law18",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter18",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law18",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter18",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter18",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law18",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law18",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories18",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law18",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law18",
+    "title": "Закон о «Адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Police_law18",
+    "title": "Федеральный закон «О полиции»",
+    "description": "Федеральный закон, определяющий права, обязанности и полномочия сотрудников полиции.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter18",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SOBR_charter18",
+    "title": "Устав Специального Отряда Быстрого Реагирования (СОБР)",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter18",
+    "title": "Устав Министерства Внутренних Дел",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 18",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law19",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law19",
+    "title": "Закон о «Адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law19",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ZOT_law19",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code19",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law19",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "FSIN_charter19",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
     "server": "СЕРВЕР 19",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter19.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law19",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter19",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter19",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law19",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law19",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "MO_charter19",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
+    "title": "Устав Министерства Обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
     "server": "СЕРВЕР 19",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter19.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter19",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
+    "id": "FSB_charter19",
+    "title": "Устав Федеральной службы безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
     "server": "СЕРВЕР 19",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter19.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter19",
+    "title": "Устав МВД",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_KoTP19",
+    "title": "Кодекс о тюремных правонарушениях",
+    "description": "Кодекс о тюремных правонарушениях и правилах поведения осужденных в исправительной колонии.",
+    "server": "СЕРВЕР 19",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP19",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 19",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP19.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator20",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
+    "id": "Calculator19",
+    "title": "Калькулятор наказаний",
+    "description": "Автоматический подсчет розыска и штрафов для 19 сервера.",
+    "server": "СЕРВЕР 19",
     "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator20.json"
-  },
-  {
-    "id": "FSIN_charter20",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter20.json"
-  },
-  {
-    "id": "MO_charter20",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter20.json"
-  },
-  {
-    "id": "mvd_charter20",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter20.json"
-  },
-  {
-    "id": "FSB_charter20",
-    "title": "Устав ФСБ",
-    "description": "Полный текст устава ФСБ",
-    "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
-    "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSB_charter20.json"
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP20",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP20.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "DK20",
+    "id": "Road_code20",
     "title": "Дорожный кодекс",
-    "description": "Полный текст дорожного кодекса",
+    "description": "Дорожный кодекс Нижегородской области, регулирующий правила вождения транспорта.",
     "server": "СЕРВЕР 20",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/DK20.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "Calculator21",
-    "title": "Калькулятор УК+КоАП",
-    "description": "Калькулятор штрафов и розыска",
-    "server": "СЕРВЕР 21",
-    "author": "Duran_Korrupcioner",
-    "type": "fines",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/Calculator21.json"
+    "id": "Procedural_code20",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "FSIN_charter21",
-    "title": "Устав ФСИН",
-    "description": "Полный текст устава ФСИН",
-    "server": "СЕРВЕР 21",
-    "author": "Duran_Korrupcioner",
+    "id": "ZOT_ZOO_law20",
+    "title": "Закон \"О закрытых охраняемых территориях и объектах\"",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 20",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/FSIN_charter21.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "MO_charter21",
-    "title": "Устав МО",
-    "description": "Полный текст устава МО",
-    "server": "СЕРВЕР 21",
-    "author": "Duran_Korrupcioner",
+    "id": "Immunity_Law20",
+    "title": "Закон «О статусе неприкосновенности должностных лиц»",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 20",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/MO_charter21.json"
+    "author": "Duran_Korrupcioner"
   },
   {
-    "id": "mvd_charter21",
-    "title": "Устав МВД",
-    "description": "Полный текст устава МВД",
-    "server": "СЕРВЕР 21",
-    "author": "Duran_Korrupcioner",
+    "id": "FSB_law20",
+    "title": "Федеральный закон «О Федеральной службе безопасности»",
+    "description": "Федеральный закон, регулирующий деятельность и полномочия Федеральной службы безопасности.",
+    "server": "СЕРВЕР 20",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/mvd_charter21.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law20",
+    "title": "Закон «О Министерстве внутренних дел»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law20",
+    "title": "Закон «О контртеррористических операциях (КТО)»",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law20",
+    "title": "Закон «Об организации Правительства»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law20",
+    "title": "Закон «Об организации Министерство обороны»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_law20",
+    "title": "Федеральный закон «О Министерстве здравоохранения»",
+    "description": "Закон, регулирующий сферу здравоохранения и деятельность медицинских учреждений.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter20",
+    "title": "Закон «Об организации ТРК «Ритм»»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_law20",
+    "title": "Закон «Об организации Федеральная служба исполнения наказаний»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law20",
+    "title": "Закон «О Адвокатуре»",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter20",
+    "title": "Устав Министерства обороны",
+    "description": "Внутренний устав Министерства обороны Нижегородской области.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter20",
+    "title": "Внутренний устав Федеральной службы безопасности",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter20",
+    "title": "Устав Министерства внутренних дел",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter20",
+    "title": "Внутренний Устав Федеральной службы исполнения наказаний",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "UIK_FSIN20",
+    "title": "Уголовно-исполнительный кодекс ФСИН",
+    "description": "Официальный нормативно-правовой документ и регламент для сотрудников государственных структур.",
+    "server": "СЕРВЕР 20",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Procedural_code21",
+    "title": "Процессуальный кодекс",
+    "description": "Процессуальный кодекс, регламентирующий порядок проведения следственных и процессуальных действий.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
   },
   {
     "id": "YK_KOAP21",
     "title": "Кодексы УК+КоАП",
-    "description": "Полный текст Уголовного и Административного кодекса",
+    "description": "Объединенный сборник Уголовного и Административного (КоАП) кодексов Нижегородской области.",
     "server": "СЕРВЕР 21",
-    "author": "Duran_Korrupcioner",
     "type": "laws",
-    "fileUrl": "https://raw.githubusercontent.com/sparkyyy204/Duran-Web-Catalog/refs/heads/main/YK_KOAP21.json"
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Calculator21",
+    "title": "Калькулятор 21",
+    "description": "Автоматический калькулятор штрафов КоАП и статей УК для быстрого подсчета наказаний на сервер 21.",
+    "server": "СЕРВЕР 21",
+    "type": "fines",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_law21",
+    "title": "Закон об организации ФСБ",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "KTO_law21",
+    "title": "Закон о Контртеррористических Операциях (КТО)",
+    "description": "Закон о контртеррористических операциях, определяющий правовой режим проведения КТО.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Advocacy_law21",
+    "title": "Закон о \"Адвокатуре\"",
+    "description": "Закон об адвокатуре и адвокатской деятельности в Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Immunity_law21",
+    "title": "Закон о неприкосновенности лиц",
+    "description": "Закон о неприкосновенности должностных лиц Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "ClosedTerritories21",
+    "title": "Закон о закрытых и охраняемых территориях",
+    "description": "Закон, регулирующий доступ гражданских лиц и сотрудников на охраняемые государственные объекты.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "Government_law21",
+    "title": "Закон об организации Правительство",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_law21",
+    "title": "Закон об организации Министерства Обороны",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MinZdrav_charter21",
+    "title": "Закон об организации Министерства Здравоохранения",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "TRK_Rhythm_charter21",
+    "title": "Закон об организации ТРК «Ритм»",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_law21",
+    "title": "Закон об организации МВД",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSIN_charter21",
+    "title": "Закон об организации ФСИН",
+    "description": "Официальный законодательный акт Нижегородской области.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_Stroevoy_Ustav21",
+    "title": "Устав строевой подготовки МО",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MO_charter21",
+    "title": "Устав МО общий",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "SOBR_charter21",
+    "title": "Устав СОБР",
+    "description": "Внутренний устав и регламент служебного поведения сотрудников организации.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "MVD_charter21",
+    "title": "Устав МВД",
+    "description": "Внутренний устав Министерства внутренних дел, обязательный для исполнения сотрудниками полиции.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "FSB_charter21",
+    "title": "Устав ФСБ",
+    "description": "Внутренний устав и кодекс поведения сотрудников Федеральной службы безопасности.",
+    "server": "СЕРВЕР 21",
+    "type": "laws",
+    "author": "Duran_Korrupcioner"
+  },
+  {
+    "id": "bindsFSBv1",
+    "title": "Сборка биндов ФСБ",
+    "description": "Базовые бинды для сотрудников ФСБ",
+    "server": "Все серверы",
+    "type": "binds",
+    "author": "Duran"
+  },
+  {
+    "id": "bindsMVDv1",
+    "title": "Сборка биндов МВД",
+    "description": "Базовые бинды для сотрудников МВД",
+    "server": "Все серверы",
+    "type": "binds",
+    "author": "Duran"
+  },
+  {
+    "id": "LekciaSuborMO",
+    "title": "Лекции и Субординация МО",
+    "description": "Шпаргалки и лекции для Мин. Обороны",
+    "server": "Все серверы",
+    "type": "binds",
+    "author": "Duran"
   }
 ]
