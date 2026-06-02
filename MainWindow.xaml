@@ -1812,6 +1812,11 @@
                                                         </StackPanel>
                                                     </Border>
                                                     
+                                                    <Button x:Name="btnToggleGroup" Height="30" Width="110" HorizontalAlignment="Right" Margin="0,0,85,0" Click="ToggleGroup_Click" Style="{StaticResource FlatBtn}" Background="{DynamicResource BgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Visibility="Collapsed">
+                                                        <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                                        <TextBlock x:Name="txtToggleGroup" Text="ОТКЛ. ГРУППУ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold"/>
+                                                    </Button>
+                                                    
                                                     <!-- Toggle View -->
                                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
 
@@ -2339,7 +2344,7 @@
 
                                                 <!-- Circle Canvas -->
                                                 <Grid Grid.Row="1" Width="460" Height="400">
-                                                    <Canvas x:Name="canvasRadial" Width="460" Height="400" ClipToBounds="True"/>
+                                                    <Canvas x:Name="canvasRadial" Width="460" Height="400" ClipToBounds="True" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
                                                     
                                                     <!-- Hint (bottom of canvas) -->
                                                     <TextBlock x:Name="lblRadialCanvasHint" Text="Нажмите на сектор для настройки бинда" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold" Opacity="0.6" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
@@ -3558,11 +3563,11 @@
                                                         <TextBlock Grid.Column="1" Text="Скрипт впишет текст, но оставит строку чата открытой (удобно для ручного ввода ID/суммы)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                                     </Grid>
                                                     
-                                                    <Border Background="{DynamicResource BgBrush}" BorderBrush="#3b82f6" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,5,0,0">
+                                                    <Border Background="{DynamicResource BgBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,5,0,0">
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="💡" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                                             <StackPanel Width="470">
-                                                                <TextBlock Text="УМНЫЙ ПРОБЕЛ" Foreground="#3b82f6" FontWeight="Bold" FontSize="11" Margin="0,0,0,3"/>
+                                                                <TextBlock Text="УМНЫЙ ПРОБЕЛ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" FontSize="11" Margin="0,0,0,3"/>
                                                                 <TextBlock Text="Если в блоке «ЖДАТЬ» поставить пробел в конце (например: «/cuff »), скрипт сам нажмет пробел в игре!" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="15"/>
                                                             </StackPanel>
                                                         </StackPanel>
@@ -3571,15 +3576,15 @@
                                             </Border>
 
                                             <!-- ПЕРЕМЕННЫЕ -->
-                                            <Border Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
                                                 <StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                                         <TextBlock Text="🔄" FontSize="16" Margin="0,0,8,0"/>
-                                                        <TextBlock Text="ПЕРЕМЕННЫЕ И ТЕГОВ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="ПЕРЕМЕННЫЕ И ТЕГИ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
                                                     </StackPanel>
                                                     
                                                     <TextBlock Text="Пользовательские переменные (создаются на Главной):" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="Вы можете сами придумывать любые переменные, например *ЗВАНИЕ*, *ИМЯ*, *ТЕГ*. Добавьте их в настройках профиля (на главной странице), укажите их значения. Затем просто пишите эти теги в тексте бинда, обязательно оборачивая их в звездочки. Скрипт автоматически заменит их на ваши значения при срабатывании." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,12"/>
+                                                    <TextBlock Text="Вы можете сами придумывать любые переменные, например *ЗВАНИЕ*, *ИМЯ*, *ТЕГ*. Добавьте их в настройках переменных (во вкладке биндера), укажите их значения. Затем просто пишите эти теги в тексте бинда, обязательно оборачивая их в звездочки. Скрипт автоматически заменит их на ваши значения при срабатывании." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,12"/>
                                                     
                                                     <TextBlock Text="Системные переменные:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" Margin="0,0,0,5"/>
                                                     <Grid Margin="0,0,0,10">
@@ -3596,7 +3601,7 @@
                                             </Border>
 
                                             <!-- ГРУППЫ -->
-                                            <Border Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15">
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15">
                                                 <StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                                         <TextBlock Text="📁" FontSize="16" Margin="0,0,8,0"/>
@@ -3611,12 +3616,12 @@
                                                     <Grid Margin="0,0,0,6">
                                                         <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition/></Grid.ColumnDefinitions>
                                                         <TextBlock Text="2." Foreground="{DynamicResource GoldBrush}" FontWeight="Bold"/>
-                                                        <TextBlock Grid.Column="1" Text="Отключенная группа полностью деактивирует все свои бинды (очень удобно при смене ролей или фракций!)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                        <TextBlock Grid.Column="1" Text="Отключенная группа полностью деактивирует все свои бинды." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                                     </Grid>
                                                     <Grid>
                                                         <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition/></Grid.ColumnDefinitions>
                                                         <TextBlock Text="3." Foreground="{DynamicResource GoldBrush}" FontWeight="Bold"/>
-                                                        <TextBlock Grid.Column="1" Text="Просто зажмите ЛКМ на бинде и перетащите его в другую группу." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                        <TextBlock Grid.Column="1" Text="Просто зажмите ЛКМ на 6 точках в плашке бинда и перетащите его в другую группу." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                                     </Grid>
                                                 </StackPanel>
                                             </Border>
@@ -3625,34 +3630,88 @@
                                     
                                     <!-- Footer / Button -->
                                     <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,11,11" VerticalAlignment="Bottom" Padding="15">
-                                        <Button Content="ПОНЯТНО, СПАСИБО!" Height="38" Style="{StaticResource FlatBtn}" Background="{DynamicResource GreenBrush}" Foreground="White" FontWeight="Bold" FontSize="12" Click="Dialog_Close">
+                                        <Button Content="ПОНЯТНО" Height="38" Style="{StaticResource FlatBtn}" Background="{DynamicResource GreenBrush}" Foreground="White" FontWeight="Bold" FontSize="12" Click="Dialog_Close">
                                             <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
                                         </Button>
                                     </Border>
                                 </Grid>
                             </Border>
 
-                            <Border x:Name="WinSectionGuide" Visibility="Collapsed" Width="550" MaxHeight="550" Background="{DynamicResource BgBrush}" CornerRadius="10" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center" Panel.ZIndex="10">
-                                <Grid Margin="20">
-                                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                                    <Grid Margin="0,0,0,15">
-                                        <TextBlock Text="ИНФОРМАЦИЯ О РАЗДЕЛАХ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" HorizontalAlignment="Center" FontSize="18"/>
-                                        <Button Content="×" HorizontalAlignment="Right" Style="{StaticResource StepDeleteBtn}" FontSize="24" Margin="0,-5,-5,0" Click="Dialog_Close"/>
-                                    </Grid>
-                                    <StackPanel Grid.Row="1" Margin="0,0,0,0">
-                                        <TextBlock Text="ОСНОВНАЯ ИНФОРМАЦИЯ:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-                                        <TextBlock Text="Создайте раздел, в котором будут храниться законы, уставы или штрафы. Вы можете создать неограниченное количество разделов, каждый из которых будет выводиться в отдельной вкладке вашего внутриигрового оверлея. Это поможет удобно структурировать информацию (например, отделить Уголовный кодекс от Правил сервера)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,15"/>
-                                        
-                                        <TextBlock Text="ТИПЫ РАЗДЕЛОВ:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-                                        <TextBlock Text="• 2 Столбца: Классический вид для кодексов (Номер и Статья). Если заполнить наказание — оно отобразится автоматически. Идеален для УК или КоАП. Заголовки (названия глав) центрируются для удобства чтения." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                        <TextBlock Text="• Блокнот: Простой текстовый редактор для свободной записи. В этом режиме нет колонок — вы пишете сплошной текст, как в заметках (Уставы, Лекции, Памятки)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                        <TextBlock Text="• Штрафы: Специальный раздел, неразрывно связанный с умным Калькулятором штрафов в игре. Добавьте сюда статьи, и в оверлее они автоматически появятся в меню для удобного подсчёта." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                            <Border x:Name="WinSectionGuide" Visibility="Collapsed" Width="550" MaxHeight="600" Background="{DynamicResource BgBrush}" CornerRadius="12" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center" Panel.ZIndex="10">
+                                <Grid>
+                                    <Border CornerRadius="11">
+                                        <Border.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="20" ShadowDepth="10" Opacity="0.5" Color="Black"/></Border.Effect>
+                                    </Border>
+                                    <!-- Header -->
+                                    <Border Background="{DynamicResource SideBrush}" CornerRadius="11,11,0,0" Padding="20,12" VerticalAlignment="Top" Height="55">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="📖" FontSize="20" Margin="0,0,10,0"/>
+                                                <TextBlock Text="ИНФОРМАЦИЯ О РАЗДЕЛАХ" Foreground="{DynamicResource GoldBrush}" FontWeight="ExtraBold" FontSize="16" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <Button Content="×" HorizontalAlignment="Right" Style="{StaticResource StepDeleteBtn}" FontSize="24" Margin="0,-5,0,0" Click="Dialog_Close"/>
+                                        </Grid>
+                                    </Border>
+                                    
+                                    <!-- Content -->
+                                    <ScrollViewer Margin="0,55,0,70" VerticalScrollBarVisibility="Auto" Padding="20,15,20,15">
+                                        <StackPanel>
+                                            <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
+                                                <StackPanel>
+                                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                         <TextBlock Text="ℹ" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource GoldBrush}"/>
+                                                         <TextBlock Text="ОСНОВНАЯ ИНФОРМАЦИЯ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                     </StackPanel>
+                                                     <TextBlock Text="Создайте раздел, в котором будут храниться законы, уставы или штрафы. Вы можете создать неограниченное количество разделов, каждый из которых будет выводиться в отдельной вкладке вашего внутриигрового оверлея. Это поможет удобно структурировать информацию (например, отделить Уголовный кодекс от Правил сервера)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                </StackPanel>
+                                            </Border>
 
-                                        <TextBlock Text="СОРТИРОВКА И УПРАВЛЕНИЕ:" Foreground="{DynamicResource GrayBrush}" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-                                        <TextBlock Text="Вы можете гибко изменять порядок элементов внутри созданного раздела. Просто зажмите левую кнопку мыши на нужной строке и перетащите ее вверх или вниз на новое место. Номера статей перестроятся автоматически в пределах своей главы." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,5"/>
-                                        <TextBlock Text="💡 Подсказка: Благодаря новому ASI-оверлею вы больше не ограничены в пространстве! Вы можете добавлять неограниченное количество текста и создавать заголовки модулей в абсолютно любом месте и удобном порядке." Foreground="{DynamicResource GoldBrush}" TextWrapping="Wrap" Margin="0,5,0,5"/>
-                                    </StackPanel>
-                                    <Button Grid.Row="2" Content="ПОНЯТНО" Height="40" Margin="0,15,0,0" Style="{StaticResource FlatBtn}" Background="{DynamicResource GreenBrush}" Click="Dialog_Close"/>
+                                            <!-- ТИПЫ РАЗДЕЛОВ -->
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,12">
+                                                <StackPanel>
+                                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                         <TextBlock Text="📋" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource GoldBrush}"/>
+                                                         <TextBlock Text="ТИПЫ РАЗДЕЛОВ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                     </StackPanel>
+                                                     <TextBlock Text="• 1/2 Столбца: Классический вид для кодексов (Номер и Статья). Если заполнить наказание — оно отобразится автоматически. Идеален для УК или КоАП. Заголовки (названия глав) центрируются для удобства чтения." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,8"/>
+                                                     <TextBlock Text="• Блокнот: Простой текстовый редактор для свободной записи. В этом режиме нет колонок — вы пишете сплошной текст, как в заметках (Уставы, Лекции, Памятки)." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,8"/>
+                                                     <TextBlock Text="• Штрафы: Специальный раздел, неразрывно связанный с умным Калькулятором штрафов в игре. Добавьте сюда статьи, и в оверлее они автоматически появятся в меню для удобного подсчёта." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- СОРТИРОВКА -->
+                                            <Border Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="15">
+                                                <StackPanel>
+                                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                         <TextBlock Text="🔄" FontSize="16" Margin="0,0,8,0" Foreground="{DynamicResource GoldBrush}"/>
+                                                         <TextBlock Text="СОРТИРОВКА И УПРАВЛЕНИЕ" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                                     </StackPanel>
+                                                     <TextBlock Text="Вы можете гибко изменять порядок элементов внутри созданного раздела. Просто зажмите левую кнопку мыши на нужной строке и перетащите ее вверх или вниз на новое место. Номера статей перестроятся автоматически в пределах своей главы." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,10"/>
+                                                     <Border Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" CornerRadius="6" Padding="10">
+                                                         <Grid>
+                                                             <Grid.ColumnDefinitions>
+                                                                 <ColumnDefinition Width="Auto"/>
+                                                                 <ColumnDefinition Width="*"/>
+                                                             </Grid.ColumnDefinitions>
+                                                             <TextBlock Grid.Column="0" Text="💡" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                                             <StackPanel Grid.Column="1">
+                                                                 <TextBlock Text="ASI-ОВЕРЛЕЙ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" FontSize="11" Margin="0,0,0,3"/>
+                                                                 <TextBlock Text="Благодаря новому ASI-оверлею вы больше не ограничены в символах Вы можете добавлять неограниченное количество текста и создавать заголовки модулей в абсолютно любом месте и удобном порядке." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="15"/>
+                                                             </StackPanel>
+                                                         </Grid>
+                                                     </Border>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                    
+                                    <!-- Footer / Button -->
+                                    <Border Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,11,11" VerticalAlignment="Bottom" Padding="15">
+                                        <Button Content="ПОНЯТНО" Height="38" Style="{StaticResource FlatBtn}" Background="{DynamicResource GreenBrush}" Foreground="White" FontWeight="Bold" FontSize="12" Click="Dialog_Close">
+                                             <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                        </Button>
+                                    </Border>
                                 </Grid>
                             </Border>
                         </Grid>

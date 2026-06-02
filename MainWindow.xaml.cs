@@ -3244,7 +3244,85 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
         private void UpdateToggleGroupButton()
         {
+            if (btnToggleGroup == null || txtToggleGroup == null) return;
 
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile) || _currentBindGroup == "ВСЕ")
+            {
+                btnToggleGroup.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            btnToggleGroup.Visibility = Visibility.Visible;
+
+            var profile = MasterData[CurrentProfile];
+            var groupBinds = profile.Binds.Values.Where(b => b.group == _currentBindGroup && !string.Equals(b.id, "Radial", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (groupBinds.Count == 0)
+            {
+                btnToggleGroup.IsEnabled = false;
+                txtToggleGroup.Text = "ОТКЛ. ГРУППУ";
+                txtToggleGroup.Foreground = (Brush)FindResource("GrayBrush");
+                return;
+            }
+
+            btnToggleGroup.IsEnabled = true;
+            bool anyActive = groupBinds.Any(b => b.active);
+
+            if (anyActive)
+            {
+                txtToggleGroup.Text = "ОТКЛ. ГРУППУ";
+                txtToggleGroup.Foreground = (Brush)FindResource("RedBrush");
+            }
+            else
+            {
+                txtToggleGroup.Text = "ВКЛ. ГРУППУ";
+                txtToggleGroup.Foreground = (Brush)FindResource("GoldBrush");
+            }
+        }
+
+        private void ToggleGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile) || _currentBindGroup == "ВСЕ") return;
+
+            var profile = MasterData[CurrentProfile];
+            var groupBinds = profile.Binds.Values.Where(b => b.group == _currentBindGroup && !string.Equals(b.id, "Radial", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (groupBinds.Count == 0) return;
+
+            bool anyActive = groupBinds.Any(b => b.active);
+            int deactivatedCount = 0;
+            string conflictName = "";
+            string conflictKey = "";
+
+            foreach (var b in groupBinds)
+            {
+                b.active = !anyActive;
+                if (!anyActive && !string.IsNullOrEmpty(b.key))
+                {
+                    var conflicts = profile.Binds.Values.Where(ob => ob.key == b.key && ob.id != b.id && ob.active && ob.id != "Radial" && ob.group != _currentBindGroup).ToList();
+                    if (conflicts.Count > 0)
+                    {
+                        foreach (var c in conflicts) c.active = false;
+                        deactivatedCount += conflicts.Count;
+                        conflictName = conflicts[0].name;
+                        conflictKey = b.key;
+                    }
+                }
+            }
+
+            SaveData();
+            UpdateBindsList();
+            UpdateToggleGroupButton();
+            UpdateBindGroups();
+            UpdateBindStatsUI();
+
+            if (deactivatedCount > 0)
+            {
+                if (deactivatedCount == 1)
+                    OpenInfo("ВНИМАНИЕ", $"Прошлый бинд («{conflictName}»), назначенный на {conflictKey}, был отключен из-за конфликта.");
+                else
+                    OpenInfo("ВНИМАНИЕ", $"Некоторые бинды ({deactivatedCount} шт.) из других групп были отключены из-за конфликта клавиш.");
+            }
         }
 
         private void Groups_Edit_Click(object sender, RoutedEventArgs e) { 
