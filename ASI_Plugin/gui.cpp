@@ -231,7 +231,13 @@ void Gui::LoadSettings() {
                 else if (t.find("Grey") != std::string::npos || t.find("Sport") != std::string::npos) currentTheme = 2;
                 else currentTheme = 0;
             }
-            if (j.contains("BinderDelay")) binderDelay = j["BinderDelay"].get<int>();
+            if (j.contains("BinderDelay")) {
+                binderDelay = j["BinderDelay"].get<int>();
+                if (binderDelay < 250) binderDelay = 250;
+                if (binderDelay > 3000) binderDelay = 3000;
+                binderDelay = 250 + ((binderDelay - 250 + 125) / 250) * 250;
+                if (binderDelay > 3000) binderDelay = 3000;
+            }
             if (j.contains("OverlayAlpha")) settingsAlpha = j["OverlayAlpha"].get<float>();
             if (j.contains("WindowDraggable")) windowDraggable = j["WindowDraggable"].get<bool>();
             if (j.contains("OverlayPosX")) overlayPosX = j["OverlayPosX"].get<float>();
@@ -262,6 +268,8 @@ void Gui::LoadSettings() {
             if (j.contains("QuoteFines")) quoteFines = j["QuoteFines"].get<bool>();
             if (j.contains("QuoteWanted")) quoteWanted = j["QuoteWanted"].get<bool>();
             if (j.contains("ShowTabWanted")) showTabWanted = j["ShowTabWanted"].get<bool>();
+            if (j.contains("NotifyPayday")) notifyPayday = j["NotifyPayday"].get<bool>();
+            if (j.contains("NotifyFineIssue")) notifyFineIssue = j["NotifyFineIssue"].get<bool>();
             
             ApplyTheme();
         } catch(...) {}
@@ -304,6 +312,8 @@ void Gui::SaveSettings() {
     j["QuoteFines"] = quoteFines;
     j["QuoteWanted"] = quoteWanted;
     j["ShowTabWanted"] = showTabWanted;
+    j["NotifyPayday"] = notifyPayday;
+    j["NotifyFineIssue"] = notifyFineIssue;
     
     std::ofstream fileOut(path);
     if (fileOut.is_open()) fileOut << j.dump(4);
@@ -1661,13 +1671,25 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                 }
             }
             
-            ImVec2 topM = (selStart.y < selEnd.y) ? ImVec2(selStart.x, selStart.y + startY) : ImVec2(selEnd.x, selEnd.y + startY);
-            ImVec2 botM = (selStart.y < selEnd.y) ? ImVec2(selEnd.x, selEnd.y + startY) : ImVec2(selStart.x, selStart.y + startY);
+            int numLines = (int)lines.size();
+            int startLineIdx = (int)(selStart.y / lineH);
+            int endLineIdx = (int)(selEnd.y / lineH);
+            if (startLineIdx < 0) startLineIdx = 0;
+            if (startLineIdx >= numLines) startLineIdx = numLines - 1;
+            if (endLineIdx < 0) endLineIdx = 0;
+            if (endLineIdx >= numLines) endLineIdx = numLines - 1;
+
+            int minLineIdx = (startLineIdx < endLineIdx) ? startLineIdx : endLineIdx;
+            int maxLineIdx = (startLineIdx < endLineIdx) ? endLineIdx : startLineIdx;
+            float topX = (startLineIdx < endLineIdx) ? selStart.x : selEnd.x;
+            float botX = (startLineIdx < endLineIdx) ? selEnd.x : selStart.x;
+
             std::string currentSelection = "";
             
             ImDrawList* cdl_notes = ImGui::GetWindowDrawList();
             int currentMatchCount = 0;
             float targetScrollY = -1.0f;
+            int lineIdx = 0;
             for (auto& l : lines) {
                 float startX = pos.x;
                 if (l.alignment == 1) { // Center
@@ -1692,25 +1714,20 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                     if (isSelecting || hasSelection) {
                         float wMin = startX + curX;
                         float wMax = startX + curX + cmd.w;
-                        float wordCenterY = startY + curY + lineH * 0.5f;
                         bool isWordSelected = false;
                         
-                        if (wordCenterY >= topM.y - lineH*0.5f && wordCenterY <= botM.y + lineH*0.5f) {
-                            bool onTopLine = std::abs(wordCenterY - topM.y) < lineH;
-                            bool onBotLine = std::abs(wordCenterY - botM.y) < lineH;
-                            
-                            if (onTopLine && onBotLine) {
-                                float sMin = (selStart.x < selEnd.x) ? selStart.x : selEnd.x;
-                                float sMax = (selStart.x > selEnd.x) ? selStart.x : selEnd.x;
-                                if (wMin <= sMax && wMax >= sMin) isWordSelected = true;
-                            } else if (onTopLine) {
-                                if (wMax >= topM.x) isWordSelected = true;
-                            } else if (onBotLine) {
-                                if (wMin <= botM.x) isWordSelected = true;
-                            } else {
-                                isWordSelected = true;
-                            }
+                        if (lineIdx > minLineIdx && lineIdx < maxLineIdx) {
+                            isWordSelected = true;
+                        } else if (lineIdx == minLineIdx && lineIdx == maxLineIdx) {
+                            float sMin = (selStart.x < selEnd.x) ? selStart.x : selEnd.x;
+                            float sMax = (selStart.x > selEnd.x) ? selStart.x : selEnd.x;
+                            if (wMin <= sMax && wMax >= sMin) isWordSelected = true;
+                        } else if (lineIdx == minLineIdx) {
+                            if (wMax >= topX) isWordSelected = true;
+                        } else if (lineIdx == maxLineIdx) {
+                            if (wMin <= botX) isWordSelected = true;
                         }
+
                         if (isWordSelected) {
                             cdl_notes->AddRectFilled(ImVec2(startX + curX, startY + curY), ImVec2(startX + curX + cmd.w, startY + curY + lineH), IM_COL32(210, 166, 94, 80)); // Semi-transparent gold
                             currentSelection += cmd.text;
@@ -1752,6 +1769,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                     currentSelection += "\n";
                 }
                 curY += lineH;
+                lineIdx++;
             }
             
             if (isSelecting || hasSelection) {
@@ -3513,16 +3531,18 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     ImVec2 dss = fontSegoeBold20->CalcTextSizeA(16.0f, FLT_MAX, 0.0f, delBuf);
     dl->AddText(fontSegoeBold20, 16.0f, ImVec2(prx+300-dss.x, ry2+1), C_GOLD, delBuf);
     float sdlY = ry2+25;
+    float pct = (float)(binderDelay - 250) / 2750.0f;
+    if (pct < 0.0f) pct = 0.0f; if (pct > 1.0f) pct = 1.0f;
     dl->AddRectFilled(ImVec2(prx+20, sdlY), ImVec2(prx+300, sdlY+6), C_BORDER, 3.0f);
-    dl->AddRectFilled(ImVec2(prx+20, sdlY), ImVec2(prx+20+((binderDelay/2000.0f)*280.0f), sdlY+6), C_GOLD, 3.0f);
-    dl->AddCircleFilled(ImVec2(prx+20+((binderDelay/2000.0f)*280.0f), sdlY+3), 7.0f, C_BOX, 16);
-    dl->AddCircle(ImVec2(prx+20+((binderDelay/2000.0f)*280.0f), sdlY+3), 7.0f, C_GOLD, 16, 2.0f);
+    dl->AddRectFilled(ImVec2(prx+20, sdlY), ImVec2(prx+20+(pct*280.0f), sdlY+6), C_GOLD, 3.0f);
+    dl->AddCircleFilled(ImVec2(prx+20+(pct*280.0f), sdlY+3), 7.0f, C_BOX, 16);
+    dl->AddCircle(ImVec2(prx+20+(pct*280.0f), sdlY+3), 7.0f, C_GOLD, 16, 2.0f);
     ImGui::SetCursorScreenPos(ImVec2(prx+20, sdlY-6));
     ImGui::InvisibleButton("##delaySlider", ImVec2(280, 18));
     if (ImGui::IsItemActive()) {
-        float pct = (ImGui::GetMousePos().x - (prx+20)) / 280.0f;
-        if (pct < 0.0f) pct = 0.0f; if (pct > 1.0f) pct = 1.0f;
-        binderDelay = (int)round(pct * 20.0f) * 100;
+        float activePct = (ImGui::GetMousePos().x - (prx+20)) / 280.0f;
+        if (activePct < 0.0f) activePct = 0.0f; if (activePct > 1.0f) activePct = 1.0f;
+        binderDelay = 250 + (int)round(activePct * 11.0f) * 250;
     }
     if (ImGui::IsItemDeactivated()) SaveSettings();
 
@@ -3881,6 +3901,9 @@ void Gui::Render() {
             if (overlayPosY < -10.0f) overlayPosY = -10.0f;
             if (overlayPosX > ds.x - 200.0f) overlayPosX = ds.x - 200.0f;
             if (overlayPosY > ds.y - 100.0f) overlayPosY = ds.y - 100.0f;
+        }
+        if (windowDraggable && ImGui::IsItemDeactivated()) {
+            SaveSettings();
         }
 
         // Close button click detection - 700x432: x=655 y=12

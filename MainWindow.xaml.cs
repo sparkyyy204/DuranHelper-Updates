@@ -2561,6 +2561,12 @@ namespace FSB_helper_C__
             sections.Insert(0, "Калькулятор штрафов 📌");
             sections.Insert(1, "Калькулятор розыска 📌");
             cbSections.ItemsSource = sections; 
+
+            // Refresh stats live on dashboard
+            var pf = MasterData[CurrentProfile];
+            if (lblStatSections != null) lblStatSections.Text = pf.Laws.Count.ToString();
+            if (lblStatLaws != null) lblStatLaws.Text = CountRealArticles(pf.Laws).ToString();
+
             if (cbSections.Items.Count > 0) { 
                 if (!string.IsNullOrEmpty(_lastLawSection) && cbSections.Items.Contains(_lastLawSection)) cbSections.SelectedItem = _lastLawSection;
                 else cbSections.SelectedIndex = 0; 

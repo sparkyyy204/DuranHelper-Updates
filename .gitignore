@@ -12,6 +12,7 @@ Output/
 # ASI build artifacts
 ASI_Plugin/build/
 ASI_Plugin/.vs/
+ASI_Plugin/build_asi.bat
 
 # Crash logs
 crash.txt
@@ -20,3 +21,7 @@ crash.txt
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Compiled binaries
+*.asi
+DuranOverlay.asi
