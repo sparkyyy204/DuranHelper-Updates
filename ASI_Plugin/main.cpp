@@ -643,7 +643,9 @@ void Gui::ExecuteLawQuote(const std::string& utf8text) {
             cleanUtf8.replace(nPos, 3, "");
         }
         
+        Log("ExecuteLawQuote: Input UTF-8 text: " + utf8text);
         std::string cp1251 = UTF8ToCP1251(cleanUtf8.c_str());
+        Log("ExecuteLawQuote: Converted CP1251 text: " + cp1251);
         std::vector<std::string> lines;
         
         // Split by \n first, then by maxLen
@@ -674,7 +676,7 @@ void Gui::ExecuteLawQuote(const std::string& utf8text) {
             }
             
             if (segment.back() == ')') {
-                segment += "\xA0"; // Append non-breaking space
+                segment += "\xA0"; // Append non-breaking space (CP1251 byte)
             }
             
             size_t start = 0;
@@ -708,9 +710,17 @@ void Gui::ExecuteLawQuote(const std::string& utf8text) {
             RunOnMainThread([msg]() {
                 SendSAMPMessage(msg.c_str());
             });
-            // Sleep 1 second but check cancellation every 100ms
-            for (int i = 0; i < 10 && !g_CancelQuote.load(); i++) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            // Sleep for Gui::binderDelay ms but check cancellation dynamically
+            if (Gui::binderDelay > 0) {
+                int totalMs = Gui::binderDelay;
+                int chunks = totalMs / 50;
+                for (int i = 0; i < chunks && !g_CancelQuote.load(); i++) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                }
+                int remainder = totalMs % 50;
+                if (remainder > 0 && !g_CancelQuote.load()) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(remainder));
+                }
             }
         }
         g_QuotingActive.store(false);

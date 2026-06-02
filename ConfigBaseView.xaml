@@ -63,36 +63,7 @@
             </Border>
         </Grid>
 
-        <!-- Loading Overlay (Visible during fetch) -->
-        <Border Grid.RowSpan="3" x:Name="LoadingOverlay" Margin="-30,-20,-10,-20" Background="{DynamicResource BgBrush}" Opacity="0.95" Panel.ZIndex="10" Visibility="Collapsed" CornerRadius="0">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid Width="100" Height="100" HorizontalAlignment="Center">
-                    <Ellipse Fill="{DynamicResource GoldBrush}" Opacity="0.1" Width="80" Height="80" x:Name="pulseRing1" RenderTransformOrigin="0.5,0.5">
-                        <Ellipse.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Ellipse.RenderTransform>
-                    </Ellipse>
-                    <Ellipse Fill="{DynamicResource GoldBrush}" Opacity="0.2" Width="60" Height="60" x:Name="pulseRing2" RenderTransformOrigin="0.5,0.5">
-                        <Ellipse.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Ellipse.RenderTransform>
-                    </Ellipse>
-                    <Path Data="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" Fill="{DynamicResource GoldBrush}" Width="40" Height="28" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
-                <TextBlock x:Name="txtLoadingTitle" Text="ПОДКЛЮЧЕНИЕ К БАЗЕ КОНФИГУРАЦИЙ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,5"/>
-                <TextBlock x:Name="txtLoadingDesc" Text="Синхронизация каталога с сервером..." Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="13" HorizontalAlignment="Center" Opacity="0.8"/>
-            </StackPanel>
-            <Border.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard>
-                        <Storyboard RepeatBehavior="Forever">
-                            <DoubleAnimation Storyboard.TargetName="pulseRing1" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="1" To="1.4" Duration="0:0:1.5" AutoReverse="True"/>
-                            <DoubleAnimation Storyboard.TargetName="pulseRing1" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="1" To="1.4" Duration="0:0:1.5" AutoReverse="True"/>
-                            <DoubleAnimation Storyboard.TargetName="pulseRing1" Storyboard.TargetProperty="Opacity" From="0.1" To="0" Duration="0:0:1.5" AutoReverse="True"/>
-                            <DoubleAnimation Storyboard.TargetName="pulseRing2" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="1" To="1.2" Duration="0:0:1.5" AutoReverse="True"/>
-                            <DoubleAnimation Storyboard.TargetName="pulseRing2" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="1" To="1.2" Duration="0:0:1.5" AutoReverse="True"/>
-                            <DoubleAnimation Storyboard.TargetName="pulseRing2" Storyboard.TargetProperty="Opacity" From="0.2" To="0.05" Duration="0:0:1.5" AutoReverse="True"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Border.Triggers>
-        </Border>
+
 
         <!-- Error View -->
         <Border Grid.Row="2" x:Name="ErrorView" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" Background="{DynamicResource SideBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="40,30" Margin="0,-40,0,0" Panel.ZIndex="5">
@@ -127,7 +98,7 @@
             </StackPanel>
         </Border>
         <!-- Items Viewer (Virtualizing ListBox) -->
-        <ListBox x:Name="icCloudList" Grid.Row="2" Background="Transparent" BorderThickness="0" Margin="0,0,-10,0" Padding="0,0,10,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel">
+        <ListBox x:Name="icCloudList" Grid.Row="2" Background="Transparent" BorderThickness="0" Margin="0,0,-10,0" Padding="0,0,10,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="Padding" Value="0"/>
@@ -260,6 +231,38 @@
             </ListBox.ItemTemplate>
         </ListBox>
     </Grid>
+
+    <!-- Loading Overlay (Visible during fetch) -->
+    <Border x:Name="LoadingOverlay" Background="{DynamicResource BgBrush}" Opacity="0.95" Panel.ZIndex="10" Visibility="Collapsed" CornerRadius="0" Margin="0">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid Width="100" Height="100" HorizontalAlignment="Center">
+                <Ellipse Fill="{DynamicResource GoldBrush}" Opacity="0.1" Width="80" Height="80" x:Name="pulseRing1" RenderTransformOrigin="0.5,0.5">
+                    <Ellipse.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Ellipse.RenderTransform>
+                </Ellipse>
+                <Ellipse Fill="{DynamicResource GoldBrush}" Opacity="0.2" Width="60" Height="60" x:Name="pulseRing2" RenderTransformOrigin="0.5,0.5">
+                    <Ellipse.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Ellipse.RenderTransform>
+                </Ellipse>
+                <Path Data="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" Fill="{DynamicResource GoldBrush}" Width="40" Height="28" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+            <TextBlock x:Name="txtLoadingTitle" Text="ПОДКЛЮЧЕНИЕ К БАЗЕ КОНФИГУРАЦИЙ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,20,0,5"/>
+            <TextBlock x:Name="txtLoadingDesc" Text="Синхронизация каталога с сервером..." Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="13" HorizontalAlignment="Center" Opacity="0.8"/>
+        </StackPanel>
+        <Border.Triggers>
+            <EventTrigger RoutedEvent="Loaded">
+                <BeginStoryboard>
+                    <Storyboard RepeatBehavior="Forever">
+                        <DoubleAnimation Storyboard.TargetName="pulseRing1" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="1" To="1.4" Duration="0:0:1.5" AutoReverse="True"/>
+                        <DoubleAnimation Storyboard.TargetName="pulseRing1" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="1" To="1.4" Duration="0:0:1.5" AutoReverse="True"/>
+                        <DoubleAnimation Storyboard.TargetName="pulseRing1" Storyboard.TargetProperty="Opacity" From="0.1" To="0" Duration="0:0:1.5" AutoReverse="True"/>
+                        <DoubleAnimation Storyboard.TargetName="pulseRing2" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="1" To="1.2" Duration="0:0:1.5" AutoReverse="True"/>
+                        <DoubleAnimation Storyboard.TargetName="pulseRing2" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" From="1" To="1.2" Duration="0:0:1.5" AutoReverse="True"/>
+                        <DoubleAnimation Storyboard.TargetName="pulseRing2" Storyboard.TargetProperty="Opacity" From="0.2" To="0.05" Duration="0:0:1.5" AutoReverse="True"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Border.Triggers>
+    </Border>
+
     <!-- Warning Overlay -->
     <Grid x:Name="WarningOverlay" Panel.ZIndex="1000">
         <Border Background="{DynamicResource BgBrush}" Opacity="0.9"/>

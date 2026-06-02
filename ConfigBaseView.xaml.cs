@@ -468,6 +468,7 @@ namespace FSB_helper_C__
                             
                             try
                             {
+                                await Task.Delay(1000);
                                 bool shouldSave = false;
                                 bool shouldRefreshUi = false;
 
@@ -660,6 +661,7 @@ namespace FSB_helper_C__
 
                 try
                 {
+                    await Task.Delay(1000);
                     string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
                     
                     string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
