@@ -118,6 +118,11 @@ public:
     static ImFont* fontSegoeBold14;
     static ImFont* fontSegoeBold20;
     static ImFont* fontSegoeBlack32;
+    
+    // Notepad specific fonts
+    static ImFont* fontSegoeRegular13;
+    static ImFont* fontSegoeItalic13;
+    static ImFont* fontSegoeBoldItalic14;
 
     // Laws
     static std::vector<LawSection> lawSections;
@@ -125,6 +130,12 @@ public:
     static bool showLawDropdown;
     static bool resetLawsScroll;
     static char searchLaws[256];
+    static bool showSearchPopup;
+    static char searchBufferPopup[256];
+    static int searchMatchIndex;
+    static int searchMatchCount;
+    static bool searchPopupFocus;
+    static bool scrollSearch;
     static float lawScrollY;
 
     // Fines
@@ -146,7 +157,15 @@ public:
     static float binderScrollY;
     static float globalScale;         // scaling factor for different resolutions
     static bool showSettings;         // settings gear panel
-    static float settingsAlpha;       // transparency slider value
+    static float settingsAlpha;
+    static bool scriptEnabled;
+    static bool binderEnabled;
+    static std::string scriptToggleKeyStr;
+    static int scriptToggleKey;
+    static bool scriptToggleNeedsAlt;
+    static bool scriptToggleNeedsCtrl;
+    static bool scriptToggleNeedsShift;
+    static bool radialActivationToggleMode;       // transparency slider value
     static int toggleKey;             // Virtual-key code for overlay toggle
     static std::string toggleKeyStr;
     static bool toggleNeedsAlt;
@@ -196,6 +215,7 @@ public:
     
     // Smart Quoting
     static bool quoteEnabled;
+    static bool quoteNotepad;
     static bool quoteExtended;
     static bool quoteChapter;
     static bool quoteFines;

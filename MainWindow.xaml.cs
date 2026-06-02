@@ -82,6 +82,7 @@ namespace FSB_helper_C__
         private System.Threading.CancellationTokenSource _renderLawsCts;
         private Task _lawsRenderTask;
         private BindItem _tempBind;
+        private string _originalTempBindJson;
 
         private LawItem _tempLaw;
         private string _capturedKey = "";
@@ -202,23 +203,41 @@ namespace FSB_helper_C__
 
             try {
                 string docPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DURAN HELPER");
-                if (!Directory.Exists(docPath)) Directory.CreateDirectory(docPath);
-                
-                string[] filesToMigrate = { "Profiles.json", "Settings.json", "laws.json", "fines.json", "calculator.json" };
-                foreach (var f in filesToMigrate) {
-                    string src = Path.Combine(Environment.CurrentDirectory, f);
-                    string dst = Path.Combine(docPath, f);
-                    if (string.Equals(src, dst, StringComparison.OrdinalIgnoreCase)) continue;
+                bool migrationSuccess = false;
+                try {
+                    if (!Directory.Exists(docPath)) Directory.CreateDirectory(docPath);
                     
-                    if (File.Exists(src)) {
-                        if (!File.Exists(dst)) {
-                            try { File.Move(src, dst); _isUpgrade = true; } catch { }
-                        } else {
-                            try { File.Delete(src); } catch { }
+                    string[] filesToMigrate = { "Profiles.json", "Settings.json", "laws.json", "fines.json", "calculator.json" };
+                    foreach (var f in filesToMigrate) {
+                        string src = Path.Combine(Environment.CurrentDirectory, f);
+                        string dst = Path.Combine(docPath, f);
+                        if (string.Equals(src, dst, StringComparison.OrdinalIgnoreCase)) continue;
+                        
+                        if (File.Exists(src)) {
+                            if (!File.Exists(dst)) {
+                                try { File.Move(src, dst); _isUpgrade = true; } catch { }
+                            } else {
+                                try { File.Delete(src); } catch { }
+                            }
                         }
                     }
-                }
-                Environment.CurrentDirectory = docPath;
+                    Environment.CurrentDirectory = docPath;
+                    migrationSuccess = true;
+                } catch { }
+                
+                string finalPath = Environment.CurrentDirectory;
+                if (!finalPath.EndsWith("\\")) finalPath += "\\";
+                
+                try {
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\DuranHelper")) {
+                        if (key != null) key.SetValue("WorkingPath", finalPath, Microsoft.Win32.RegistryValueKind.String);
+                    }
+                } catch { }
+                try {
+                    using (var key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\DuranHelper")) {
+                        if (key != null) key.SetValue("WorkingPath", finalPath, Microsoft.Win32.RegistryValueKind.String);
+                    }
+                } catch { }
             } catch { }
 
             InitializeComponent();
@@ -964,6 +983,8 @@ namespace FSB_helper_C__
             string radialPath = Path.Combine(Environment.CurrentDirectory, "radial.json");
             string gamePath = txtGamePath?.Text ?? "";
             bool hasGta = !string.IsNullOrWhiteSpace(gamePath) && File.Exists(Path.Combine(gamePath, "gta_sa.exe"));
+            bool hasAsi = !string.IsNullOrWhiteSpace(gamePath) && File.Exists(Path.Combine(gamePath, "DuranOverlay.asi"));
+            bool hasSamp = !string.IsNullOrWhiteSpace(gamePath) && File.Exists(Path.Combine(gamePath, "samp.dll"));
 
             var profilesSummary = MasterData.Select(kvp => new {
                 profile = kvp.Key,
@@ -1014,12 +1035,16 @@ namespace FSB_helper_C__
                     is_64bit_process = Environment.Is64BitProcess,
                     process_uptime = TimeSpan.FromMilliseconds(Environment.TickCount64).ToString(@"dd\.hh\:mm\:ss"),
                     debug_mode = App.IsDebugMode,
-                    asi_engine_running = _isEngineRunning
+                    asi_engine_running = _isEngineRunning,
+                    memory_usage_mb = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1024 / 1024,
+                    screen_resolution = $"{SystemParameters.PrimaryScreenWidth}x{SystemParameters.PrimaryScreenHeight}"
                 },
                 paths = new {
                     working_directory = Environment.CurrentDirectory,
                     game_path = gamePath,
-                    game_exe_found = hasGta
+                    game_exe_found = hasGta,
+                    duran_asi_found = hasAsi,
+                    samp_dll_found = hasSamp
                 },
                 files = new {
                     settings_json = FileMeta(settingsPath),
@@ -1027,7 +1052,8 @@ namespace FSB_helper_C__
                     radial_json = FileMeta(radialPath),
                     settings_content = ReadSafe(settingsPath),
                     profiles_content = ReadSafe(profilesPath),
-                    radial_content = ReadSafe(radialPath)
+                    radial_content = ReadSafe(radialPath),
+                    asi_log = ReadSafe(Path.Combine(gamePath, "DuranOverlay_Debug.log"))
                 },
                 profiles_summary = profilesSummary,
                 ui_state = new {
@@ -1288,14 +1314,17 @@ namespace FSB_helper_C__
                     tbSyntax.Inlines.Clear();
                     var parts = System.Text.RegularExpressions.Regex.Split(txt.Text ?? "", @"(\*[^\*]+\*)");
                     var gold = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
+                    var red = (SolidColorBrush)Application.Current.Resources["RedBrush"];
                     var white = (SolidColorBrush)Application.Current.Resources["TextBrush"];
                     var vars = MasterData[CurrentProfile].Variables;
 
                     foreach (var part in parts)
                     {
                         if (string.IsNullOrEmpty(part)) continue;
-                        if ((part.StartsWith("*") && part.EndsWith("*") && vars != null && vars.ContainsKey(part)) || part == "*ВРЕМЯ*")
-                            tbSyntax.Inlines.Add(new Run(part) { Foreground = gold, FontWeight = FontWeights.Bold });
+                        if (part == "*ВРЕМЯ*" || part == "*ID*")
+                            tbSyntax.Inlines.Add(new Run(part) { Foreground = red });
+                        else if (part.StartsWith("*") && part.EndsWith("*") && vars != null && vars.ContainsKey(part))
+                            tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
                         else
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = white });
                     }
@@ -1717,6 +1746,13 @@ namespace FSB_helper_C__
                     } else {
                         btnStopBindKey.Content = "Нет";
                     }
+                    if (s != null && s.ContainsKey("ScriptToggleKey") && !string.IsNullOrWhiteSpace(s["ScriptToggleKey"])) {
+                        btnKeyToggleScript.Content = s["ScriptToggleKey"];
+                    } else if (s != null && s.ContainsKey("ToggleScript") && !string.IsNullOrWhiteSpace(s["ToggleScript"])) {
+                        btnKeyToggleScript.Content = s["ToggleScript"];
+                    } else {
+                        btnKeyToggleScript.Content = "Нет";
+                    }
                     if (s != null && s.ContainsKey("LastGroup")) _currentBindGroup = s["LastGroup"];
                     if (s != null && s.ContainsKey("LastSection")) _lastLawSection = s["LastSection"];
                     
@@ -1845,6 +1881,7 @@ namespace FSB_helper_C__
                 { "IssueFine", btnIssueFineKey?.Content?.ToString() ?? "Alt + Space" }, 
                 { "CancelFine", btnCancelFineKey?.Content?.ToString() ?? "Space" }, 
                 { "StopBind", (btnStopBindKey?.Content?.ToString() == "Нет" || btnStopBindKey?.Content?.ToString() == "") ? "" : (btnStopBindKey?.Content?.ToString() ?? "") }, 
+                { "ScriptToggleKey", (btnKeyToggleScript?.Content?.ToString() == "Нет" || btnKeyToggleScript?.Content?.ToString() == "") ? "" : (btnKeyToggleScript?.Content?.ToString() ?? "") },
                 { "LastGroup", _currentBindGroup ?? "" }, 
                 { "LastSection", _lastLawSection ?? "" }, 
                 { "CustomThemesText", JsonConvert.SerializeObject(CustomThemes ?? new Dictionary<string, Dictionary<string, string>>()) },
@@ -2267,6 +2304,22 @@ namespace FSB_helper_C__
         private async void SwitchTabAnim(int index) { 
             if (Tabs.SelectedIndex == index) return;
             
+            if (OverlayContainer.Visibility == Visibility.Visible && BinderEditorControl.Visibility == Visibility.Visible && IsBindEditorDirty())
+            {
+                _dialogHost.ShowUnsavedChanges(
+                    onSave: () => { Bind_Save_Click(null, null); SwitchTabAnimNow(index); },
+                    onExit: () => { OverlayContainer.Visibility = Visibility.Collapsed; SwitchTabAnimNow(index); }
+                );
+                return;
+            }
+            if (OverlayContainer.Visibility == Visibility.Visible) {
+                OverlayContainer.Visibility = Visibility.Collapsed;
+            }
+
+            SwitchTabAnimNow(index);
+        }
+
+        private async void SwitchTabAnimNow(int index) { 
             // Instantly hide and reset position while WPF builds the heavy visual tree
             Tabs.BeginAnimation(OpacityProperty, null);
             if (Tabs_TT != null) Tabs_TT.BeginAnimation(TranslateTransform.YProperty, null);
@@ -2312,15 +2365,15 @@ namespace FSB_helper_C__
                 ViewCloud.CancelLoading();
             }
 
-            // Fade out shield on Radial (3), Cloud (4) and Options (5)
-            if (index >= 3) {
+            // Fade out shield on Cloud (4) and Options (5)
+            if (index >= 4) {
                 if (canvasShieldBg.Opacity > 0 || canvasShieldBg.Visibility == Visibility.Visible) {
                     DoubleAnimation fadeOutShield = new DoubleAnimation(canvasShieldBg.Opacity, 0, TimeSpan.FromSeconds(0.3));
-                    fadeOutShield.Completed += (s, e) => { if (Tabs.SelectedIndex >= 3) canvasShieldBg.Visibility = Visibility.Collapsed; };
+                    fadeOutShield.Completed += (s, e) => { if (Tabs.SelectedIndex >= 4) canvasShieldBg.Visibility = Visibility.Collapsed; };
                     canvasShieldBg.BeginAnimation(OpacityProperty, fadeOutShield);
                 }
             } else {
-                // Fade in shield on Home (0), Laws (1), Binds (2) - but only if not in Wizard mode
+                // Fade in shield on Home (0), Laws (1), Binds (2), Radial (3) - but only if not in Wizard mode
                 if (WinWizard.Visibility != Visibility.Visible && _hasProfile) {
                     canvasShieldBg.Visibility = Visibility.Visible;
                     DoubleAnimation fadeInShield = new DoubleAnimation(canvasShieldBg.Opacity, 1, TimeSpan.FromSeconds(0.3));
@@ -3085,7 +3138,7 @@ namespace FSB_helper_C__
 
 private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender is Button btn && btn.Tag != null) { var target = btn.Tag.ToString(); _dialogHost.ShowInput("ИМЯ КЛОНА ПРОФИЛЯ", async (v) => { var d = MasterData[target]; MasterData[v] = JsonConvert.DeserializeObject<ProfileData>(JsonConvert.SerializeObject(d)); CurrentProfile = v; await Task.Delay(200); RefreshUI(); SaveData(); }, validator: (v) => MasterData.ContainsKey(v) ? "Имя занято!" : null); } }
         private void Profile_Rename_Item_Click(object sender, RoutedEventArgs e) { var target = (sender as Button).Tag.ToString(); _dialogHost.ShowInput("НОВОЕ ИМЯ ПРОФИЛЯ", async (v) => { var d = MasterData[target]; MasterData.Remove(target); MasterData[v] = d; CurrentProfile = v; await Task.Delay(200); RefreshUI(); SaveData(); }, validator: (v) => MasterData.ContainsKey(v) ? "Имя занято!" : null); }
-        private void Profile_Delete_Click(object sender, RoutedEventArgs e) { if (!string.IsNullOrEmpty(CurrentProfile)) { _dialogHost.ShowAlert("УДАЛЕНИЕ", "Удалить профиль " + CurrentProfile + "?", async () => { if (MasterData.ContainsKey(CurrentProfile)) { MasterData.Remove(CurrentProfile); CurrentProfile = MasterData.Count > 0 ? MasterData.Keys.First() : ""; await Task.Delay(200); SaveData(); RefreshUI(); } }); } }
+        private void Profile_Delete_Click(object sender, RoutedEventArgs e) { if (!string.IsNullOrEmpty(CurrentProfile)) { _dialogHost.ShowAlert("УДАЛЕНИЕ", "Удалить профиль " + CurrentProfile + "?", async () => { if (MasterData.ContainsKey(CurrentProfile)) { try { string deletedDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DeletedProfiles"); if (!System.IO.Directory.Exists(deletedDir)) System.IO.Directory.CreateDirectory(deletedDir); string safeName = string.Join("_", CurrentProfile.Split(System.IO.Path.GetInvalidFileNameChars())); string backupPath = System.IO.Path.Combine(deletedDir, $"{safeName}_{DateTime.Now:yyyyMMdd_HHmmss}.json"); System.IO.File.WriteAllText(backupPath, JsonConvert.SerializeObject(MasterData[CurrentProfile], Formatting.Indented)); } catch { } MasterData.Remove(CurrentProfile); CurrentProfile = MasterData.Count > 0 ? MasterData.Keys.First() : ""; await Task.Delay(200); SaveData(); RefreshUI(); } }); } }
         private void Disable_Scroll(object sender, MouseWheelEventArgs e) { e.Handled = true; }
         private void Disable_KeyScroll(object sender, KeyEventArgs e) { 
             if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.PageDown || e.Key == Key.PageUp || e.Key == Key.Home || e.Key == Key.End) e.Handled = true; 
@@ -3167,7 +3220,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             p.Groups = p.Groups.Distinct().ToList(); 
             if (p.Groups.IndexOf("ВСЕ") != 0) { p.Groups.Remove("ВСЕ"); p.Groups.Insert(0, "ВСЕ"); } 
             if (!p.Groups.Contains(_currentBindGroup)) _currentBindGroup = "ВСЕ";
-            icBindGroups.ItemsSource = p.Groups.Select(g => new BindGroupItem { Name = g, BindsCount = (g == "ВСЕ" ? p.Binds.Count : p.Binds.Values.Count(b => b.group == g)) }).ToList(); 
+            icBindGroups.ItemsSource = p.Groups.Select(g => new BindGroupItem { Name = g, BindsCount = (g == "ВСЕ" ? p.Binds.Values.Count(b => !string.Equals(b.id, "Radial", StringComparison.OrdinalIgnoreCase) && b.name != "Radial Menu") : p.Binds.Values.Count(b => b.group == g)) }).ToList(); 
             UpdateToggleGroupButton();
         }
 
@@ -3464,7 +3517,6 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             BinderEditorControl.txtBindAutoTrigger.Text = ""; 
             BinderEditorControl.rbTypeKey.IsChecked = true;
             BinderEditorControl.btnBindKey.Content = "КЛАВИША: НЕТ";
-            AddStep(new BindStep { action = "CHAT", desc = "ЧАТ", value="", isEnter = true, ColorCode="#1f6feb" }); 
             BinderEditorControl.icBindSteps.ItemsSource = null; 
             UpdateBindsStepsIndex();
             OpenBindEditor(); 
@@ -3529,7 +3581,21 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             BinderEditorControl.rbTypeKey.IsChecked = !_tempBind.isAuto;
             BinderEditorControl.txtBindAutoTrigger.Text = _tempBind.isAuto ? _tempBind.key : "";
             BinderEditorControl.btnBindKey.Content = "КЛАВИША: " + ((_tempBind.isAuto || string.IsNullOrEmpty(_tempBind.key)) ? "НЕТ" : _tempBind.DisplayKey); 
+            _originalTempBindJson = JsonConvert.SerializeObject(_tempBind);
             OpenOverlay(BinderEditorControl); 
+        }
+
+        private bool IsBindEditorDirty()
+        {
+            if (_tempBind == null) return false;
+            if (string.IsNullOrEmpty(_originalTempBindJson)) return true;
+
+            _tempBind.name = BinderEditorControl.txtBindName.Text;
+            _tempBind.isAuto = BinderEditorControl.rbTypeAuto.IsChecked == true;
+            if (_tempBind.isAuto) _tempBind.key = BinderEditorControl.txtBindAutoTrigger.Text;
+
+            string currentJson = JsonConvert.SerializeObject(_tempBind);
+            return currentJson != _originalTempBindJson;
         }
 
         internal void BindType_Changed(object sender, RoutedEventArgs e)
@@ -3568,11 +3634,13 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 }
             }
             MasterData[CurrentProfile].Binds[_tempBind.id] = _tempBind;
+            _originalTempBindJson = JsonConvert.SerializeObject(_tempBind);
             
             Action onComplete = () => {
                 UpdateBindsList();
                 UpdateBindGroups();
                 UpdateBindStatsUI();
+                BinderEditorControl.Visibility = Visibility.Collapsed;
                 Overlay_Close(null, null);
             };
 
@@ -3646,6 +3714,25 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         internal void Step_Add_Key(object sender, RoutedEventArgs e) { if (_tempBind.steps.Count >= 50) { OpenInfo("ЛИМИТ", "Максимум 50 строк!"); return; } _captureTarget = "BindStep"; StartKeyCapture(); }
         
         internal void Step_Delete_Click(object sender, RoutedEventArgs e) { var step = (sender as Button).Tag as BindStep; if (step != null) { _tempBind.steps.Remove(step); UpdateBindsStepsIndex(); } }
+
+        internal void ReorderBindStep(object source, object target, bool insertAfter = false)
+        {
+            var sourceStep = source as BindStep;
+            var targetStep = target as BindStep;
+            if (sourceStep == null || targetStep == null || sourceStep == targetStep) return;
+
+            int sourceIndex = _tempBind.steps.IndexOf(sourceStep);
+            int targetIndex = _tempBind.steps.IndexOf(targetStep);
+            if (sourceIndex < 0 || targetIndex < 0) return;
+
+            _tempBind.steps.RemoveAt(sourceIndex);
+            if (sourceIndex < targetIndex) targetIndex--;
+            
+            if (insertAfter) targetIndex++;
+
+            _tempBind.steps.Insert(targetIndex, sourceStep);
+            UpdateBindsStepsIndex();
+        }
 
         internal void Bind_SetKey_Editor_Click(object sender, RoutedEventArgs e) { _captureTarget = "BindHotKey"; StartKeyCapture(); }
                 private void OptKey_Click(object sender, RoutedEventArgs e) { 
@@ -3781,6 +3868,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                             btnIssueFineKey.Content?.ToString() == "L" + bareMod || btnIssueFineKey.Content?.ToString() == "R" + bareMod ||
                             btnCancelFineKey.Content?.ToString() == "L" + bareMod || btnCancelFineKey.Content?.ToString() == "R" + bareMod ||
                             btnStopBindKey.Content?.ToString() == "L" + bareMod || btnStopBindKey.Content?.ToString() == "R" + bareMod ||
+                            btnKeyToggleScript.Content?.ToString() == "L" + bareMod || btnKeyToggleScript.Content?.ToString() == "R" + bareMod ||
                             btnRadialKey.Content?.ToString() == "L" + bareMod || btnRadialKey.Content?.ToString() == "R" + bareMod) {
                             
                             Dialog_Close(null, null);
@@ -3803,7 +3891,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 
                 if (!string.IsNullOrEmpty(_capturedKey))
                 {
-                    if (_capturedKey == btnKeyToggle.Content?.ToString() || _capturedKey == btnKeyPrev.Content?.ToString() || _capturedKey == btnKeyNext.Content?.ToString() || _capturedKey == btnRadialKey.Content?.ToString() || _capturedKey == btnBinderHintKey.Content?.ToString() || _capturedKey == btnIssueFineKey.Content?.ToString() || _capturedKey == btnCancelFineKey.Content?.ToString() || _capturedKey == btnStopBindKey.Content?.ToString())
+                    if (_capturedKey == btnKeyToggle.Content?.ToString() || _capturedKey == btnKeyPrev.Content?.ToString() || _capturedKey == btnKeyNext.Content?.ToString() || _capturedKey == btnRadialKey.Content?.ToString() || _capturedKey == btnBinderHintKey.Content?.ToString() || _capturedKey == btnIssueFineKey.Content?.ToString() || _capturedKey == btnCancelFineKey.Content?.ToString() || _capturedKey == btnStopBindKey.Content?.ToString() || _capturedKey == btnKeyToggleScript.Content?.ToString())
                     {
                         Dialog_Close(null, null);
                         OpenInfo("ОШИБКА", "Эта клавиша уже назначена в системных клавишах!");
@@ -3836,7 +3924,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 if (!string.IsNullOrEmpty(_capturedKey))
                 {
                     // Check against ALL system keys (Toggle, Prev, Next, Radial)
-                    if (_capturedKey == btnKeyToggle.Content?.ToString() || _capturedKey == btnKeyPrev.Content?.ToString() || _capturedKey == btnKeyNext.Content?.ToString() || _capturedKey == btnRadialKey.Content?.ToString() || _capturedKey == btnBinderHintKey.Content?.ToString() || _capturedKey == btnIssueFineKey.Content?.ToString() || _capturedKey == btnCancelFineKey.Content?.ToString() || _capturedKey == btnStopBindKey.Content?.ToString())
+                    if (_capturedKey == btnKeyToggle.Content?.ToString() || _capturedKey == btnKeyPrev.Content?.ToString() || _capturedKey == btnKeyNext.Content?.ToString() || _capturedKey == btnRadialKey.Content?.ToString() || _capturedKey == btnBinderHintKey.Content?.ToString() || _capturedKey == btnIssueFineKey.Content?.ToString() || _capturedKey == btnCancelFineKey.Content?.ToString() || _capturedKey == btnStopBindKey.Content?.ToString() || _capturedKey == btnKeyToggleScript.Content?.ToString())
                     {
                         Dialog_Close(null, null);
                         OpenInfo("ОШИБКА", "Эта клавиша уже назначена в системных клавишах!");
@@ -3871,7 +3959,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 if (!string.IsNullOrEmpty(_capturedKey))
                 {
                     // Check against system keys
-                    if (_capturedKey == btnKeyToggle.Content?.ToString() || _capturedKey == btnKeyPrev.Content?.ToString() || _capturedKey == btnKeyNext.Content?.ToString() || _capturedKey == btnRadialKey.Content?.ToString() || _capturedKey == btnBinderHintKey.Content?.ToString() || _capturedKey == btnIssueFineKey.Content?.ToString() || _capturedKey == btnCancelFineKey.Content?.ToString())
+                    if (_capturedKey == btnKeyToggle.Content?.ToString() || _capturedKey == btnKeyPrev.Content?.ToString() || _capturedKey == btnKeyNext.Content?.ToString() || _capturedKey == btnRadialKey.Content?.ToString() || _capturedKey == btnBinderHintKey.Content?.ToString() || _capturedKey == btnIssueFineKey.Content?.ToString() || _capturedKey == btnCancelFineKey.Content?.ToString() || _capturedKey == btnStopBindKey.Content?.ToString() || _capturedKey == btnKeyToggleScript.Content?.ToString())
                     {
                         Dialog_Close(null, null);
                         OpenInfo("ОШИБКА", "Эта клавиша уже назначена в системных клавишах!");
@@ -3906,7 +3994,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 UpdateLawsList();
                 Dialog_Close(null, null);
             }
-            else if (_captureTarget == "Toggle" || _captureTarget == "Prev" || _captureTarget == "Next" || _captureTarget == "Radial" || _captureTarget == "BinderHint" || _captureTarget == "IssueFine" || _captureTarget == "CancelFine" || _captureTarget == "StopBind")
+            else if (_captureTarget == "Toggle" || _captureTarget == "Prev" || _captureTarget == "Next" || _captureTarget == "Radial" || _captureTarget == "BinderHint" || _captureTarget == "IssueFine" || _captureTarget == "CancelFine" || _captureTarget == "StopBind" || _captureTarget == "ToggleScript")
             {
                 if (!string.IsNullOrEmpty(_capturedKey))
                 {
@@ -3917,9 +4005,11 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                     string cBH = btnBinderHintKey.Content?.ToString();
                     string cIF = btnIssueFineKey.Content?.ToString();
                     string cCF = btnCancelFineKey.Content?.ToString();
+                    string cSB = btnStopBindKey.Content?.ToString();
+                    string cTS = btnKeyToggleScript.Content?.ToString();
                     
                     bool conflictOpt = false;
-                    var allSysKeys = new List<string> { cT, cP, cN, cR, cBH, cIF, cCF };
+                    var allSysKeys = new List<string> { cT, cP, cN, cR, cBH, cIF, cCF, cSB, cTS };
                     if (allSysKeys.Count(k => k == _capturedKey) > 0) conflictOpt = true;
 
                     if (conflictOpt)
@@ -3953,6 +4043,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 else if (_captureTarget == "BinderHint") btnBinderHintKey.Content = keyName;
                 else if (_captureTarget == "IssueFine") btnIssueFineKey.Content = keyName;
                 else if (_captureTarget == "CancelFine") btnCancelFineKey.Content = keyName;
+                else if (_captureTarget == "ToggleScript") btnKeyToggleScript.Content = keyName;
                 else if (_captureTarget == "StopBind") {
                     btnStopBindKey.Content = keyName;
                     btnStopBindKey.Foreground = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
@@ -3978,7 +4069,30 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         private void StopKeyCapture() { this.PreviewKeyDown -= Window_PreviewKeyDown; Dialog_Close(null, null); }
         
         private void OpenOverlay(UIElement win) { OverlayContainer.Visibility = Visibility.Visible; BinderEditorControl.Visibility = WinLawEdit.Visibility = WinReorder.Visibility = Visibility.Collapsed; win.Visibility = Visibility.Visible; DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.15)); OverlayContainer.BeginAnimation(OpacityProperty, fade); }
-        internal async void Overlay_Close(object sender, RoutedEventArgs e) { DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); OverlayContainer.BeginAnimation(OpacityProperty, fade); await Task.Delay(150); OverlayContainer.Visibility = Visibility.Collapsed; }
+        internal async void Overlay_Close(object sender, RoutedEventArgs e) { 
+            if (OverlayContainer.Visibility == Visibility.Visible)
+            {
+                if (BinderEditorControl.Visibility == Visibility.Visible && IsBindEditorDirty())
+                {
+                    _dialogHost.ShowUnsavedChanges(
+                        onSave: () => { Bind_Save_Click(null, null); },
+                        onExit: async () => { 
+                            DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); 
+                            OverlayContainer.BeginAnimation(OpacityProperty, fade); 
+                            await Task.Delay(150); 
+                            OverlayContainer.Visibility = Visibility.Collapsed; 
+                        }
+                    );
+                }
+                else
+                {
+                    DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); 
+                    OverlayContainer.BeginAnimation(OpacityProperty, fade); 
+                    await Task.Delay(150); 
+                    OverlayContainer.Visibility = Visibility.Collapsed; 
+                }
+            }
+        }
         
         // ===== Fine Calculator =====
         private void UpdateFinesList() {
@@ -4177,6 +4291,37 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         internal void Open_Guide(object sender, RoutedEventArgs e) { OpenDialog(WinGuide); }
 
         private void Open_VK(object sender, RoutedEventArgs e) { try { Process.Start(new ProcessStartInfo("https://vk.com/duranhelper") { UseShellExecute = true }); } catch { } }
+        private void Open_GitHub(object sender, RoutedEventArgs e) { try { Process.Start(new ProcessStartInfo("https://github.com/sparkyyy204/DuranHelper-Updates") { UseShellExecute = true }); } catch { } }
+
+        private void UninstallScript_Click(object sender, RoutedEventArgs e)
+        {
+            string gamePath = txtGamePath?.Text ?? "";
+            if (string.IsNullOrEmpty(gamePath) || !System.IO.Directory.Exists(gamePath)) { 
+                OpenInfo("ОШИБКА", "Сначала укажите путь к игре!"); 
+                return; 
+            }
+            
+            string asiPath = System.IO.Path.Combine(gamePath, "DuranOverlay.asi");
+            if (System.IO.File.Exists(asiPath)) {
+                _dialogHost.ShowAlert("УДАЛИТЬ ПЛАГИН?", "Вы уверены, что хотите удалить плагин DuranOverlay.asi из корневой папки игры?", () => {
+                    if (IsFileLockedForWrite(asiPath)) {
+                        OpenInfo("ВНИМАНИЕ", "Файл плагина занят процессом.\nПожалуйста, полностью закройте игру (gta_sa.exe) перед удалением.");
+                        return;
+                    }
+                    try {
+                        System.IO.File.Delete(asiPath);
+                        AddLog("Плагин DuranOverlay.asi успешно удален из игры.", "#2ea043");
+                        OpenInfo("ГОТОВО", "Плагин DuranOverlay.asi был удален.");
+                        UpdateDashboardState();
+                    } catch (Exception ex) {
+                        AddLog("Ошибка удаления: " + ex.Message, "#f85149");
+                        OpenInfo("ОШИБКА", "Не удалось удалить файл.\n" + ex.Message);
+                    }
+                });
+            } else {
+                OpenInfo("ВНИМАНИЕ", "Файл DuranOverlay.asi не найден в папке с игрой.");
+            }
+        }
 
 
         
@@ -4300,6 +4445,53 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                     } 
                 } catch { OpenInfo("ОШИБКА", "Неверный формат файла законов!"); } 
             } 
+        }
+
+        private void ImportAhk_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsSetupIncomplete()) { OpenInfo("ОШИБКА ДОСТУПА", "Сначала завершите настройку на вкладке «ГЛАВНАЯ»."); return; }
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) { OpenInfo("ОШИБКА", "Сначала создайте или импортируйте профиль!"); return; }
+            
+            var d = new OpenFileDialog { Filter = "AHK Script (*.ahk)|*.ahk|Text Files (*.txt)|*.txt|All Files (*.*)|*.*" };
+            if (d.ShowDialog() == true)
+            {
+                try
+                {
+                    var parsedResult = AhkParser.Parse(d.FileName);
+                    
+                    if (parsedResult.Binds.Count == 0 && parsedResult.Variables.Count == 0) {
+                        OpenInfo("ИМПОРТ", "Не удалось найти бинды или переменные в выбранном файле.");
+                        return;
+                    }
+
+                    var win = new AhkImportWindow(parsedResult);
+                    win.Owner = this;
+                    if (win.ShowDialog() == true)
+                    {
+                        var result = win.ImportResult;
+                        if (result != null)
+                        {
+                            foreach (var b in result.Binds)
+                            {
+                                MasterData[CurrentProfile].Binds[b.id] = b;
+                            }
+                            foreach (var kv in result.Variables)
+                            {
+                                MasterData[CurrentProfile].Variables[kv.Key] = kv.Value;
+                            }
+                            UpdateBindsList();
+                            UpdateBindGroups();
+                            UpdateBindStatsUI();
+                            SaveData();
+                            OpenInfo("УСПЕХ", $"Импортировано биндов: {result.Binds.Count}, переменных: {result.Variables.Count}", true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    OpenInfo("ОШИБКА", "Ошибка при чтении файла: " + ex.Message);
+                }
+            }
         }
 
 
@@ -5062,8 +5254,6 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             if (btnInstallPlugin != null) {
                 btnInstallPlugin.IsHitTestVisible = false;
                 btnInstallPlugin.Content = "ЗАГРУЗКА...";
-                var pulse = new DoubleAnimation(1, 0.4, TimeSpan.FromSeconds(0.6)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever };
-                btnInstallPlugin.BeginAnimation(OpacityProperty, pulse);
             }
 
             try {
@@ -5085,7 +5275,6 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 Dispatcher.Invoke(() => {
                     // Stop pulse animation on both buttons before RefreshUI changes visibility
                     if (btnInstallPlugin != null) {
-                        btnInstallPlugin.BeginAnimation(OpacityProperty, null);
                         btnInstallPlugin.Opacity = 1;
                         btnInstallPlugin.IsHitTestVisible = true;
                     }
@@ -5663,7 +5852,6 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             btnCheckScript.Visibility = Visibility.Visible;
             btnInstallPlugin.Visibility = Visibility.Collapsed;
             if (btnInstallPlugin != null) {
-                btnInstallPlugin.BeginAnimation(OpacityProperty, null);
                 btnInstallPlugin.Opacity = 1;
             }
             dashGameOverlay.Opacity = 0;
@@ -5781,10 +5969,6 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             dashGameBadgeRed.Visibility = Visibility.Visible;
             btnCheckScript.Visibility = Visibility.Collapsed;
             btnInstallPlugin.Visibility = Visibility.Visible;
-            if (btnInstallPlugin != null) {
-                var pulse = new DoubleAnimation(1, 0.4, TimeSpan.FromSeconds(0.6)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever };
-                btnInstallPlugin.BeginAnimation(OpacityProperty, pulse);
-            }
             dashGameOverlay.Opacity = 0;
             if (path != null) lblGameFolder.Text = string.IsNullOrEmpty(path) ? "Путь не установлен" : path;
 
@@ -6820,6 +7004,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         protected override void OnRender(DrawingContext drawingContext) { drawingContext.DrawRectangle(_brush, null, new Rect(0, 0, this.AdornedElement.RenderSize.Width, this.AdornedElement.RenderSize.Height)); }
     }
 }
+
+
 
 
 

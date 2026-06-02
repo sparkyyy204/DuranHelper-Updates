@@ -242,6 +242,101 @@
             </Border>
         </Grid>
 
+        <!-- ======================================================== -->
+        <!-- UNSAVED CHANGES DIALOG                                   -->
+        <!-- ======================================================== -->
+        <Grid x:Name="WinUnsaved" Visibility="Collapsed" Width="400" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <!-- Shadow Layer -->
+            <Border CornerRadius="12" Background="Transparent" BorderThickness="0" Margin="1.5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" ShadowDepth="0" Color="Black" Opacity="0.8"/>
+                </Border.Effect>
+            </Border>
+            <!-- Background Layer -->
+            <Border x:Name="WinUnsavedBg" CornerRadius="12" BorderThickness="1.5" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource GoldBrush}">
+                <Grid>
+                    <StackPanel Margin="0,12,0,20">
+                        <!-- Header -->
+                        <Grid Margin="15,0,15,10">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="ВНИМАНИЕ" Foreground="{DynamicResource GoldBrush}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                        <!-- Separator -->
+                        <Line X1="15" Y1="0" X2="385" Y2="0" Stroke="{DynamicResource LineBrush}" StrokeThickness="1"/>
+                        
+                        <StackPanel Margin="25,20,25,0">
+                            <!-- Message -->
+                            <TextBlock Text="У вас есть несохраненные изменения. Вы уверены, что хотите выйти?" Foreground="{DynamicResource TextBrush}" FontSize="12" FontFamily="Segoe UI" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,20" LineHeight="20"/>
+                            <!-- Buttons -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- СОХРАНИТЬ -->
+                                <Button Grid.Column="0" Content="СОХРАНИТЬ" Click="UnsavedSave_Click" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid>
+                                                <Border x:Name="btnGlow" CornerRadius="8" Opacity="0.5">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect Color="#2ea043" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
+                                                    </Border.Effect>
+                                                </Border>
+                                                <Border x:Name="bg" Background="{DynamicResource BoxBrush}" CornerRadius="8" BorderBrush="{DynamicResource GreenBrush}" BorderThickness="1" Padding="0,10">
+                                                    <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource GreenBrush}" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                </Border>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="btnGlow" Property="Opacity" Value="0.8"/>
+                                                    <Setter TargetName="bg" Property="Background" Value="#1a2a1f"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <!-- ВЫЙТИ -->
+                                <Button Grid.Column="2" Content="ВЫЙТИ" Click="UnsavedExit_Click" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="bg" Background="{DynamicResource BoxBrush}" CornerRadius="8" BorderBrush="{DynamicResource RedBrush}" BorderThickness="1" Padding="0,10">
+                                                <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource RedBrush}" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="bg" Property="Background" Value="#2a1218"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <!-- ОТМЕНА -->
+                                <Button Grid.Column="4" Content="ОТМЕНА" Click="UnsavedCancel_Click" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="bg" Background="{DynamicResource BoxBrush}" CornerRadius="8" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Padding="0,10">
+                                                <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="bg" Property="Background" Value="#222"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
         <!-- ═══════════════════════════════════════════ -->
         <!-- INPUT DIALOG (ввод текста)                 -->
         <!-- ═══════════════════════════════════════════ -->

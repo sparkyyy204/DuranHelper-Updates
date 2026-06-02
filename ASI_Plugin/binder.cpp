@@ -14,25 +14,24 @@ extern HMODULE g_hModule; // From main.cpp
 #include <Knownfolders.h>
 #include <combaseapi.h>
 
-std::string GetAppDataPath() {
-    PWSTR pathStr = nullptr;
-    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &pathStr))) {
-        int size_needed = WideCharToMultiByte(CP_ACP, 0, pathStr, -1, NULL, 0, NULL, NULL);
-        std::string strTo(size_needed, 0);
-        WideCharToMultiByte(CP_ACP, 0, pathStr, -1, &strTo[0], size_needed, NULL, NULL);
-        CoTaskMemFree(pathStr);
-        if (!strTo.empty() && strTo.back() == '\0') {
-            strTo.pop_back();
+std::wstring GetAppDataPath() {
+    HKEY hKey;
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\DuranHelper", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        wchar_t pathBuf[MAX_PATH] = {0};
+        DWORD pathSize = sizeof(pathBuf);
+        if (RegQueryValueExW(hKey, L"WorkingPath", NULL, NULL, (LPBYTE)pathBuf, &pathSize) == ERROR_SUCCESS) {
+            RegCloseKey(hKey);
+            std::wstring regPath(pathBuf);
+            if (!regPath.empty() && regPath.back() != L'\\') regPath += L'\\';
+            return regPath;
         }
-        return strTo + "\\DURAN HELPER\\";
+        RegCloseKey(hKey);
     }
-
-    // Fallback to older API
-    char path[MAX_PATH];
-    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
-        return std::string(path) + "\\DURAN HELPER\\";
+    wchar_t path[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
+        return std::wstring(path) + L"\\DURAN HELPER\\";
     }
-    return "";
+    return L"";
 }
 
 // Map AHK Key String to Virtual-Key code
@@ -237,12 +236,12 @@ void BinderManager::ExecuteBind(const BindItem& bind) {
 
 void BinderManager::ReloadBinds() {
     Binds.clear();
-    std::string baseDir = GetAppDataPath();
+    std::wstring baseDir = GetAppDataPath();
     if (baseDir.empty()) return;
 
     try {
         // 1. Read Settings to find LastProfile
-        std::ifstream settingsFile(baseDir + "Settings.json");
+        std::ifstream settingsFile(baseDir + L"Settings.json");
         if (!settingsFile.is_open()) return;
         
         json jSettings;
@@ -262,7 +261,7 @@ void BinderManager::ReloadBinds() {
         if (lastProfile.empty()) return;
 
         // 2. Read Profiles.json
-        std::ifstream profilesFile(baseDir + "Profiles.json");
+        std::ifstream profilesFile(baseDir + L"Profiles.json");
         if (!profilesFile.is_open()) return;
 
         json jProfiles;
@@ -325,16 +324,19 @@ void BinderManager::ReloadBinds() {
         // Output debug string to help with JSON parse errors
         OutputDebugStringA(("JSON Parse Error: " + std::string(e.what()) + "\n").c_str());
     }
+    
+    // Validate radial menu whenever binds are loaded
+    Gui::LoadRadialConfig();
 }
 
 void Gui::LoadRadialConfig() {
     radialSectors.clear();
     radialSectorCount = 4;
-    std::string baseDir = GetAppDataPath();
+    std::wstring baseDir = GetAppDataPath();
     if (baseDir.empty()) return;
 
     try {
-        std::ifstream f(baseDir + "radial.json");
+        std::ifstream f(baseDir + L"radial.json");
         if (!f.is_open()) return;
         json j;
         f >> j;
@@ -377,5 +379,26 @@ void Gui::LoadRadialConfig() {
             }
         }
     } catch (...) {}
+
+    // Validate that all bound IDs actually exist in Binds (except special built-ins)
+    auto validateSector = [](RadialSector& sec) {
+        if (sec.bindId.empty()) return;
+        if (sec.bindId == "open_fines" || sec.bindId == "open_wanted") return;
+        bool found = false;
+        for (const auto& b : BinderManager::Get().Binds) {
+            if (b.id == sec.bindId) { found = true; break; }
+        }
+        if (!found) {
+            sec.bindId = "";
+            sec.bindName = "";
+            sec.icon = "star";
+            sec.requiresId = false;
+        }
+    };
+
+    for (auto& sec : Gui::radialSectors) validateSector(sec);
+    for (auto& grp : Gui::radialGroups) {
+        for (auto& sec : grp.sectors) validateSector(sec);
+    }
 }
 

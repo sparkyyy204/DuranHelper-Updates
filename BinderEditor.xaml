@@ -12,47 +12,58 @@
         <local:InverseBoolConverter x:Key="InvBool"/>
         
         <DataTemplate x:Key="BindStepTemplate">
-            <Grid Height="48" Margin="0,0,0,8">
+            <Grid MinHeight="48" Margin="0,0,0,8" AllowDrop="True" Drop="BindStep_Drop" DragOver="BindStep_DragOver" DragLeave="BindStep_DragLeave">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
-                <Canvas Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="-1">
-                    <Line x:Name="DashLine" X1="0" Y1="8" X2="0" Y2="58" Stroke="{DynamicResource LineBrush}" StrokeThickness="2" StrokeDashArray="4 4">
-                        <Line.Style>
-                            <Style TargetType="Line">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsLast}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Line.Style>
-                    </Line>
-                </Canvas>
-                <Ellipse Grid.Column="0" Width="16" Height="16" Fill="{DynamicResource BgBrush}" Stroke="{Binding ColorCode}" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <!-- The continuous line connecting to the next item -->
+                <Grid Grid.Column="0" HorizontalAlignment="Center" Margin="0,24,0,-32" Panel.ZIndex="-1" ClipToBounds="True">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLast}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Canvas Width="2" HorizontalAlignment="Center">
+                        <Line X1="0" Y1="0" X2="0" Y2="2000" Stroke="{DynamicResource LineBrush}" StrokeThickness="2" StrokeDashArray="2 2"/>
+                    </Canvas>
+                </Grid>
+                
+                <Ellipse Grid.Column="0" Width="16" Height="16" Fill="{DynamicResource BgBrush}" Stroke="{Binding ColorCode}" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,16,0,0"/>
                 
                 <Border Grid.Column="1" Background="{DynamicResource SideBrush}" CornerRadius="8" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
                     <Grid Margin="10,0">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24"/>
                             <ColumnDefinition Width="Auto" MinWidth="60"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
                         
-                        <Grid Grid.Column="0" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,10,0">
+                        <!-- Drag Handle -->
+                        <Border Grid.Column="0" Background="Transparent" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown" ToolTip="Перетащите чтобы изменить порядок">
+                            <Path Data="M 6 6 h 0.01 M 12 6 h 0.01 M 6 12 h 0.01 M 12 12 h 0.01 M 6 18 h 0.01 M 12 18 h 0.01" 
+                                  Stroke="{DynamicResource GrayBrush}" StrokeThickness="3" StrokeEndLineCap="Round" StrokeStartLineCap="Round" 
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.3"/>
+                        </Border>
+                        
+                        <Grid Grid.Column="1" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,10,0">
                             <Border Background="{Binding ColorCode}" Opacity="0.2" CornerRadius="4"/>
                             <TextBlock Text="{Binding desc}" Foreground="{Binding ColorCode}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="10" Margin="12,0"/>
                         </Grid>
                         
-                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                        <Grid Grid.Column="2" VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/> <ColumnDefinition Width="Auto"/> <ColumnDefinition Width="*"/>    </Grid.ColumnDefinitions>
 
-                            <Border x:Name="InputContainer" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="4" Height="28">
+                            <Border x:Name="InputContainer" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="4" MinHeight="28">
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Setter Property="Grid.ColumnSpan" Value="3"/>
@@ -79,8 +90,8 @@
                                     </Style>
                                 </Border.Style>
                                 <Grid>
-                                    <ScrollViewer x:Name="svSyntax" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" IsHitTestVisible="False">
-                                        <TextBlock x:Name="tbSyntax" FontSize="12" FontFamily="Segoe UI" Padding="8,0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <ScrollViewer x:Name="svSyntax" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" IsHitTestVisible="False">
+                                        <TextBlock x:Name="tbSyntax" FontSize="12" FontFamily="Segoe UI" Padding="8,6,8,6" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Visibility" Value="Visible"/>
@@ -97,11 +108,12 @@
                                     <TextBox x:Name="txtStepVal" Text="{Binding value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                              TextChanged="StepVal_TextChanged" SelectionChanged="StepVal_SelectionChanged" Loaded="StepVal_Loaded" ScrollViewer.ScrollChanged="TxtStepVal_ScrollChanged" 
                                              Background="Transparent" CaretBrush="White" SelectionBrush="#551f6feb" BorderThickness="0" 
-                                             FontSize="12" FontFamily="Segoe UI" VerticalContentAlignment="Center">
+                                             FontSize="12" FontFamily="Segoe UI" VerticalAlignment="Center"
+                                             TextWrapping="Wrap" MaxHeight="200">
                                         <TextBox.Style>
                                             <Style TargetType="TextBox">
                                                 <Setter Property="Visibility" Value="Visible"/>
-                                                <Setter Property="Padding" Value="8,0"/>
+                                                <Setter Property="Padding" Value="8,6"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                                 <Setter Property="Foreground" Value="Transparent"/>
                                                 <Style.Triggers>
@@ -161,7 +173,7 @@
                             </TextBlock>
                         </Grid>
                         
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <StackPanel Grid.Column="3" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Right">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -204,7 +216,7 @@
                             </Border>
                         </StackPanel>
                         
-                        <Button Grid.Column="3" Foreground="#ff7b72" Opacity="0.5" BorderThickness="0" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Center" Click="Step_Delete_Click" Tag="{Binding}" Width="30" Height="30">
+                        <Button Grid.Column="4" Foreground="{DynamicResource RedBrush}" Opacity="0.5" BorderThickness="0" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Center" Click="Step_Delete_Click" Tag="{Binding}" Width="30" Height="30">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Cursor" Value="Hand"/>
@@ -228,27 +240,31 @@
                         </Button>
                     </Grid>
                 </Border>
+                <Border x:Name="DropIndicatorTop" Grid.Column="1" Height="2" Background="{DynamicResource GoldBrush}" VerticalAlignment="Top" Margin="0,-4,0,0" Visibility="Collapsed" Panel.ZIndex="10"/>
+                <Border x:Name="DropIndicatorBottom" Grid.Column="1" Height="2" Background="{DynamicResource GoldBrush}" VerticalAlignment="Bottom" Margin="0,0,0,-4" Visibility="Collapsed" Panel.ZIndex="10"/>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Background="#CC000000">
-        <Border x:Name="WinBindEdit" Visibility="Visible" Width="780" Height="560" Background="{DynamicResource BgBrush}" CornerRadius="16" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center">
-<Border.Effect>
-                <DropShadowEffect BlurRadius="20" ShadowDepth="12" Opacity="0.6" Color="Black" Direction="270"/>
-            </Border.Effect>
-            <Grid>
+    <Grid Background="{DynamicResource BgBrush}">
+        <Border x:Name="WinBindEdit" Visibility="Visible" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Grid Margin="30,20,30,20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="20"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 
-                <Border BorderBrush="{DynamicResource SideBrush}" BorderThickness="0,0,0,2">
-                    <Grid>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="РЕДАКТОР БИНДА" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
-                            
-                            <Button x:Name="btnNewBindInfo" Content="ИНСТРУКЦИЯ" ToolTip="Справка по биндам" Margin="15,0,0,0" Padding="14,6" Background="Transparent" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource GrayBrush}" BorderThickness="1.5" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Open_Guide" VerticalAlignment="Center" Cursor="Hand">
+                <!-- HEADER -->
+                <Grid Grid.Row="0">
+                    <StackPanel HorizontalAlignment="Left">
+                        <TextBlock Text="РЕДАКТОР БИНДА" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontWeight="Bold" FontSize="24"/>
+                        <TextBlock Text="СОЗДАВАЙТЕ И РЕДАКТИРУЙТЕ МАКРОСЫ И БИНДЫ С УДОБСТВОМ" Foreground="{DynamicResource GrayBrush}" Opacity="0.8" FontFamily="Segoe UI" FontWeight="Bold" FontSize="12" Margin="0,5,0,0"/>
+                    </StackPanel>
+                    
+                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="8" Padding="10,6">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="btnNewBindInfo" Content="ИНСТРУКЦИЯ" Margin="0,0,15,0" Padding="14,6" Background="Transparent" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource GrayBrush}" BorderThickness="1.5" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Open_Guide" VerticalAlignment="Center" Cursor="Hand">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
@@ -267,175 +283,244 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
+                            <Button Style="{StaticResource ModalCloseBtn}" Click="Overlay_Close" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button Style="{StaticResource ModalCloseBtn}" Margin="0,0,20,0" Click="Overlay_Close"/>
-                    </Grid>
-                </Border>
+                    </Border>
+                </Grid>
 
-                <Grid Grid.Row="1">
+                <!-- BODY -->
+                <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="2"/>
-                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="240"/>
                     </Grid.ColumnDefinitions>
                     
-                    <Grid Grid.Column="0" Margin="30,20,20,20">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        
-                        <TextBlock Grid.Row="0" Text="ПОСЛЕДОВАТЕЛЬНОСТЬ ДЕЙСТВИЙ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" Margin="0,0,0,15"/>
-                        
-                        <Border Grid.Row="1" Margin="-10,0,0,10">
-                            <ScrollViewer x:Name="svBindSteps" VerticalScrollBarVisibility="Visible">
-                                <ScrollViewer.Resources>
-                                    <Style TargetType="ScrollBar">
-                                        <Setter Property="Width" Value="4"/>
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ScrollBar">
-                                                    <Grid Background="Transparent">
-                                                        <Border Background="{DynamicResource SideBrush}" CornerRadius="2" Width="4" HorizontalAlignment="Center"/>
-                                                        <Track x:Name="PART_Track" IsDirectionReversed="True">
-                                                            <Track.Thumb>
-                                                                <Thumb>
-                                                                    <Thumb.Template>
-                                                                        <ControlTemplate TargetType="Thumb"><Border Background="{DynamicResource GrayBrush}" CornerRadius="2" Width="4"/></ControlTemplate>
-                                                                    </Thumb.Template>
-                                                                </Thumb>
-                                                            </Track.Thumb>
-                                                        </Track>
-                                                    </Grid>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ScrollViewer.Resources>
-                                <ItemsControl x:Name="icBindSteps" ItemTemplate="{StaticResource BindStepTemplate}" UseLayoutRounding="True"/>
-                            </ScrollViewer>
-                        </Border>
-                        
-                        <Grid Grid.Row="2" Height="50" Margin="0,10,0,0">
-                            <Rectangle Fill="{DynamicResource DeepBgBrush}" Stroke="{DynamicResource LineBrush}" StrokeThickness="1" RadiusX="8" RadiusY="8" StrokeDashArray="4 4" SnapsToDevicePixels="True"/>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
-                                <TextBlock Text="ДОБАВИТЬ ШАГ:" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                                
-                                <Button Content="+ ЧАТ" Width="135" Height="30" Background="{DynamicResource SideBrush}" Foreground="#3b82f6" BorderBrush="#3b82f6" BorderThickness="1" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Step_Add_Chat" Margin="0,0,10,0" Cursor="Hand">
-                                    <Button.Template><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
-                                </Button>
-                                
-                                <Button Content="+ КНОПКА" Width="135" Height="30" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource RedBrush}" BorderBrush="{DynamicResource RedBrush}" BorderThickness="1" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Step_Add_Key" Cursor="Hand">
-                                    <Button.Template><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-
-                    <Border Grid.Column="1" Background="{DynamicResource SideBrush}"/>
-
-                    <StackPanel Grid.Column="2" Margin="20,20,20,20">
-                        
-                        <TextBlock Text="НАЗВАНИЕ МАКРОСА" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,4"/>
-                        <Border Height="34" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,25">
-                            <TextBox x:Name="txtBindName" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="12" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center" CaretBrush="White"/>
-                        </Border>
-                        
-                        <TextBlock Text="ТИП АКТИВАЦИИ" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,4"/>
-                        <StackPanel Margin="0,0,0,25">
-                            <RadioButton x:Name="rbTypeKey" Content="Горячая клавиша" IsChecked="True" Foreground="White" FontFamily="Segoe UI" FontSize="12" Margin="0,0,0,10" Checked="BindType_Changed" Cursor="Hand">
-                                <RadioButton.Template>
-                                    <ControlTemplate TargetType="RadioButton">
-                                        <StackPanel Orientation="Horizontal" Background="Transparent">
-                                            <Grid Width="16" Height="16" Margin="0,0,10,0">
-                                                <Ellipse x:Name="ring" Stroke="{DynamicResource GoldBrush}" StrokeThickness="2" Fill="Transparent"/>
-                                                <Ellipse x:Name="dot" Width="8" Height="8" Fill="{DynamicResource GoldBrush}" Visibility="Visible"/>
-                                            </Grid>
-                                            <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsChecked" Value="False">
-                                                <Setter TargetName="dot" Property="Visibility" Value="Collapsed"/>
-                                                <Setter TargetName="ring" Property="Stroke" Value="{DynamicResource GrayBrush}"/>
-                                                <Setter TargetName="ring" Property="StrokeThickness" Value="1.5"/>
-                                                <Setter Property="Foreground" Value="{DynamicResource GrayBrush}"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </RadioButton.Template>
-                            </RadioButton>
+                    <!-- LEFT COLUMN: STEPS -->
+                    <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" CornerRadius="12" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
+                        <Grid Margin="15,20,15,20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
                             
-                            <RadioButton x:Name="rbTypeAuto" Content="Автозамена (Текст)" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" Checked="BindType_Changed" Cursor="Hand">
-                                <RadioButton.Template>
-                                    <ControlTemplate TargetType="RadioButton">
-                                        <StackPanel Orientation="Horizontal" Background="Transparent">
-                                            <Grid Grid.Column="0" Width="16" Height="16" Margin="0,0,10,0">
-                                                <Ellipse x:Name="ring" Stroke="{DynamicResource GrayBrush}" StrokeThickness="1.5" Fill="Transparent"/>
-                                                <Ellipse x:Name="dot" Width="8" Height="8" Fill="{DynamicResource GoldBrush}" Visibility="Collapsed"/>
-                                            </Grid>
-                                            <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="dot" Property="Visibility" Value="Visible"/>
-                                                <Setter TargetName="ring" Property="Stroke" Value="{DynamicResource GoldBrush}"/>
-                                                <Setter TargetName="ring" Property="StrokeThickness" Value="2"/>
-                                                <Setter Property="Foreground" Value="#ffffff"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </RadioButton.Template>
-                            </RadioButton>
-                        </StackPanel>
-
-                        <TextBlock Text="КЛАВИША АКТИВАЦИИ" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,4"/>
-                        <Grid Margin="0,0,0,40">
-                            <Button x:Name="btnBindKey" Height="60" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" FontFamily="Segoe UI" FontSize="18" FontWeight="Bold" Click="Bind_SetKey_Editor_Click" Cursor="Hand">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
-                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                <TextBlock Text="ТЕКУЩАЯ:" Foreground="{DynamicResource GrayBrush}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                                                <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}" HorizontalAlignment="Center"/>
-                                            </StackPanel>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
+                            <TextBlock Grid.Row="0" Text="ПОСЛЕДОВАТЕЛЬНОСТЬ ДЕЙСТВИЙ" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" Margin="0,0,0,15"/>
                             
-                            <Border x:Name="pnlBindAutoTrigger" Visibility="Collapsed" Background="{DynamicResource DeepBgBrush}" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" CornerRadius="6" Height="34">
+                            <Border Grid.Row="1" Margin="0,0,0,10">
                                 <Grid>
-                                    <TextBlock Text="Текст..." Foreground="{DynamicResource GrayBrush}" VerticalAlignment="Center" Margin="10,0" IsHitTestVisible="False" FontFamily="Segoe UI" FontSize="12">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
+                                    <Border x:Name="StepWidthRef" Margin="0,0,5,0" IsHitTestVisible="False"/>
+                                    <ScrollViewer x:Name="svBindSteps" VerticalScrollBarVisibility="Auto" Margin="0,0,-15,0">
+                                        <ItemsControl x:Name="icBindSteps" Width="{Binding ActualWidth, ElementName=StepWidthRef}" HorizontalAlignment="Left" ItemTemplate="{StaticResource BindStepTemplate}" UseLayoutRounding="True" Margin="0,0,0,0"/>
+                                    </ScrollViewer>
+                                    
+                                    <!-- Empty State -->
+                                    <StackPanel x:Name="spEmptySteps" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-20,0,0" IsHitTestVisible="False">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Text.Length, ElementName=txtBindAutoTrigger}" Value="0">
+                                                    <DataTrigger Binding="{Binding Items.Count, ElementName=icBindSteps}" Value="0">
                                                         <Setter Property="Visibility" Value="Visible"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <TextBox x:Name="txtBindAutoTrigger" Background="Transparent" Foreground="White" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center" FontSize="12" FontFamily="Segoe UI" HorizontalContentAlignment="Left" CaretBrush="White"/>
+                                        </StackPanel.Style>
+                                        <Border Width="70" Height="70" CornerRadius="35" Background="#15d2a65e" HorizontalAlignment="Center" Margin="0,0,0,15">
+                                            <Path Data="M7,2V13H10V22L17,10H13L17,2H7Z" Fill="#d2a65e" Stretch="Uniform" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
+                                        </Border>
+                                        <TextBlock Text="ШАГИ НЕ ДОБАВЛЕНЫ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
+                                        <TextBlock Text="Нажмите «+ ЧАТ» или другую кнопку ниже,&#x0a;чтобы добавить первое действие." Foreground="#8b949e" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,8,0,0" Opacity="0.4" TextWrapping="Wrap"/>
+                                    </StackPanel>
                                 </Grid>
                             </Border>
-                        </Grid>
-
-                        <StackPanel VerticalAlignment="Bottom">
-                            <Button Content="СОХРАНИТЬ БИНД" Height="45" Background="{DynamicResource GreenBrush}" Foreground="White" BorderThickness="0" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold" Click="Bind_Save_Click" Margin="0,0,0,10" Cursor="Hand">
-                                <Button.Template><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" CornerRadius="6"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
-                                <Button.Style><Style TargetType="Button"><Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Opacity" Value="0.8"/></Trigger></Style.Triggers></Style></Button.Style>
-                            </Button>
                             
-                            <Button Content="ОТМЕНИТЬ" Height="35" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Click="Overlay_Close" Cursor="Hand">
-                                <Button.Template><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
-                                <Button.Style><Style TargetType="Button"><Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Trigger></Style.Triggers></Style></Button.Style>
+                            <Grid Grid.Row="2" Height="50" Margin="0,10,0,0">
+                                <Rectangle Fill="{DynamicResource DeepBgBrush}" Stroke="{DynamicResource LineBrush}" StrokeThickness="1" RadiusX="8" RadiusY="8" StrokeDashArray="4 4" SnapsToDevicePixels="True"/>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="ДОБАВИТЬ ШАГ:" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GrayBrush}" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                                    
+                                    <Button Content="+ ЧАТ" Width="100" Height="32" Background="{DynamicResource SideBrush}" Foreground="#3b82f6" BorderBrush="#3b82f6" BorderThickness="1" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Step_Add_Chat" Margin="0,0,10,0" Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                                                    <Grid>
+                                                        <Border x:Name="hover" Background="White" Opacity="0" CornerRadius="5"/>
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.1"/></Trigger>
+                                                    <Trigger Property="IsPressed" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.2"/></Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    
+                                    <Button Content="+ КНОПКА" Width="100" Height="32" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource RedBrush}" BorderBrush="{DynamicResource RedBrush}" BorderThickness="1" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Step_Add_Key" Margin="0,0,10,0" Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                                                    <Grid>
+                                                        <Border x:Name="hover" Background="White" Opacity="0" CornerRadius="5"/>
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.1"/></Trigger>
+                                                    <Trigger Property="IsPressed" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.2"/></Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    
+                                    <Button Content="+ ЗАДЕРЖКА" Width="105" Height="32" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Click="Step_Add_Wait" Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                                                    <Grid>
+                                                        <Border x:Name="hover" Background="White" Opacity="0" CornerRadius="5"/>
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.1"/></Trigger>
+                                                    <Trigger Property="IsPressed" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.2"/></Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- RIGHT COLUMN: SETTINGS -->
+                    <Border Grid.Column="2" Background="{DynamicResource SidebarBrush}" CornerRadius="12" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Padding="20">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Grid.Row="0">
+                                <!-- Group: Name -->
+                                <StackPanel Margin="0,0,0,25">
+                                    <TextBlock Text="НАЗВАНИЕ БИНДА" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,10"/>
+                                    <Border Height="38" Background="{DynamicResource BgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="6">
+                                        <TextBox x:Name="txtBindName" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="13" BorderThickness="0" Padding="12,0" VerticalContentAlignment="Center" CaretBrush="White"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Group: Activation -->
+                                <StackPanel>
+                                    <TextBlock Text="ТИП АКТИВАЦИИ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,15"/>
+                                    <StackPanel Margin="0,0,0,20">
+                                        <RadioButton x:Name="rbTypeKey" Content="Горячая клавиша" IsChecked="True" Foreground="White" FontFamily="Segoe UI" FontSize="13" Margin="0,0,0,12" Checked="BindType_Changed" Cursor="Hand">
+                                            <RadioButton.Template>
+                                                <ControlTemplate TargetType="RadioButton">
+                                                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                                                        <Grid Width="18" Height="18" Margin="0,0,12,0">
+                                                            <Ellipse x:Name="ring" Stroke="{DynamicResource GoldBrush}" StrokeThickness="2" Fill="Transparent"/>
+                                                            <Ellipse x:Name="dot" Width="10" Height="10" Fill="{DynamicResource GoldBrush}" Visibility="Visible"/>
+                                                        </Grid>
+                                                        <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsChecked" Value="False">
+                                                            <Setter TargetName="dot" Property="Visibility" Value="Collapsed"/>
+                                                            <Setter TargetName="ring" Property="Stroke" Value="{DynamicResource GrayBrush}"/>
+                                                            <Setter TargetName="ring" Property="StrokeThickness" Value="1.5"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource GrayBrush}"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </RadioButton.Template>
+                                        </RadioButton>
+                                        
+                                        <RadioButton x:Name="rbTypeAuto" Content="Автозамена (Текст)" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="13" Checked="BindType_Changed" Cursor="Hand">
+                                            <RadioButton.Template>
+                                                <ControlTemplate TargetType="RadioButton">
+                                                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                                                        <Grid Width="18" Height="18" Margin="0,0,12,0">
+                                                            <Ellipse x:Name="ring" Stroke="{DynamicResource GrayBrush}" StrokeThickness="1.5" Fill="Transparent"/>
+                                                            <Ellipse x:Name="dot" Width="10" Height="10" Fill="{DynamicResource GoldBrush}" Visibility="Collapsed"/>
+                                                        </Grid>
+                                                        <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsChecked" Value="True">
+                                                            <Setter TargetName="dot" Property="Visibility" Value="Visible"/>
+                                                            <Setter TargetName="ring" Property="Stroke" Value="{DynamicResource GoldBrush}"/>
+                                                            <Setter TargetName="ring" Property="StrokeThickness" Value="2"/>
+                                                            <Setter Property="Foreground" Value="#ffffff"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </RadioButton.Template>
+                                        </RadioButton>
+                                    </StackPanel>
+
+                                    <TextBlock Text="КЛАВИША АКТИВАЦИИ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,10"/>
+                                    <Grid>
+                                        <Button x:Name="btnBindKey" Height="60" Background="{DynamicResource SideBrush}" Foreground="{DynamicResource GoldBrush}" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1.5" FontFamily="Segoe UI" FontSize="18" FontWeight="Bold" Click="Bind_SetKey_Editor_Click" Cursor="Hand">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                            <TextBlock Text="ТЕКУЩАЯ:" Foreground="{DynamicResource GrayBrush}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                                            <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}" HorizontalAlignment="Center"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                        
+                                        <Border x:Name="pnlBindAutoTrigger" Visibility="Collapsed" Background="{DynamicResource BgBrush}" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" CornerRadius="6" Height="38">
+                                            <Grid>
+                                                <TextBlock Text="Текст..." Foreground="{DynamicResource GrayBrush}" VerticalAlignment="Center" Margin="12,0" IsHitTestVisible="False" FontFamily="Segoe UI" FontSize="13">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text.Length, ElementName=txtBindAutoTrigger}" Value="0">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBox x:Name="txtBindAutoTrigger" Background="Transparent" Foreground="White" BorderThickness="0" Padding="12,0" VerticalContentAlignment="Center" FontSize="13" FontFamily="Segoe UI" HorizontalContentAlignment="Left" CaretBrush="White"/>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+
+                        <StackPanel Grid.Row="2" VerticalAlignment="Bottom">
+                            <!-- Hint text -->
+                            <TextBlock Text="По умолчанию задержка устанавливается в оверлее, но если вы добавите её с помощью шагов слева (+ ЗАДЕРЖКА), будет считываться именно ваша задержка." Foreground="{DynamicResource GrayBrush}" FontSize="11" FontFamily="Segoe UI" TextWrapping="Wrap" Margin="0,0,0,15" Opacity="0.8" TextAlignment="Center"/>
+                            
+                            <Button Content="СОХРАНИТЬ БИНД" Height="55" Background="{DynamicResource GreenBrush}" Foreground="White" BorderThickness="0" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Click="Bind_Save_Click" Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="bg" Background="{TemplateBinding Background}" CornerRadius="10">
+                                            <Grid>
+                                                <Border x:Name="hover" Background="White" Opacity="0" CornerRadius="10"/>
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.1"/></Trigger>
+                                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="hover" Property="Opacity" Value="0.2"/></Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
                             </Button>
                         </StackPanel>
-                    </StackPanel>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Grid>
         </Border>

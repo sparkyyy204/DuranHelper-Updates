@@ -25,7 +25,17 @@ namespace FSB_helper_C__
     public class BindStep : System.ComponentModel.INotifyPropertyChanged { 
         public int Index { get; set; } 
         public string action { get; set; } 
-        public string value { get; set; } 
+        private string _value;
+        public string value { 
+            get => _value?.Replace("\r", "")?.Replace("\n", ""); 
+            set { 
+                string cleanVal = value?.Replace("\r", "")?.Replace("\n", "");
+                if (_value != cleanVal) {
+                    _value = cleanVal;
+                    OnPropertyChanged("value");
+                }
+            } 
+        } 
         public string desc { get; set; } 
         public string ColorCode { get; set; } 
         private bool _isEnter = true;
