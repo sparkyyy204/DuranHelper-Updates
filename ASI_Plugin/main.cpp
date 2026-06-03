@@ -1396,7 +1396,7 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     // Radial Menu open: forward ALL mouse events to ImGui, block game
     if (Gui::radialMenuOpen && !Gui::show) {
         // Click mode: LMB selects group or executes bind
-        if (uMsg == WM_LBUTTONDOWN && Gui::radialActivationToggleMode) {
+        if (uMsg == WM_LBUTTONUP && Gui::radialActivationToggleMode) {
             if (Gui::radialMode == "Grouped") {
                 if (Gui::radialSelectedGroup == -1 && Gui::radialHoveredGroup != -1) {
                     // Click on a group to open it
