@@ -186,7 +186,6 @@ void Gui::LoadSettings() {
                 tempToggle.ahkKey = k;
                 BinderManager::Get().ParseAhkKey(tempToggle);
                 toggleKey = tempToggle.vkCode;
-                if (toggleKey == 0) toggleKey = VK_F9; // fallback
                 toggleNeedsAlt = tempToggle.needsAlt;
                 toggleNeedsCtrl = tempToggle.needsCtrl;
                 toggleNeedsShift = tempToggle.needsShift;
@@ -195,21 +194,21 @@ void Gui::LoadSettings() {
                 std::string k = j["BinderHint"];
                 BindItem temp; temp.ahkKey = k; BinderManager::Get().ParseAhkKey(temp);
                 binderHintKeyStr = k;
-                binderHintKey = temp.vkCode; if (binderHintKey == 0) binderHintKey = VK_F4;
+                binderHintKey = temp.vkCode;
                 binderHintNeedsAlt = temp.needsAlt; binderHintNeedsCtrl = temp.needsCtrl; binderHintNeedsShift = temp.needsShift;
             }
             if (j.contains("IssueFine")) {
                 std::string k = j["IssueFine"];
                 Gui::issueFineKeyStr = k;
                 BindItem temp; temp.ahkKey = k; BinderManager::Get().ParseAhkKey(temp);
-                issueFineKey = temp.vkCode; if (issueFineKey == 0) issueFineKey = VK_UP;
+                issueFineKey = temp.vkCode;
                 issueFineNeedsAlt = temp.needsAlt; issueFineNeedsCtrl = temp.needsCtrl; issueFineNeedsShift = temp.needsShift;
             }
             if (j.contains("CancelFine")) {
                 std::string k = j["CancelFine"];
                 Gui::cancelFineKeyStr = k;
                 BindItem temp; temp.ahkKey = k; BinderManager::Get().ParseAhkKey(temp);
-                cancelFineKey = temp.vkCode; if (cancelFineKey == 0) cancelFineKey = VK_DOWN;
+                cancelFineKey = temp.vkCode;
                 cancelFineNeedsAlt = temp.needsAlt; cancelFineNeedsCtrl = temp.needsCtrl; cancelFineNeedsShift = temp.needsShift;
             }
             if (j.contains("StopBind") && !j["StopBind"].get<std::string>().empty()) {

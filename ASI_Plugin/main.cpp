@@ -344,7 +344,7 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
             if (confirmed) {
                 revoked = true;
                 RunOnMainThread([]() {
-                    AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {2EA043}\xD0\x9B\xD0\xB8\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\x92\xD0\xA3 \xD0\xBF\xD0\xBE\xD0\xB4\xD1\x82\xD0\xB2\xD0\xB5\xD1\\x80\xD0\xB6\xD0\xB4\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
+                    AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {2EA043}\xD0\x9B\xD0\xB8\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\x92\xD0\xA3 \xD0\xBF\xD0\xBE\xD0\xB4\xD1\x82\xD0\xB2\xD0\xB5\xD1\x80\xD0\xB6\xD0\xB4\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
                 });
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
@@ -1043,18 +1043,21 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
 
     // ===== Radial Menu =====
-    if (Gui::radialEnabled && Gui::radialSectorCount > 0 && !Gui::radialSectors.empty() && !Gui::show && !Gui::radialIdInputOpen) {
-        int radVk = VK_MBUTTON;
+    if (Gui::scriptEnabled && Gui::radialEnabled && Gui::radialSectorCount > 0 && !Gui::radialSectors.empty() && !Gui::show && !Gui::radialIdInputOpen) {
+        int radVk = 0;
         bool radAlt = false, radCtrl = false, radShift = false;
+        bool foundRadBind = false;
         for (auto& b : BinderManager::Get().Binds) {
             if (b.id == "Radial") {
-                if (b.vkCode != 0) radVk = b.vkCode;
+                radVk = b.vkCode;
                 radAlt = b.needsAlt; radCtrl = b.needsCtrl; radShift = b.needsShift;
+                foundRadBind = true;
                 break;
             }
         }
+        if (!foundRadBind) radVk = VK_MBUTTON;
 
-        if (msgVk == radVk) {
+        if (radVk != 0 && msgVk == radVk) {
             bool altDown = (msgVk == VK_MENU || msgVk == VK_LMENU || msgVk == VK_RMENU) ? radAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
             bool ctrlDown = (msgVk == VK_CONTROL || msgVk == VK_LCONTROL || msgVk == VK_RCONTROL) ? radCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
             bool shiftDown = (msgVk == VK_SHIFT || msgVk == VK_LSHIFT || msgVk == VK_RSHIFT) ? radShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
