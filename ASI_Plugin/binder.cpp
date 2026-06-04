@@ -253,7 +253,6 @@ void BinderManager::ReloadBinds() {
         tempToggle.ahkKey = keyToggleStr;
         BinderManager::Get().ParseAhkKey(tempToggle);
         Gui::toggleKey = tempToggle.vkCode;
-        if (Gui::toggleKey == 0) Gui::toggleKey = VK_F9;
         Gui::toggleNeedsAlt = tempToggle.needsAlt;
         Gui::toggleNeedsCtrl = tempToggle.needsCtrl;
         Gui::toggleNeedsShift = tempToggle.needsShift;
