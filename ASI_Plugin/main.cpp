@@ -24,6 +24,8 @@ bool g_WndProcHooked = false;
 #include <fstream>
 
 bool g_Initialized = false;
+volatile bool g_DeviceResetting = false;  // true while D3D9 device is being reset (Alt-Tab)
+volatile int g_SkipFrames = 0;            // skip N frames of ImGui rendering after focus change
 std::atomic<bool> g_CancelQuote(false);
 std::atomic<bool> g_QuotingActive(false);
 std::atomic<bool> g_CancelBind(false);  // Stop running binder sequence
@@ -887,6 +889,9 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
     // Auto-hide overlay if game loses focus (Alt-Tab, minimize)
+    if (uMsg == WM_ACTIVATEAPP) {
+        g_SkipFrames = 30;  // Skip ImGui rendering for ~30 frames during focus transition
+    }
     if (uMsg == WM_ACTIVATEAPP && wParam == FALSE) {
         if (Gui::show) Gui::Toggle();
         Gui::ClearNotifications();
@@ -1522,20 +1527,36 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 // ===== D3D9 Hook Functions =====
-// These will be set up via kthook for D3D9 bodies instead of VTable rewrites!
 typedef HRESULT(__stdcall* EndSceneFn)(IDirect3DDevice9*);
 typedef HRESULT(__stdcall* ResetFn)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
-static kthook::kthook_simple<EndSceneFn> hookEndScene;
-static kthook::kthook_simple<ResetFn> hookReset;
+static EndSceneFn oEndScene = nullptr;
+static ResetFn oReset = nullptr;
 
-static HRESULT Hooked_EndScene(const kthook::kthook_simple<EndSceneFn>& hook, IDirect3DDevice9* pDevice) {
+static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
     static IDirect3DDevice9* currentDevice = nullptr;
     static bool firstEndScene = true;
 
     if (firstEndScene) {
         Log("Hooked_EndScene: First call executed on device " + std::to_string((uintptr_t)pDevice));
         firstEndScene = false;
+    }
+
+    // ── SAFETY 1: never render while device is being reset ──
+    if (g_DeviceResetting) {
+        return oEndScene(pDevice);
+    }
+
+    // ── SAFETY 2: check if D3D9 device is in a usable state ──
+    HRESULT coop = pDevice->TestCooperativeLevel();
+    if (coop != D3D_OK) {
+        return oEndScene(pDevice);
+    }
+
+    // ── SAFETY 3: skip N frames after focus change (Alt-Tab cooldown) ──
+    if (g_SkipFrames > 0) {
+        g_SkipFrames--;
+        return oEndScene(pDevice);
     }
     
     // Handle Alt-Tab Device Recreation explicitly
@@ -1576,24 +1597,38 @@ static HRESULT Hooked_EndScene(const kthook::kthook_simple<EndSceneFn>& hook, ID
     }
 
     Gui::Render();
-    return hook.get_trampoline()(pDevice);
+
+    return oEndScene(pDevice);
 }
 
-static HRESULT Hooked_Reset(const kthook::kthook_simple<ResetFn>& hook, IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
+static HRESULT __stdcall Hooked_Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
     Log("Hooked_Reset: Display reset requested.");
+    g_DeviceResetting = true;  // block EndScene from rendering during reset
+
     if (g_Initialized) {
         ImGui_ImplDX9_InvalidateDeviceObjects();
     }
 
-    HRESULT hr = hook.get_trampoline()(pDevice, pParams);
+    HRESULT hr = oReset(pDevice, pParams);
     if (SUCCEEDED(hr)) {
         Log("Hooked_Reset: Reset successful.");
+        g_SkipFrames = 30;  // Give game time to stabilize after reset
         if (g_Initialized) {
             ImGui_ImplDX9_CreateDeviceObjects();
         }
     } else {
-        Log("Hooked_Reset: Reset failed.");
+        Log("Hooked_Reset: Reset failed (hr=0x" + std::to_string(hr) + "). Marking ImGui uninitialized.");
+        // Device reset failed — ImGui objects are invalidated but not recreated.
+        // Mark as uninitialized so EndScene fully reinits on next successful frame.
+        if (g_Initialized) {
+            ImGui_ImplDX9_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+            g_Initialized = false;
+        }
     }
+
+    g_DeviceResetting = false;
     return hr;
 }
 
@@ -1871,47 +1906,35 @@ static void MainThread() {
 
     // Chat hook was moved to immediately after GetModuleHandleA
 
-    // ===== Hook D3D9 via kthook =====
-    IDirect3DDevice9* pDevice = GetGameDevice();
-    
-    if (!pDevice) {
-        Log("MainThread: GetGameDevice() returned nullptr. Creating a dummy device to get VTable...");
-        IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
-        if (!pD3D) { Log("MainThread: Direct3DCreate9 failed!"); return; }
-        HWND hWnd = FindWindowA("Grand theft auto San Andreas", nullptr);
-        if (!hWnd) hWnd = GetDesktopWindow();
-        D3DPRESENT_PARAMETERS d3dpp = {};
-        d3dpp.Windowed = TRUE; d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-        d3dpp.hDeviceWindow = hWnd; d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-        HRESULT hr = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow,
-            D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
-        if (FAILED(hr)) { Log("MainThread: CreateDevice on dummy failed."); pD3D->Release(); return; }
-        
-        void** vtable = *(void***)pDevice;
-        Log("MainThread: Dummy VTable ready. Hooking EndScene (42) and Reset (16) via kthook...");
-        hookEndScene.set_dest(vtable[42]);
-        hookEndScene.set_cb(Hooked_EndScene);
-        hookEndScene.install();
-        
-        hookReset.set_dest(vtable[16]);
-        hookReset.set_cb(Hooked_Reset);
-        hookReset.install();
-
-        pDevice->Release(); pD3D->Release();
-        Log("MainThread: Dummy D3D hooks installed via kthook.");
-        return;
+    // ===== Hook D3D9 via VTable Hook =====
+    IDirect3DDevice9* pDevice = nullptr;
+    Log("MainThread: Waiting for game D3D9 device...");
+    while (true) {
+        pDevice = GetGameDevice();
+        if (pDevice) {
+            void** vtable = *(void***)pDevice;
+            if (vtable && vtable[42] && vtable[16]) {
+                break;
+            }
+        }
+        Sleep(100);
     }
     
-    Log("MainThread: GetGameDevice() found existing device. Hooking VTable directly via kthook.");
+    Log("MainThread: Game D3D9 device found. Installing VTable hooks...");
     void** vtable = *(void***)pDevice;
-    hookEndScene.set_dest(vtable[42]);
-    hookEndScene.set_cb(Hooked_EndScene);
-    hookEndScene.install();
     
-    hookReset.set_dest(vtable[16]);
-    hookReset.set_cb(Hooked_Reset);
-    hookReset.install();
-    Log("MainThread: Existing device D3D hooks installed via kthook.");
+    DWORD oldProt;
+    VirtualProtect(&vtable[42], sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProt);
+    oEndScene = (EndSceneFn)vtable[42];
+    vtable[42] = (void*)Hooked_EndScene;
+    VirtualProtect(&vtable[42], sizeof(void*), oldProt, &oldProt);
+    Log("MainThread: VTable EndScene hook installed.");
+    
+    VirtualProtect(&vtable[16], sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProt);
+    oReset = (ResetFn)vtable[16];
+    vtable[16] = (void*)Hooked_Reset;
+    VirtualProtect(&vtable[16], sizeof(void*), oldProt, &oldProt);
+    Log("MainThread: VTable Reset hook installed.");
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
