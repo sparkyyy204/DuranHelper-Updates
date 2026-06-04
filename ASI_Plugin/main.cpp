@@ -1532,6 +1532,7 @@ typedef HRESULT(__stdcall* ResetFn)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 
 static EndSceneFn oEndScene = nullptr;
 static ResetFn oReset = nullptr;
+static IDirect3DStateBlock9* g_StateBlock = nullptr;
 
 static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
     static IDirect3DDevice9* currentDevice = nullptr;
@@ -1561,6 +1562,10 @@ static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
     
     // Handle Alt-Tab Device Recreation explicitly
     if (currentDevice != pDevice) {
+        if (g_StateBlock) {
+            g_StateBlock->Release();
+            g_StateBlock = nullptr;
+        }
         if (currentDevice != nullptr && g_Initialized) {
             Log("Hooked_EndScene: Device changed. Invalidating ImGui.");
             ImGui_ImplDX9_InvalidateDeviceObjects();
@@ -1596,7 +1601,18 @@ static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
         *(float*)0xB6EC18 = 0.0f;
     }
 
+    if (!g_StateBlock) {
+        pDevice->CreateStateBlock(D3DSBT_ALL, &g_StateBlock);
+    }
+    if (g_StateBlock) {
+        g_StateBlock->Capture();
+    }
+
     Gui::Render();
+
+    if (g_StateBlock) {
+        g_StateBlock->Apply();
+    }
 
     return oEndScene(pDevice);
 }
@@ -1604,6 +1620,11 @@ static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
 static HRESULT __stdcall Hooked_Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams) {
     Log("Hooked_Reset: Display reset requested.");
     g_DeviceResetting = true;  // block EndScene from rendering during reset
+
+    if (g_StateBlock) {
+        g_StateBlock->Release();
+        g_StateBlock = nullptr;
+    }
 
     if (g_Initialized) {
         ImGui_ImplDX9_InvalidateDeviceObjects();
