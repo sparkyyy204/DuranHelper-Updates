@@ -91,7 +91,7 @@
                                 </Border.Style>
                                 <Grid>
                                     <ScrollViewer x:Name="svSyntax" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" IsHitTestVisible="False">
-                                        <TextBlock x:Name="tbSyntax" FontSize="12" FontFamily="Segoe UI" Padding="8,6,8,6" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap">
+                                        <TextBlock x:Name="tbSyntax" Foreground="{DynamicResource TextBrush}" FontSize="12" FontFamily="Segoe UI" Padding="8,6,8,6" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Visibility" Value="Visible"/>

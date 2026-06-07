@@ -30,6 +30,12 @@ std::atomic<bool> g_CancelQuote(false);
 std::atomic<bool> g_QuotingActive(false);
 std::atomic<bool> g_CancelBind(false);  // Stop running binder sequence
 
+std::atomic<int> g_ActiveThreadsCount{0};
+struct ThreadTracker {
+    ThreadTracker() { g_ActiveThreadsCount++; }
+    ~ThreadTracker() { g_ActiveThreadsCount--; }
+};
+
 // ===== Function signatures =====
 using EndScene_t = HRESULT(__stdcall*)(IDirect3DDevice9*);
 using Reset_t = HRESULT(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
@@ -305,6 +311,7 @@ static bool __fastcall HookedRPC(void* pThis, void* /*edx*/, int* uniqueID, RakN
 void StartFineSequence(const std::string& targetId, const std::string& articleMsg, bool doRevoke, bool doQuote, const std::string& quoteText) {
     g_FineSequenceCancel.store(false);
     std::thread([id = targetId, art = articleMsg, doRevoke, doQuote, quoteText]() {
+        ThreadTracker tracker;
         bool revoked = false;
         // --- Phase 1: License Revocation ---
         if (doRevoke) {
@@ -505,6 +512,7 @@ void StartWantedSequence(const std::string& targetId, const std::string& article
     g_WantedSequenceStop.store(false);
     
     std::thread([targetId, articleMsg, stars, doQuote, quoteText]() {
+        ThreadTracker tracker;
         g_WantedSequenceState.store(1);
         
         // Sequence: /su [id] [stars] -> Down -> Enter -> type articleMsg
@@ -633,6 +641,7 @@ void Gui::ExecuteLawQuote(const std::string& utf8text) {
     g_CancelQuote.store(false);
     
     std::thread([utf8text]() {
+        ThreadTracker tracker;
         std::string cleanUtf8 = utf8text;
         // Replace non-breaking space (U+00A0) with normal space
         size_t nPos = 0;
@@ -731,14 +740,19 @@ void Gui::ExecuteLawQuote(const std::string& utf8text) {
 
 // ===== Bind Execution (shared by WndProc hotkeys and overlay play button) =====
 std::atomic<int> g_RunningBindsCount{0};
+std::atomic<bool> g_RecordingID{false};
+std::string g_EnteredID = "";
 
 void ExecuteBindActions(const BindItem& bind) {
     std::thread([b = bind]() {
+        ThreadTracker tracker;
         g_RunningBindsCount++;
         Log("Executing Bind: " + b.name);
         g_CancelBind.store(false);  // reset cancel flag on each new bind
 
 
+
+        std::string bindLocalID = "";
 
         for (const auto& step : b.steps) {
             if (g_CancelBind.load()) break;  // user pressed stop-bind key
@@ -763,6 +777,11 @@ void ExecuteBindActions(const BindItem& bind) {
                 // Then parse custom variables from JSON
                 for (const auto& var : BinderManager::Get().Variables) {
                     if (var.first.empty()) continue;
+                    
+                    std::string upperKey = var.first;
+                    std::transform(upperKey.begin(), upperKey.end(), upperKey.begin(), ::toupper);
+                    if (upperKey == "*ID*" || upperKey == "*ВРЕМЯ*") continue;
+
                     size_t pos = 0;
                     while ((pos = processedText.find(var.first, pos)) != std::string::npos) {
                         processedText.replace(pos, var.first.length(), var.second);
@@ -772,23 +791,46 @@ void ExecuteBindActions(const BindItem& bind) {
 
                 std::string cpText = UTF8ToCP1251(processedText.c_str());
                 int cursorOffset = 0;
+                bool idPos_was_found = false;
+                bool idReplaced = false;
+
                 size_t idPos = cpText.find("*ID*");
                 if (idPos == std::string::npos) idPos = cpText.find("*id*");
                 
                 if (idPos != std::string::npos) {
-                    cpText.erase(idPos, 4);
-                    if (!step.isEnter) {
-                        cursorOffset = cpText.length() - idPos;
+                    idPos_was_found = true;
+                    if (!bindLocalID.empty()) {
+                        // We already have a saved ID, replace all occurrences!
+                        while (idPos != std::string::npos) {
+                            cpText.replace(idPos, 4, bindLocalID);
+                            idPos = cpText.find("*ID*");
+                            if (idPos == std::string::npos) idPos = cpText.find("*id*");
+                        }
+                        idReplaced = true;
+                    } else {
+                        // No saved ID yet, remove placeholder for WAIT mode
+                        cpText.erase(idPos, 4);
+                        if (!step.isEnter) {
+                            cursorOffset = cpText.length() - idPos;
+                        }
                     }
                 }
 
-                if (step.isEnter) {
-                    // Enter mode: send directly via RakNet
+                if (step.isEnter && (!idPos_was_found || idReplaced)) {
+                    // Enter mode: send directly via RakNet (or it's just normal text, or ID was automatically filled)
+                    RunOnMainThread([text = cpText]() {
+                        SendSAMPMessage(text.c_str());
+                    });
+                } else if (step.isEnter && idPos_was_found && !idReplaced) {
+                    // Edge case: Enter mode but no saved ID. We just send the text with the placeholder removed.
                     RunOnMainThread([text = cpText]() {
                         SendSAMPMessage(text.c_str());
                     });
                 } else {
                     // Wait mode: open chat with pre-filled text, user finishes manually
+                    g_EnteredID = "";
+                    g_RecordingID.store(true);
+
                     RunOnMainThread([text = cpText, cursorOffset]() {
                         OpenChatWithText(text.c_str(), cursorOffset);
                     });
@@ -806,7 +848,14 @@ void ExecuteBindActions(const BindItem& bind) {
                         if (g_CancelBind.load()) break;
                         std::this_thread::sleep_for(std::chrono::milliseconds(50));
                     }
+                    g_RecordingID.store(false);
+                    
                     if (g_CancelBind.load()) break;
+
+                    // Save the entered ID for subsequent steps in this bind
+                    if (idPos_was_found && bindLocalID.empty() && !g_EnteredID.empty()) {
+                        bindLocalID = g_EnteredID;
+                    }
                 }
             } else if (step.action == "WAIT") {
                 try {
@@ -930,6 +979,7 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     if (uMsg == WM_APP + 777) {
         Log("LIVE SYNC: Received reload signal from launcher.");
         std::thread([]() {
+            ThreadTracker tracker;
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             RunOnMainThread([]() {
                 Gui::LoadSettings();        // ← sync ALL system hotkeys (toggle, binder hint, issue/cancel fine, stop bind)
@@ -1033,7 +1083,7 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
 
     if ((isDown || isUp) && msgVk == VK_ESCAPE && Gui::show) {
-        if (isUp) Gui::Toggle();
+        if (isUp) Gui::HandleEscape();
         return 0; // prevent game pause menu from opening
     }
 
@@ -1335,6 +1385,22 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
     }
 
+    if (g_RecordingID.load() && uMsg == WM_CHAR) {
+        char c = (char)wParam;
+        if (c >= '0' && c <= '9') {
+            g_EnteredID += c;
+        } else if (c == VK_BACK) {
+            if (!g_EnteredID.empty()) g_EnteredID.pop_back();
+        }
+    }
+
+    if (g_ChatOpen.load()) {
+        if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE) {
+            g_ChatOpen.store(false);
+            g_ChatBuffer.clear();
+        }
+    }
+
     // Sequence actions via hotkey
     if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled && Gui::binderEnabled) {
         if (g_FineSequenceState.load() != 0) {
@@ -1359,6 +1425,18 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 g_WantedSequenceStop.store(true);
                 return 0; // block from game
             }
+        }
+    }
+
+    // Patrol Hotkeys
+    if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled && !g_ChatOpen.load() && Gui::activePatrol.active) {
+        if (msgVk == 'Y' && !tAltDown && !tCtrlDown && !tShiftDown) {
+            Gui::ExecutePatrolReport();
+            return 0; // block from game
+        }
+        if (msgVk == 'N' && !tAltDown && !tCtrlDown && !tShiftDown) {
+            Gui::activePatrol.active = false;
+            return 0; // block from game
         }
     }
 
@@ -1842,7 +1920,7 @@ static void MainThread() {
             }
 
             if ((msg->message == WM_KEYDOWN || msg->message == WM_KEYUP) && msg->wParam == VK_ESCAPE && Gui::show) {
-                if (msg->message == WM_KEYUP) Gui::Toggle();
+                if (msg->message == WM_KEYUP) Gui::HandleEscape();
                 MSG* m = const_cast<MSG*>(msg); m->message = WM_NULL;
                 return 0;
             }
@@ -1964,6 +2042,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         g_hModule = hModule;
         DisableThreadLibraryCalls(hModule);
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MainThread, NULL, 0, NULL);
+        break;
+    case DLL_PROCESS_DETACH:
+        g_CancelQuote.store(true);
+        g_FineSequenceCancel.store(true);
+        g_WantedSequenceCancel.store(true);
+        g_CancelBind.store(true);
+        while (g_ActiveThreadsCount.load() > 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
         break;
     }
     return TRUE;

@@ -131,6 +131,14 @@ namespace FSB_helper_C__
         public List<RadialMenuGroup> Groups { get; set; } = new List<RadialMenuGroup>();
     }
 
+    public class PatrolBlock {
+        public string id { get; set; } = Guid.NewGuid().ToString("N");
+        public string Name { get; set; } = "НОВЫЙ ПАТРУЛЬ";
+        public string StartText { get; set; } = "";
+        public string ProcessText { get; set; } = "";
+        public string EndText { get; set; } = "";
+    }
+
     public class ProfileData { 
         public Dictionary<string, LawSection> Laws { get; set; } = new Dictionary<string, LawSection>(); 
         public Dictionary<string, BindItem> Binds { get; set; } = new Dictionary<string, BindItem>() { { "Radial", new BindItem { id = "Radial", name = "Radial Menu", key = "НЕТ" } } }; 
@@ -145,6 +153,7 @@ namespace FSB_helper_C__
         public string GamePath { get; set; } = "";
         public List<string> InstalledCloudIds { get; set; } = new List<string>();
         public RadialMenuConfig RadialMenu { get; set; } = new RadialMenuConfig();
+        public List<PatrolBlock> Patrols { get; set; } = new List<PatrolBlock>();
     }
     
     public class VarItem { public string Key { get; set; } public string Val { get; set; } }

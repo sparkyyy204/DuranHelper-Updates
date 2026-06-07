@@ -2,6 +2,7 @@
 #include <d3d9.h>
 #include <string>
 #include <vector>
+#include <map>
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
@@ -100,6 +101,24 @@ struct Notification {
 
 extern float savedSensX, savedSensY;
 
+struct PatrolData {
+    std::string name;
+    std::string startText;
+    std::string processText;
+    std::string endText;
+    int defaultIntervalMin;
+};
+
+struct ActivePatrol {
+    bool active;
+    PatrolData data;
+    int currentStage; // 0=start, 1=process, 2=end
+    float timeRemainingSec;
+    int intervalMin;
+    bool autoSend;
+    std::map<std::string, std::string> variables;
+};
+
 class Gui {
 public:
     static bool show;
@@ -107,8 +126,11 @@ public:
     static bool clearNextFrame;
         
     static float alpha;
-    static int activeTab;            // 0=Законы, 1=Штрафы, 2=Биндер, 3=База
+    static int activeTab;            // -1=Меню, 0=Законы, 1=Штрафы, 2=Биндер, 3=База, 4=Розыск, 5=Патрули
     
+    // UI Modes
+    static bool useGridMenu;
+
     // Version
     static std::string versionStr;
 
@@ -123,6 +145,11 @@ public:
     static ImFont* fontSegoeRegular13;
     static ImFont* fontSegoeItalic13;
     static ImFont* fontSegoeBoldItalic14;
+
+    // Patrols
+    static std::vector<PatrolData> patrols;
+    static ActivePatrol activePatrol;
+    static int selectedPatrolIndex;
 
     // Laws
     static std::vector<LawSection> lawSections;
@@ -256,6 +283,7 @@ public:
     static void Render();
     static void RenderBinderHint();
     static void Toggle();
+    static void HandleEscape();
     static void ToggleBinderHint();
     static void LoadLaws();
     static void LoadFines();
@@ -268,6 +296,7 @@ public:
     static void AddNotification(const std::string& type, const std::string& text, const std::string& keyAccept, const std::string& actionAccept, const std::string& keyCancel, const std::string& actionCancel, float maxDuration, bool hasProgress, ImU32 color);
     static void ApplyTheme(float alphaMul = 1.0f);
     static void ExecuteLawQuote(const std::string& utf8text);
+    static void ExecutePatrolReport();
     static void ClearNotifications();
 
 private:
@@ -276,12 +305,16 @@ private:
     static void RenderNotifications();
     static void DrawHudFrame(ImDrawList* dl, ImVec2 origin);
     static void DrawTabs(ImDrawList* dl, ImVec2 origin);
+    static void DrawGridMenu(ImDrawList* dl, ImVec2 origin);
+    static void DrawGridBackButton(ImDrawList* dl, ImVec2 origin);
     static void RenderLawsTab(ImDrawList* dl, ImVec2 origin);
     static void RenderFinesTab(ImDrawList* dl, ImVec2 origin);
     static void RenderBinderTab(ImDrawList* dl, ImVec2 origin);
     static void RenderWantedTab(ImDrawList* dl, ImVec2 origin);
     static void RenderSettingsTab(ImDrawList* dl, ImVec2 origin);
     static void RenderDatabaseTab(ImDrawList* dl, ImVec2 origin);
+    static void RenderPatrolsTab(ImDrawList* dl, ImVec2 origin);
+    static void RenderPatrolWidget();
     static void RenderRadialMenu();
     static void RenderRadialIdInput();
     static void DrawRadialIcon(ImDrawList* dl, ImVec2 center, float size, const std::string& icon, ImU32 color);
