@@ -88,74 +88,7 @@ namespace FSB_helper_C__
         private string _capturedKey = "";
         private string _captureTarget = "";
 
-        // WPF Key.ToString() → AHK hotkey name mapping (по документации AHK)
-        private static readonly Dictionary<string, string> WpfToAhkKey = new(StringComparer.OrdinalIgnoreCase) {
-            // === OEM / Punctuation keys ===
-            {"Oem5", "\\"}, {"OemPipe", "\\"}, 
-            {"Oem3", "``"}, {"OemTilde", "``"},              // Ё / `~
-            {"OemPlus", "="}, {"OemMinus", "-"},              // +/= и -/_  (основная)
-            {"OemQuestion", "/"}, {"Oem2", "/"},              // ?/
-            {"OemComma", ","}, {"OemPeriod", "."},             // , .
-            {"OemSemicolon", ";"}, {"Oem1", ";"},             // ;:
-            {"OemQuotes", "'"}, {"Oem7", "'"},                // '"
-            {"OemOpenBrackets", "["}, {"Oem4", "["},          // [{
-            {"OemCloseBrackets", "]"}, {"Oem6", "]"},         // ]}
-            
-            // === Numpad (NumLock ON) ===
-            {"NumPad0", "Numpad0"}, {"NumPad1", "Numpad1"}, {"NumPad2", "Numpad2"},
-            {"NumPad3", "Numpad3"}, {"NumPad4", "Numpad4"}, {"NumPad5", "Numpad5"},
-            {"NumPad6", "Numpad6"}, {"NumPad7", "Numpad7"}, {"NumPad8", "Numpad8"},
-            {"NumPad9", "Numpad9"},
-            {"Multiply", "NumpadMult"}, {"Divide", "NumpadDiv"},
-            {"Add", "NumpadAdd"}, {"Subtract", "NumpadSub"},
-            {"Decimal", "NumpadDot"},
-            
-            // === Lock keys ===
-            {"Capital", "CapsLock"}, {"Scroll", "ScrollLock"}, {"NumLock", "NumLock"},
-            
-            // === Navigation ===
-            {"Prior", "PgUp"}, {"Next", "PgDn"},
-            {"Return", "Enter"},
-            
-            // === Special keys ===
-            {"Back", "Backspace"}, {"Snapshot", "PrintScreen"},
-            {"Cancel", "CtrlBreak"}, {"Pause", "Pause"},
-            {"Apps", "AppsKey"}, {"Sleep", "Sleep"},
-            {"Help", "Help"},
-            
-            // === Windows keys ===
-            {"LWin", "LWin"}, {"RWin", "RWin"},
 
-            // === Browser/Multimedia ===
-            {"BrowserBack", "Browser_Back"}, {"BrowserForward", "Browser_Forward"},
-            {"BrowserRefresh", "Browser_Refresh"}, {"BrowserStop", "Browser_Stop"},
-            {"BrowserSearch", "Browser_Search"}, {"BrowserFavorites", "Browser_Favorites"},
-            {"BrowserHome", "Browser_Home"},
-            {"VolumeMute", "Volume_Mute"}, {"VolumeDown", "Volume_Down"}, {"VolumeUp", "Volume_Up"},
-            {"MediaNextTrack", "Media_Next"}, {"MediaPreviousTrack", "Media_Prev"},
-            {"MediaStop", "Media_Stop"}, {"MediaPlayPause", "Media_Play_Pause"},
-            {"LaunchMail", "Launch_Mail"}, {"SelectMedia", "Launch_Media"},
-            {"LaunchApplication1", "Launch_App1"}, {"LaunchApplication2", "Launch_App2"},
-        };
-
-        // Display names for the UI (friendly labels)
-        private static readonly Dictionary<string, string> WpfToDisplayKey = new(StringComparer.OrdinalIgnoreCase) {
-            {"Oem5", "\\"}, {"OemPipe", "\\"},
-            {"Oem3", "Ё"}, {"OemTilde", "Ё"},
-            {"OemPlus", "="}, {"OemMinus", "-"},
-            {"OemQuestion", "/"}, {"Oem2", "/"},
-            {"OemComma", ","}, {"OemPeriod", "."},
-            {"OemSemicolon", ";"}, {"Oem1", ";"},
-            {"OemQuotes", "'"}, {"Oem7", "'"},
-            {"OemOpenBrackets", "["}, {"Oem4", "["},
-            {"OemCloseBrackets", "]"}, {"Oem6", "]"},
-            {"Multiply", "Num *"}, {"Divide", "Num /"},
-            {"Add", "Num +"}, {"Subtract", "Num -"},
-            {"Decimal", "Num ."}, {"Capital", "CapsLock"},
-            {"Prior", "PgUp"}, {"Next", "PgDn"},
-            {"Return", "Enter"}, {"Back", "Backspace"},
-            {"Snapshot", "PrintScreen"}, {"Apps", "Menu"},
-        };
         private string _tempRenameTarget = "";
         private bool _isLoadingRtf = false; 
         private bool _startMinimized = false;        
@@ -201,44 +134,7 @@ namespace FSB_helper_C__
                 return; 
             }
 
-            try {
-                string docPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DURAN HELPER");
-                bool migrationSuccess = false;
-                try {
-                    if (!Directory.Exists(docPath)) Directory.CreateDirectory(docPath);
-                    
-                    string[] filesToMigrate = { "Profiles.json", "Settings.json", "laws.json", "fines.json", "calculator.json" };
-                    foreach (var f in filesToMigrate) {
-                        string src = Path.Combine(Environment.CurrentDirectory, f);
-                        string dst = Path.Combine(docPath, f);
-                        if (string.Equals(src, dst, StringComparison.OrdinalIgnoreCase)) continue;
-                        
-                        if (File.Exists(src)) {
-                            if (!File.Exists(dst)) {
-                                try { File.Move(src, dst); _isUpgrade = true; } catch { }
-                            } else {
-                                try { File.Delete(src); } catch { }
-                            }
-                        }
-                    }
-                    Environment.CurrentDirectory = docPath;
-                    migrationSuccess = true;
-                } catch { }
-                
-                string finalPath = Environment.CurrentDirectory;
-                if (!finalPath.EndsWith("\\")) finalPath += "\\";
-                
-                try {
-                    using (var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\DuranHelper")) {
-                        if (key != null) key.SetValue("WorkingPath", finalPath, Microsoft.Win32.RegistryValueKind.String);
-                    }
-                } catch { }
-                try {
-                    using (var key = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\DuranHelper")) {
-                        if (key != null) key.SetValue("WorkingPath", finalPath, Microsoft.Win32.RegistryValueKind.String);
-                    }
-                } catch { }
-            } catch { }
+            _isUpgrade = FSB_helper_C__.Services.SystemMigrationService.MigrateLegacyFilesToDocuments();
 
             InitializeComponent();
 
@@ -1305,7 +1201,7 @@ namespace FSB_helper_C__
             if (txt == null || string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
             if (txt.Parent is Grid grid)
             {
-                var svSyntax = grid.Children.OfType<ScrollViewer>().FirstOrDefault(x => x.Name == "svSyntax");
+                var svSyntax = grid.Children.OfType<ScrollViewer>().FirstOrDefault();
                 if (svSyntax == null) return;
                 
                 var tbSyntax = svSyntax.Content as TextBlock;
@@ -1315,7 +1211,7 @@ namespace FSB_helper_C__
                     var parts = System.Text.RegularExpressions.Regex.Split(txt.Text ?? "", @"(\*[^\*]+\*)");
                     var gold = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
                     var red = (SolidColorBrush)Application.Current.Resources["RedBrush"];
-                    var white = (SolidColorBrush)Application.Current.Resources["TextBrush"];
+                    var darkBlue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498db"));
                     var vars = MasterData[CurrentProfile].Variables;
 
                     foreach (var part in parts)
@@ -1323,10 +1219,62 @@ namespace FSB_helper_C__
                         if (string.IsNullOrEmpty(part)) continue;
                         if (part == "*ВРЕМЯ*" || part == "*ID*")
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = red });
-                        else if (part.StartsWith("*") && part.EndsWith("*") && vars != null && vars.ContainsKey(part))
-                            tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
+                        else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
+                        {
+                            if (vars != null && vars.ContainsKey(part))
+                                tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
+                            else
+                                tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
+                        }
                         else
-                            tbSyntax.Inlines.Add(new Run(part) { Foreground = white });
+                            tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground }); // inherit explicitly
+                    }
+                }
+            }
+        }
+
+        public static readonly DependencyProperty SyntaxTextProperty = DependencyProperty.RegisterAttached(
+            "SyntaxText", typeof(string), typeof(MainWindow), new PropertyMetadata(string.Empty, OnSyntaxTextChanged));
+
+        public static string GetSyntaxText(DependencyObject obj) => (string)obj.GetValue(SyntaxTextProperty);
+        public static void SetSyntaxText(DependencyObject obj, string value) => obj.SetValue(SyntaxTextProperty, value);
+
+        private static void OnSyntaxTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TextBlock tb)
+            {
+                var text = e.NewValue as string ?? "";
+                tb.Inlines.Clear();
+                if (string.IsNullOrEmpty(text)) return;
+                
+                var win = Application.Current.MainWindow as MainWindow;
+                if (win == null) { tb.Text = text; return; }
+
+                var parts = System.Text.RegularExpressions.Regex.Split(text, @"(\*[^\*]+\*)");
+                var gold = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
+                var red = (SolidColorBrush)Application.Current.Resources["RedBrush"];
+                var darkBlue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498db"));
+                
+                string curProf = win.CurrentProfile;
+                Dictionary<string, string> vars = null;
+                if (!string.IsNullOrEmpty(curProf) && win.MasterData.ContainsKey(curProf))
+                    vars = win.MasterData[curProf].Variables;
+
+                foreach (var part in parts)
+                {
+                    if (string.IsNullOrEmpty(part)) continue;
+                    if (part == "*ВРЕМЯ*" || part == "*ID*")
+                        tb.Inlines.Add(new Run(part) { Foreground = red });
+                    else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
+                    {
+                        if (vars != null && vars.ContainsKey(part))
+                            tb.Inlines.Add(new Run(part) { Foreground = gold });
+                        else
+                            tb.Inlines.Add(new Run(part) { Foreground = darkBlue });
+                    }
+                    else
+                    {
+                        tb.Inlines.Add(new Run(part)); // inherit foreground
                     }
                 }
             }
@@ -1940,6 +1888,8 @@ namespace FSB_helper_C__
                 } catch { }
             }
             
+            var patrolsExport = hasProfile ? (MasterData[CurrentProfile].Patrols ?? new List<PatrolBlock>()) : new List<PatrolBlock>();
+            
             bool isUpdatingConfig = _isUpdatingConfig;
             
             Task.Run(() => {
@@ -1951,6 +1901,7 @@ namespace FSB_helper_C__
                     if (finesExport != null) { try { File.WriteAllText("calculator.json", JsonConvert.SerializeObject(finesExport, Formatting.Indented)); } catch { } }
                     try { File.WriteAllText("version.json", "{\"version\": \"" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3) + "\"}"); } catch { }
                     if (radialExport != null) { try { File.WriteAllText("radial.json", JsonConvert.SerializeObject(radialExport, Formatting.Indented)); } catch { } }
+                    try { File.WriteAllText("patrols.json", JsonConvert.SerializeObject(new { Patrols = patrolsExport }, Formatting.Indented)); } catch { }
                 }
                 
                 if (!isUpdatingConfig) {
@@ -2557,9 +2508,15 @@ namespace FSB_helper_C__
         private void UpdateLawsList() { 
             if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return; 
             cbSections.ItemsSource = null; 
-            var sections = MasterData[CurrentProfile].Laws.Keys.ToList();
-            sections.Insert(0, "Калькулятор штрафов 📌");
-            sections.Insert(1, "Калькулятор розыска 📌");
+            var sections = new List<string>();
+
+            if (btnToggleTabLaws.IsChecked == true) {
+                sections = MasterData[CurrentProfile].Laws.Keys.ToList();
+            } else if (btnToggleTabCalcs != null && btnToggleTabCalcs.IsChecked == true) {
+                sections.Add("Калькулятор штрафов 📌");
+                sections.Add("Калькулятор розыска 📌");
+            }
+
             cbSections.ItemsSource = sections; 
 
             // Refresh stats live on dashboard
@@ -2574,12 +2531,45 @@ namespace FSB_helper_C__
                 lblNoLaws.Visibility = Visibility.Collapsed; 
             } 
             else { 
-                pnlLaws2Col.Visibility = pnlLawsText.Visibility = Visibility.Collapsed; 
-                pnlFineCalcList.Visibility = Visibility.Collapsed;
-                pnlWantedCalcList.Visibility = Visibility.Collapsed;
-                lblSectionType.Text = ""; 
-                lblNoLaws.Visibility = Visibility.Visible; 
+                if (pnlLaws2Col != null) pnlLaws2Col.Visibility = Visibility.Collapsed; 
+                if (pnlLawsText != null) pnlLawsText.Visibility = Visibility.Collapsed;
+                if (pnlFineCalcList != null) pnlFineCalcList.Visibility = Visibility.Collapsed;
+                if (pnlWantedCalcList != null) pnlWantedCalcList.Visibility = Visibility.Collapsed;
+                if (lblSectionType != null) lblSectionType.Text = ""; 
+                if (lblNoLaws != null && btnToggleTabPatrols.IsChecked != true) lblNoLaws.Visibility = Visibility.Visible; 
             } 
+        }
+
+        private void LawsSubTab_Changed(object sender, RoutedEventArgs e)
+        {
+            if (btnToggleTabPatrols.IsChecked == true) {
+                if (gridLawsTopBar != null) gridLawsTopBar.Visibility = Visibility.Visible;
+                if (lblCurrentSection != null) lblCurrentSection.Visibility = Visibility.Collapsed;
+                if (cbSections != null) cbSections.Visibility = Visibility.Collapsed;
+                if (btnPatrolsInfo != null) btnPatrolsInfo.Visibility = Visibility.Visible;
+                
+                if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ СЦЕНАРИЙ"; }
+                if (btnSectionDel != null) { btnSectionDel.Visibility = Visibility.Visible; btnSectionDel.Content = "ОЧИСТИТЬ РАЗДЕЛ"; }
+                
+                if (pnlPatrolsList != null) pnlPatrolsList.Visibility = Visibility.Visible;
+                if (pnlLaws2Col != null) pnlLaws2Col.Visibility = Visibility.Collapsed; 
+                if (pnlLawsText != null) pnlLawsText.Visibility = Visibility.Collapsed;
+                if (pnlFineCalcList != null) pnlFineCalcList.Visibility = Visibility.Collapsed;
+                if (pnlWantedCalcList != null) pnlWantedCalcList.Visibility = Visibility.Collapsed;
+                if (lblNoLaws != null) lblNoLaws.Visibility = Visibility.Collapsed;
+                if (lblSectionType != null) lblSectionType.Visibility = Visibility.Collapsed; 
+                UpdatePatrolsList();
+            } else {
+                if (gridLawsTopBar != null) gridLawsTopBar.Visibility = Visibility.Visible;
+                if (lblCurrentSection != null) lblCurrentSection.Visibility = Visibility.Visible;
+                if (cbSections != null) cbSections.Visibility = Visibility.Visible;
+                if (btnPatrolsInfo != null) btnPatrolsInfo.Visibility = Visibility.Collapsed;
+                if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ РАЗДЕЛ"; }
+                if (btnSectionDel != null) { btnSectionDel.Visibility = Visibility.Visible; btnSectionDel.Content = "УДАЛИТЬ РАЗДЕЛ"; }
+                if (lblSectionType != null) lblSectionType.Visibility = Visibility.Visible;
+                if (pnlPatrolsList != null) pnlPatrolsList.Visibility = Visibility.Collapsed;
+                UpdateLawsList();
+            }
         }
         
         private void Section_Changed(object sender, SelectionChangedEventArgs e) 
@@ -2593,18 +2583,18 @@ namespace FSB_helper_C__
             btnSectionDel.Content = "УДАЛИТЬ РАЗДЕЛ";
             string sec = cbSections.SelectedItem.ToString();
             _lastLawSection = sec;
+            
             if (sec == "Калькулятор штрафов 📌") {
                 pnlLaws2Col.Visibility = pnlLawsText.Visibility = Visibility.Collapsed;
                 pnlWantedCalcList.Visibility = Visibility.Collapsed;
                 pnlFineCalcList.Visibility = Visibility.Visible;
                 btnSectionDel.Visibility = Visibility.Visible;
                 btnSectionDel.Content = "ОЧИСТИТЬ РАЗДЕЛ";
-                btnSectionAdd.Content = "+ СОЗДАТЬ РАЗДЕЛ";
+                btnSectionAdd.Content = "+ ДОБАВИТЬ СТАТЬЮ";
                 btnSectionAdd.ClearValue(Button.WidthProperty);
                 btnSectionAdd.SetResourceReference(BackgroundProperty, "LineBrush");
                 btnSectionAdd.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#c9d1d9");
                 cbSections.SetResourceReference(BackgroundProperty, "DeepBgBrush");
-                cbSections.SetResourceReference(BorderBrushProperty, "GoldBrush");
                 lblSectionType.Text = "";
                 UpdateFinesList();
                 return;
@@ -2615,16 +2605,17 @@ namespace FSB_helper_C__
                 pnlWantedCalcList.Visibility = Visibility.Visible;
                 btnSectionDel.Visibility = Visibility.Visible;
                 btnSectionDel.Content = "ОЧИСТИТЬ РАЗДЕЛ";
-                btnSectionAdd.Content = "+ СОЗДАТЬ РАЗДЕЛ";
+                btnSectionAdd.Content = "+ ДОБАВИТЬ СТАТЬЮ";
                 btnSectionAdd.ClearValue(Button.WidthProperty);
                 btnSectionAdd.SetResourceReference(BackgroundProperty, "LineBrush");
                 btnSectionAdd.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#c9d1d9");
                 cbSections.SetResourceReference(BackgroundProperty, "DeepBgBrush");
-                cbSections.SetResourceReference(BorderBrushProperty, "GoldBrush");
                 lblSectionType.Text = "";
                 UpdateWantedList();
                 return;
             }
+
+            pnlLaws2Col.Visibility = pnlLawsText.Visibility = pnlFineCalcList.Visibility = pnlWantedCalcList.Visibility = Visibility.Collapsed; 
 
             if (!MasterData[CurrentProfile].Laws.ContainsKey(sec)) return;
             pnlFineCalcList.Visibility = Visibility.Collapsed;
@@ -3156,6 +3147,21 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         }
         
         private void Section_Add_Click(object sender, RoutedEventArgs e) {
+            if (btnToggleTabPatrols.IsChecked == true) {
+                _currentEditingPatrolId = null;
+                txtPatrolName.Text = "";
+                txtPatrolStart.Text = "";
+                txtPatrolProcess.Text = "";
+                txtPatrolEnd.Text = "";
+                overlayDim.Visibility = Visibility.Visible;
+                pnlPatrolEditorOverlay.Visibility = Visibility.Visible;
+                return;
+            }
+            if (cbSections.SelectedItem != null) {
+                string sec = cbSections.SelectedItem.ToString();
+                if (sec == "Калькулятор штрафов 📌") { Fine_Add_Click(sender, e); return; }
+                if (sec == "Калькулятор розыска 📌") { Wanted_Add_Click(sender, e); return; }
+            }
             _dialogHost.ShowInput("НАЗВАНИЕ РАЗДЕЛА", (v) => {
                 string t = "1col"; if (_dialogHost.GetSectionTypeIndex() == 1) t = "2col"; else if (_dialogHost.GetSectionTypeIndex() == 2) t = "text";
                 string newName = v.Trim();
@@ -3178,6 +3184,17 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         private void Section_Rename_Click(object sender, RoutedEventArgs e) { if (sender is Button btn && btn.Tag != null) { var old = btn.Tag.ToString(); _dialogHost.ShowInput("НОВОЕ ИМЯ РАЗДЕЛА", (v) => { string newName = v.Trim(); string baseName = newName; if (!string.Equals(old, newName, StringComparison.OrdinalIgnoreCase)) { int count = 1; while (MasterData[CurrentProfile].Laws.Keys.Any(k => string.Equals(k, newName, StringComparison.OrdinalIgnoreCase))) { newName = $"{baseName} #{count}"; count++; } } var d = MasterData[CurrentProfile].Laws[old]; MasterData[CurrentProfile].Laws.Remove(old); MasterData[CurrentProfile].Laws[newName] = d; _lastLawSection = newName; UpdateLawsList(); SaveData(); }, maxLength: 20); } }
 
         private void Section_Delete_Click(object sender, RoutedEventArgs e) { 
+            if (btnToggleTabPatrols.IsChecked == true) {
+                _dialogHost.ShowAlert("ОЧИСТИТЬ РАЗДЕЛ", $"Вы уверены, что хотите удалить ВСЕ сценарии?", () => {
+                    if (!string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile)) {
+                        if (MasterData[CurrentProfile].Patrols == null) MasterData[CurrentProfile].Patrols = new List<PatrolBlock>();
+                        MasterData[CurrentProfile].Patrols.Clear();
+                        UpdatePatrolsList();
+                        SaveData();
+                    }
+                });
+                return;
+            }
             if (cbSections.SelectedItem != null) { 
                 var sec = cbSections.SelectedItem.ToString(); 
                 int oldIndex = cbSections.SelectedIndex;
@@ -3897,10 +3914,10 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             if (kn.StartsWith("D") && kn.Length == 2 && char.IsDigit(kn[1])) kn = kn.Substring(1);
             
             // Convert WPF key name to AHK key name
-            if (WpfToAhkKey.ContainsKey(kn)) kn = WpfToAhkKey[kn];
+            if (FSB_helper_C__.Services.KeyMapper.WpfToAhkKey.ContainsKey(kn)) kn = FSB_helper_C__.Services.KeyMapper.WpfToAhkKey[kn];
 
             // Use display name for UI if available
-            string displayKn = WpfToDisplayKey.ContainsKey(k.ToString()) ? WpfToDisplayKey[k.ToString()] : kn;
+            string displayKn = FSB_helper_C__.Services.KeyMapper.WpfToDisplayKey.ContainsKey(k.ToString()) ? FSB_helper_C__.Services.KeyMapper.WpfToDisplayKey[k.ToString()] : kn;
             
             lblPressedKey.Text = txt + displayKn; 
             _capturedKey = txt + kn;
@@ -4361,6 +4378,91 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         
         private void OpenDialog(UIElement win) { Panel.SetZIndex(DialogOverlay, 1300); Panel.SetZIndex(win, 1310); DialogOverlay.Visibility = Visibility.Visible; WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinWantedEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = Visibility.Collapsed; win.Visibility = Visibility.Visible; DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); }
         private async void Dialog_Close(object sender, RoutedEventArgs e) { this.PreviewKeyDown -= Window_PreviewKeyDown; DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); await Task.Delay(150); DialogOverlay.Visibility = Visibility.Collapsed; Panel.SetZIndex(DialogOverlay, 1000); WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinWantedEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = Visibility.Collapsed; }
+
+        // ======================= PATROLS LOGIC =======================
+        private string _currentEditingPatrolId = null;
+
+        private void UpdatePatrolsList() {
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
+            var profile = MasterData[CurrentProfile];
+            if (profile.Patrols == null) profile.Patrols = new List<PatrolBlock>();
+            icPatrolsList.ItemsSource = null;
+            icPatrolsList.ItemsSource = profile.Patrols;
+            txtEmptyPatrols.Visibility = (profile.Patrols.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void PatrolsInfo_Click(object sender, RoutedEventArgs e) {
+            _dialogHost.ShowInfo("ИНСТРУКЦИЯ", "Вы можете использовать переменные в докладах.\nОберните любой текст в *звездочки* (например, *ТЕГ* или *СЕКТОР*), чтобы потом быстро заполнять эти данные в оверлее во время игры.");
+        }
+
+        private void PatrolEditor_TextChanged(object sender, TextChangedEventArgs e) {
+            if (sender is TextBox txt) FormatSyntax(txt);
+        }
+
+        private void PatrolEditor_Close_Click(object sender, RoutedEventArgs e) {
+            pnlPatrolEditorOverlay.Visibility = Visibility.Collapsed;
+            overlayDim.Visibility = Visibility.Collapsed;
+        }
+
+        private void PatrolEditor_Save_Click(object sender, RoutedEventArgs e) {
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
+            var profile = MasterData[CurrentProfile];
+            if (profile.Patrols == null) profile.Patrols = new List<PatrolBlock>();
+            
+            string id = _currentEditingPatrolId;
+            var block = profile.Patrols.FirstOrDefault(p => p.id == id);
+            if (block == null) {
+                block = new PatrolBlock { id = Guid.NewGuid().ToString("N") };
+                profile.Patrols.Add(block);
+            }
+            
+            block.Name = txtPatrolName.Text.Trim() == "" ? "НОВЫЙ СЦЕНАРИЙ" : txtPatrolName.Text.Trim();
+            block.StartText = txtPatrolStart.Text;
+            block.ProcessText = txtPatrolProcess.Text;
+            block.EndText = txtPatrolEnd.Text;
+
+            SaveData();
+            UpdatePatrolsList();
+            
+            pnlPatrolEditorOverlay.Visibility = Visibility.Collapsed;
+            overlayDim.Visibility = Visibility.Collapsed;
+        }
+
+        private void Patrol_Edit_Click(object sender, RoutedEventArgs e) {
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
+            var profile = MasterData[CurrentProfile];
+            if (sender is Button btn && btn.Tag != null) {
+                string id = btn.Tag.ToString();
+                var block = profile.Patrols?.FirstOrDefault(p => p.id == id);
+                if (block != null) {
+                    _currentEditingPatrolId = block.id;
+                    txtPatrolName.Text = block.Name;
+                    txtPatrolStart.Text = block.StartText;
+                    txtPatrolProcess.Text = block.ProcessText;
+                    txtPatrolEnd.Text = block.EndText;
+                    
+                    overlayDim.Visibility = Visibility.Visible;
+                    pnlPatrolEditorOverlay.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        private void Patrol_Delete_Click(object sender, RoutedEventArgs e) {
+            if (string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
+            var profile = MasterData[CurrentProfile];
+            if (sender is Button btn && btn.Tag != null) {
+                string id = btn.Tag.ToString();
+                _dialogHost.ShowAlert("УДАЛЕНИЕ СЦЕНАРИЯ", "Вы действительно хотите удалить этот сценарий?", () => {
+                    var block = profile.Patrols?.FirstOrDefault(p => p.id == id);
+                    if (block != null) {
+                        profile.Patrols.Remove(block);
+                        SaveData();
+                        UpdatePatrolsList();
+                    }
+                });
+            }
+        }
+        // ============================================================
 
 
 

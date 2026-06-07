@@ -319,6 +319,20 @@ void BinderManager::ReloadBinds() {
             }
             Binds.push_back(b);
         }
+
+        // Load Patrols
+        Gui::patrols.clear();
+        if (profileObj.contains("Patrols") && profileObj["Patrols"].is_array()) {
+            for (auto& pData : profileObj["Patrols"]) {
+                PatrolData p;
+                p.name = pData.value("Name", "");
+                p.startText = pData.value("StartText", "");
+                p.processText = pData.value("ProcessText", "");
+                p.endText = pData.value("EndText", "");
+                p.defaultIntervalMin = pData.value("IntervalMin", 10);
+                Gui::patrols.push_back(p);
+            }
+        }
     } catch (const std::exception& e) {
         // Output debug string to help with JSON parse errors
         OutputDebugStringA(("JSON Parse Error: " + std::string(e.what()) + "\n").c_str());
