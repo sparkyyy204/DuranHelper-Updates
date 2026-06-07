@@ -5269,8 +5269,12 @@ void Gui::RenderNotifications() {
 void Gui::RenderPatrolWidget() {
     if (!activePatrol.active) return;
 
-    // Draggable Logic
-    static float pwX = 100.0f, pwY = 100.0f;
+    // Position widget at bottom-right (notifications area) by default
+    ImVec2 screenSz = ImGui::GetIO().DisplaySize;
+    static float pwX = -1.0f, pwY = -1.0f;
+    if (pwX < 0) { pwX = screenSz.x - 400.0f; pwY = screenSz.y - 160.0f; }
+
+    // Draggable when overlay is open
     if (show) {
         ImGui::SetCursorScreenPos(ImVec2(pwX, pwY));
         ImGui::InvisibleButton("##PatrolWidgetDrag", ImVec2(380, 135));
@@ -5280,75 +5284,98 @@ void Gui::RenderPatrolWidget() {
         }
     }
 
-    ImVec2 origin(pwX, pwY);
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    float w = 380.0f, h = 135.0f, c = 12.0f; // SVG corner = 12
 
-    // Base Octagon
-    float w = 380.0f, h = 135.0f, corner = 15.0f;
+    // SVG octagon: points="12,0 368,0 380,12 380,123 368,135 12,135 0,123 0,12"
     ImVec2 poly[8] = {
-        {pwX + corner, pwY}, {pwX + w - corner, pwY},
-        {pwX + w, pwY + corner}, {pwX + w, pwY + h - corner},
-        {pwX + w - corner, pwY + h}, {pwX + corner, pwY + h},
-        {pwX, pwY + h - corner}, {pwX, pwY + corner}
+        {pwX + c, pwY}, {pwX + w - c, pwY},
+        {pwX + w, pwY + c}, {pwX + w, pwY + h - c},
+        {pwX + w - c, pwY + h}, {pwX + c, pwY + h},
+        {pwX, pwY + h - c}, {pwX, pwY + c}
     };
-    
-    // Background 85% transparent dark
-    dl->AddConvexPolyFilled(poly, 8, IM_COL32(15, 18, 25, 216)); // 216 is ~85%
-    dl->AddPolyline(poly, 8, C_BORDER, ImDrawFlags_Closed, 1.5f);
+    // SVG: fill="rgba(10,13,18,0.85)" stroke="#30363D" stroke-width="2"
+    dl->AddConvexPolyFilled(poly, 8, IM_COL32(10, 13, 18, 217));
+    dl->AddPolyline(poly, 8, IM_COL32(48, 54, 61, 255), ImDrawFlags_Closed, 2.0f);
 
-    // Grid pattern 30px step
-    for (float x = 30; x < w; x += 30) dl->AddLine(ImVec2(pwX + x, pwY), ImVec2(pwX + x, pwY + h), IM_COL32(255,255,255,10));
-    for (float y = 30; y < h; y += 30) dl->AddLine(ImVec2(pwX, pwY + y), ImVec2(pwX + w, pwY + y), IM_COL32(255,255,255,10));
+    // SVG grid pattern: #161B22 stroke, 30px spacing
+    ImU32 gridCol = IM_COL32(22, 27, 34, 255);
+    for (float gx = 30; gx < w; gx += 30)
+        dl->AddLine(ImVec2(pwX + gx, pwY), ImVec2(pwX + gx, pwY + h), gridCol);
+    for (float gy = 30; gy < h; gy += 30)
+        dl->AddLine(ImVec2(pwX, pwY + gy), ImVec2(pwX + w, pwY + gy), gridCol);
 
-    // Header (height 38px)
+    // SVG header: polygon fill="#11151D", line at y=38 stroke="#30363D" width=2
     ImVec2 hdrPoly[6] = {
-        {pwX + corner, pwY}, {pwX + w - corner, pwY},
-        {pwX + w, pwY + corner}, {pwX + w, pwY + 38},
-        {pwX, pwY + 38}, {pwX, pwY + corner}
+        {pwX + c, pwY}, {pwX + w - c, pwY},
+        {pwX + w, pwY + c}, {pwX + w, pwY + 38},
+        {pwX, pwY + 38}, {pwX, pwY + c}
     };
-    dl->AddConvexPolyFilled(hdrPoly, 6, IM_COL32(20, 24, 32, 255));
-    dl->AddLine(ImVec2(pwX, pwY + 38), ImVec2(pwX + w, pwY + 38), C_BORDER, 1.5f);
+    dl->AddConvexPolyFilled(hdrPoly, 6, IM_COL32(17, 21, 29, 255));
+    dl->AddLine(ImVec2(pwX, pwY + 38), ImVec2(pwX + w, pwY + 38), IM_COL32(48, 54, 61, 255), 2.0f);
 
-    // Gold corner top-left
-    dl->AddTriangleFilled(ImVec2(pwX+corner, pwY), ImVec2(pwX, pwY+corner), ImVec2(pwX+corner, pwY+corner), C_GOLD);
+    // SVG gold accent: polyline points="-1,13 13,-1 200,-1" stroke="#D2A65E" width=3
+    ImVec2 accentPts[3] = { {pwX - 1, pwY + 13}, {pwX + 13, pwY - 1}, {pwX + 200, pwY - 1} };
+    dl->AddPolyline(accentPts, 3, IM_COL32(210, 166, 94, 255), 0, 3.0f);
 
-    // V2.0 Badge
-    dl->AddRectFilled(ImVec2(pwX+15, pwY+8), ImVec2(pwX+50, pwY+26), C_RED, 4.0f);
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(pwX+20, pwY+10), C_WHITE, "V2.0");
+    // SVG header text: "DURAN" white x=15 y=26, "PATROL" gold x=88 y=26, Arial Black 16px
+    dl->AddText(fontSegoeBlack32, 16.0f, ImVec2(pwX + 15, pwY + 13), C_WHITE, "DURAN");
+    dl->AddText(fontSegoeBlack32, 16.0f, ImVec2(pwX + 88, pwY + 13), C_GOLD, "PATROL");
 
-    // Title
-    dl->AddText(fontSegoeBlack32, 16.0f, ImVec2(pwX+60, pwY+9), C_WHITE, "DURAN PATROL");
+    // SVG badge: rect x=172 y=14 w=30 h=14 fill=#E74C3C rx=4, text "V2.0" x=176 y=25
+    dl->AddRectFilled(ImVec2(pwX + 172, pwY + 14), ImVec2(pwX + 202, pwY + 28), C_RED, 4.0f);
+    dl->AddText(fontSegoeBold12, 10.0f, ImVec2(pwX + 176, pwY + 17), C_WHITE, "V2.0");
 
-    // Timer
+    // Timer countdown
     if (activePatrol.timeRemainingSec > 0) activePatrol.timeRemainingSec -= ImGui::GetIO().DeltaTime;
     if (activePatrol.timeRemainingSec < 0) activePatrol.timeRemainingSec = 0;
-    
     int mins = (int)activePatrol.timeRemainingSec / 60;
     int secs = (int)activePatrol.timeRemainingSec % 60;
     char tBuf[16]; sprintf_s(tBuf, "%02d:%02d", mins, secs);
-    
-    dl->AddText(fontSegoeBlack32, 32.0f, ImVec2(pwX+20, pwY+55), C_GOLD, tBuf);
-    dl->AddText(fontSegoeBold12, 10.0f, ImVec2(pwX+20, pwY+95), C_GRAY, "\xD0\x94\xD0\x9E \xD0\xA1\xD0\x9B\xD0\x95\xD0\x94\xD0\xA3\xD0\xAE\xD0\xA9\xD0\x95\xD0\x93\xD0\x9E \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90"); // "ДО СЛЕДУЮЩЕГО ДОКЛАДА"
 
-    // Variables Box
-    float vx = pwX + 200, vy = pwY + 45;
-    dl->AddRectFilled(ImVec2(vx, vy), ImVec2(pwX + w - 10, pwY + h - 10), IM_COL32(0,0,0,100), 4.0f);
-    dl->AddRect(ImVec2(vx, vy), ImVec2(pwX + w - 10, pwY + h - 10), C_BORDER, 4.0f);
-    
-    float vty = vy + 5;
+    // SVG timer: Segoe UI monospace 38px bold WHITE x=15 y=78
+    dl->AddText(fontSegoeBlack32, 38.0f, ImVec2(pwX + 15, pwY + 48), C_WHITE, tBuf);
+
+    // SVG timer subtitle: 9px bold #6B737F x=15 y=92
+    dl->AddText(fontSegoeBold12, 9.0f, ImVec2(pwX + 15, pwY + 85),
+        IM_COL32(107, 115, 127, 255),
+        "\xD0\x94\xD0\x9E \xD0\xA1\xD0\x9B\xD0\x95\xD0\x94\xD0\xA3\xD0\xAE\xD0\xA9\xD0\x95\xD0\x93\xD0\x9E \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90");
+
+    // SVG variables box: rect x=180 y=48 w=185 h=42 fill=#11151D stroke=#1F242E 1.5 rx=4
+    float vbx = pwX + 180, vby = pwY + 48;
+    dl->AddRectFilled(ImVec2(vbx, vby), ImVec2(vbx + 185, vby + 42), IM_COL32(17, 21, 29, 255), 4.0f);
+    dl->AddRect(ImVec2(vbx, vby), ImVec2(vbx + 185, vby + 42), IM_COL32(31, 36, 46, 255), 4.0f, 0, 1.5f);
+
+    // SVG var entries: label #8B949E 11px bold, value #F3D399 11px bold
+    float vty = vby + 7;
     for (auto& kv : activePatrol.variables) {
-        char kBuf[128]; sprintf_s(kBuf, "%s:", kv.first.c_str());
-        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(vx+10, vty+12), IM_COL32(114, 122, 132, 255), kBuf);
-        float kWidth = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, kBuf).x;
-        dl->AddText(fontSegoeBold12, 12.0f, ImVec2(vx+10+kWidth+5, vty+11), C_WHITE, kv.second.c_str());
-        vty += 15;
+        char kBuf[128]; sprintf_s(kBuf, "%s: ", kv.first.c_str());
+        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(vbx + 10, vty), IM_COL32(139, 148, 158, 255), kBuf);
+        float kW = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, kBuf).x;
+        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(vbx + 10 + kW, vty), IM_COL32(243, 211, 153, 255), kv.second.c_str());
+        vty += 16;
     }
 
-    // Hotkey hints at bottom (floating outside octagon)
-    dl->AddRectFilled(ImVec2(pwX+20, pwY+h+5), ImVec2(pwX+110, pwY+h+25), IM_COL32(30,30,30,200), 4.0f);
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(pwX+25, pwY+h+8), C_GOLD, "Y \xD0\x94\xD0\xBE\xD0\xBB\xD0\xBE\xD0\xB6\xD0\xB8\xD1\x82\xD1\x8C"); // Y Доложить
-    dl->AddRectFilled(ImVec2(pwX+120, pwY+h+5), ImVec2(pwX+210, pwY+h+25), IM_COL32(30,30,30,200), 4.0f);
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(pwX+125, pwY+h+8), C_RED, "N \xD0\x97\xD0\xB0\xD0\xB2\xD0\xB5\xD1\x80\xD1\x88\xD0\xB8\xD1\x82\xD1\x8C"); // N Завершить
+    // SVG separator: line x1=15 y1=105 x2=365 y2=105 stroke=#1F242E 1.5
+    dl->AddLine(ImVec2(pwX + 15, pwY + 105), ImVec2(pwX + 365, pwY + 105), IM_COL32(31, 36, 46, 255), 1.5f);
+
+    // SVG hotkey 1: rect x=15 y=112 w=18 h=16 fill=#11151D stroke=#30363D 1.5 rx=3
+    dl->AddRectFilled(ImVec2(pwX + 15, pwY + 112), ImVec2(pwX + 33, pwY + 128), IM_COL32(17, 21, 29, 255), 3.0f);
+    dl->AddRect(ImVec2(pwX + 15, pwY + 112), ImVec2(pwX + 33, pwY + 128), IM_COL32(48, 54, 61, 255), 3.0f, 0, 1.5f);
+    // Key "Y" centered: SVG x=24 text-anchor=middle, #D2A65E 11px bold
+    ImVec2 ySz = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, "Y");
+    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(pwX + 24 - ySz.x * 0.5f, pwY + 115), C_GOLD, "Y");
+    // Label: SVG x=38 #8B949E 10px bold
+    dl->AddText(fontSegoeBold12, 10.0f, ImVec2(pwX + 38, pwY + 116), IM_COL32(139, 148, 158, 255),
+        "\xD0\x94\xD0\x9E\xD0\x9B\xD0\x9E\xD0\x96\xD0\x98\xD0\xA2\xD0\xAC");
+
+    // SVG hotkey 2: rect x=110 y=112 w=18 h=16
+    dl->AddRectFilled(ImVec2(pwX + 110, pwY + 112), ImVec2(pwX + 128, pwY + 128), IM_COL32(17, 21, 29, 255), 3.0f);
+    dl->AddRect(ImVec2(pwX + 110, pwY + 112), ImVec2(pwX + 128, pwY + 128), IM_COL32(48, 54, 61, 255), 3.0f, 0, 1.5f);
+    ImVec2 nSz = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, "N");
+    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(pwX + 119 - nSz.x * 0.5f, pwY + 115), C_GOLD, "N");
+    dl->AddText(fontSegoeBold12, 10.0f, ImVec2(pwX + 133, pwY + 116), IM_COL32(139, 148, 158, 255),
+        "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC");
 }
 
 void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
@@ -5356,68 +5383,97 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     else if (selectedPatrolIndex >= (int)patrols.size()) selectedPatrolIndex = patrols.size() - 1;
     if (selectedPatrolIndex < 0) selectedPatrolIndex = 0;
 
-    // Header Title and Back Arrow
+    // SVG: Back arrow triangle path d="M 28 25 L 35 18 L 35 32 Z" fill="#8B949E"
     if (useGridMenu) {
-        ImGui::SetCursorScreenPos(ImVec2(o.x + 20, o.y + 20));
-        if (ImGui::InvisibleButton("##BackToGrid", ImVec2(30, 30))) {
-            activeTab = -1; // Go back
-            return; // Skip rendering rest
+        ImGui::SetCursorScreenPos(ImVec2(o.x + 20, o.y + 12));
+        if (ImGui::InvisibleButton("##BackToGrid", ImVec2(25, 25))) {
+            activeTab = -1;
+            return;
         }
-        dl->AddText(fontSegoeBlack32, 20.0f, ImVec2(o.x + 20, o.y + 25), ImGui::IsItemHovered() ? C_WHITE : C_GRAY, "<");
+        ImU32 arrowCol = ImGui::IsItemHovered() ? C_WHITE : IM_COL32(139, 148, 158, 255);
+        dl->AddTriangleFilled(ImVec2(o.x + 28, o.y + 25), ImVec2(o.x + 35, o.y + 18), ImVec2(o.x + 35, o.y + 32), arrowCol);
     }
-    dl->AddText(fontSegoeBlack32, 20.0f, ImVec2(o.x + 50, o.y + 25), C_WHITE, "\xD0\x90\xD0\x92\xD0\xA2\xD0\x9E-\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\xAB"); // АВТО-ДОКЛАДЫ
+    // SVG: "АВТО-ДОКЛАДЫ" x=45 y=30, font-size=14 bold gray #8B949E
+    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x + 45, o.y + 19),
+        IM_COL32(139, 148, 158, 255),
+        "\xD0\x90\xD0\x92\xD0\xA2\xD0\x9E-\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\xAB");
 
     if (patrols.empty()) {
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x + 250, o.y + 200), C_GRAY, "\xD0\x9F\xD0\xB0\xD1\x82\xD1\x80\xD1\x83\xD0\xBB\xD0\xB8 \xD0\xBD\xD0\xB5 \xD0\xBD\xD0\xB0\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB5\xD0\xBD\xD1\x8B \xD0\xB2 ConfigManager.");
-        return; 
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x + 200, o.y + 200), C_GRAY,
+            "\xD0\x9F\xD0\xB0\xD1\x82\xD1\x80\xD1\x83\xD0\xBB\xD0\xB8 \xD0\xBD\xD0\xB5 \xD0\xBD\xD0\xB0\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB5\xD0\xBD\xD1\x8B \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5.");
+        return;
     }
 
-    // Left sidebar (140 width)
+    // SVG left sidebar: rect x=20 y=65 w=140 h=347, panel fill=#11151D stroke=#1F242E 1.5 rx=8
     float sx = o.x + 20, sy = o.y + 65;
     float sbW = 140, sbH = 347;
-    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx+sbW, sy+sbH), C_HEADER, 8.0f);
-    dl->AddRect(ImVec2(sx, sy), ImVec2(sx+sbW, sy+sbH), C_BORDER, 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx + sbW, sy + sbH), IM_COL32(17, 21, 29, 255), 8.0f);
+    dl->AddRect(ImVec2(sx, sy), ImVec2(sx + sbW, sy + sbH), IM_COL32(31, 36, 46, 255), 8.0f, 0, 1.5f);
 
-    ImGui::SetCursorScreenPos(ImVec2(sx+5, sy+5));
-    ImGui::BeginChild("##PatrolsSidebar", ImVec2(sbW-10, sbH-10), false, ImGuiWindowFlags_NoBackground);
-    for (int i=0; i<(int)patrols.size(); i++) {
+    // SVG: "ТИПЫ ДОКЛАДОВ" x=32 y=85, 11px bold gray
+    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(o.x + 32, o.y + 76), IM_COL32(139, 148, 158, 255),
+        "\xD0\xA2\xD0\x98\xD0\x9F\xD0\xAB \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9E\xD0\x92");
+
+    // SVG separator: line x1=30 y1=95 x2=150 y2=95 stroke=#1F242E 1.5
+    dl->AddLine(ImVec2(o.x + 30, o.y + 95), ImVec2(o.x + 150, o.y + 95), IM_COL32(31, 36, 46, 255), 1.5f);
+
+    // Sidebar items
+    ImGui::SetCursorScreenPos(ImVec2(sx + 5, o.y + 100));
+    ImGui::BeginChild("##PatrolsSidebar", ImVec2(sbW - 10, sbH - 40), false, ImGuiWindowFlags_NoBackground);
+    for (int i = 0; i < (int)patrols.size(); i++) {
         bool isSel = (selectedPatrolIndex == i);
         ImVec2 cp = ImGui::GetCursorScreenPos();
-        ImGui::SetCursorScreenPos(cp);
-        ImGui::InvisibleButton((std::string("##p") + std::to_string(i)).c_str(), ImVec2(sbW-15, 30));
+        ImGui::InvisibleButton((std::string("##p") + std::to_string(i)).c_str(), ImVec2(130, 30));
         if (ImGui::IsItemClicked()) selectedPatrolIndex = i;
         bool hover = ImGui::IsItemHovered();
-        ImU32 bgC = isSel ? C_GOLD_BG : (hover ? IM_COL32(255,255,255,10) : IM_COL32(0,0,0,0));
-        ImU32 textC = isSel ? C_GOLD : (hover ? C_WHITE : C_GRAY);
         ImDrawList* cdl = ImGui::GetWindowDrawList();
-        cdl->AddRectFilled(ImVec2(cp.x, cp.y), ImVec2(cp.x+sbW-15, cp.y+30), bgC, 4.0f);
-        if (isSel) cdl->AddRect(ImVec2(cp.x, cp.y), ImVec2(cp.x+sbW-15, cp.y+30), C_GOLD, 4.0f);
-        cdl->AddText(fontSegoeBold14, 12.0f, ImVec2(cp.x+10, cp.y+6), textC, patrols[i].name.c_str());
+        // SVG active: btn-active fill=#1F242E rx=4, white text
+        if (isSel) {
+            cdl->AddRectFilled(ImVec2(cp.x, cp.y), ImVec2(cp.x + 130, cp.y + 30), IM_COL32(31, 36, 46, 255), 4.0f);
+        } else if (hover) {
+            cdl->AddRectFilled(ImVec2(cp.x, cp.y), ImVec2(cp.x + 130, cp.y + 30), IM_COL32(31, 36, 46, 128), 4.0f);
+        }
+        ImU32 textCol = isSel ? C_WHITE : (hover ? C_WHITE : IM_COL32(139, 148, 158, 255));
+        cdl->AddText(fontSegoeBold12, 12.0f, ImVec2(cp.x + 10, cp.y + 9), textCol, patrols[i].name.c_str());
     }
     ImGui::EndChild();
 
-    // Right Panel (510 width)
+    // SVG right panel: rect x=170 y=65 w=510 h=347, panel fill=#11151D stroke=#1F242E 1.5 rx=8
     float px = o.x + 170, py = o.y + 65;
     float panW = 510;
-    dl->AddRectFilled(ImVec2(px, py), ImVec2(px+panW, py+347), C_HEADER, 8.0f);
-    dl->AddRect(ImVec2(px, py), ImVec2(px+panW, py+347), C_BORDER, 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(px, py), ImVec2(px + panW, py + 347), IM_COL32(17, 21, 29, 255), 8.0f);
+    dl->AddRect(ImVec2(px, py), ImVec2(px + panW, py + 347), IM_COL32(31, 36, 46, 255), 8.0f, 0, 1.5f);
 
     auto& p = patrols[selectedPatrolIndex];
-    dl->AddText(fontSegoeBlack32, 24.0f, ImVec2(px+20, py+15), C_GOLD, p.name.c_str());
 
-    // Format box
-    float fx = px + 20, fy = py + 55, fw = panW - 40, fh = 80;
-    dl->AddRectFilled(ImVec2(fx, fy), ImVec2(fx+fw, fy+fh), IM_COL32(8, 10, 15, 255), 4.0f); // #080A0F
-    dl->AddRect(ImVec2(fx, fy), ImVec2(fx+fw, fy+fh), IM_COL32(48, 54, 61, 255), 4.0f); // #30363D
-    
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(fx+10, fy+10), C_GRAY, "\xD0\x9D\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xBE:"); // Начало:
-    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(fx+70, fy+10), C_WHITE, p.startText.c_str());
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(fx+10, fy+30), C_GRAY, "\xD0\x92 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x86\xD0\xB5\xD1\x81\xD1\x81\xD0\xB5:"); // В процессе:
-    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(fx+90, fy+30), C_WHITE, p.processText.c_str());
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(fx+10, fy+50), C_GRAY, "\xD0\x9E\xD0\xBA\xD0\xBE\xD0\xBD\xD1\x87\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5:"); // Окончание:
-    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(fx+90, fy+50), C_WHITE, p.endText.c_str());
+    // SVG panel header: selected name 14px bold white x=190 y=90
+    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(px + 20, py + 14), C_WHITE, p.name.c_str());
 
-    // Extract Variables (Exclude global/system)
+    // SVG separator: line x1=170 y1=100 x2=680 y2=100 stroke=#1F242E 1px
+    dl->AddLine(ImVec2(px, o.y + 100), ImVec2(px + panW, o.y + 100), IM_COL32(31, 36, 46, 255), 1.0f);
+
+    // SVG: "ФОРМАТ ДОКЛАДА" x=190 y=120, 11px bold gray
+    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(px + 20, o.y + 111),
+        IM_COL32(139, 148, 158, 255),
+        "\xD0\xA4\xD0\x9E\xD0\xA0\xD0\x9C\xD0\x90\xD0\xA2 \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90");
+
+    // SVG format box: rect x=190 y=130 w=470 h=65, fill=#080A0F stroke=#30363D 1 rx=4
+    float fx = px + 20, fy = o.y + 130;
+    dl->AddRectFilled(ImVec2(fx, fy), ImVec2(fx + 470, fy + 65), IM_COL32(8, 10, 15, 255), 4.0f);
+    dl->AddRect(ImVec2(fx, fy), ImVec2(fx + 470, fy + 65), IM_COL32(48, 54, 61, 255), 4.0f, 0, 1.0f);
+
+    // SVG format text: text-norm gray 11px at y=148, 163, 178 (combined label+template)
+    dl->PushClipRect(ImVec2(fx + 1, fy + 1), ImVec2(fx + 469, fy + 64), true);
+    char fmtBuf[512];
+    snprintf(fmtBuf, sizeof(fmtBuf), "\xD0\x9D\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xBE: %s", p.startText.c_str());
+    dl->AddText(fontSegoeRegular13, 11.0f, ImVec2(fx + 10, fy + 8), IM_COL32(139, 148, 158, 255), fmtBuf, nullptr, 450.0f);
+    snprintf(fmtBuf, sizeof(fmtBuf), "\xD0\x92 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x86\xD0\xB5\xD1\x81\xD1\x81\xD0\xB5: %s", p.processText.c_str());
+    dl->AddText(fontSegoeRegular13, 11.0f, ImVec2(fx + 10, fy + 24), IM_COL32(139, 148, 158, 255), fmtBuf, nullptr, 450.0f);
+    snprintf(fmtBuf, sizeof(fmtBuf), "\xD0\x9E\xD0\xBA\xD0\xBE\xD0\xBD\xD1\x87\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5: %s", p.endText.c_str());
+    dl->AddText(fontSegoeRegular13, 11.0f, ImVec2(fx + 10, fy + 40), IM_COL32(139, 148, 158, 255), fmtBuf, nullptr, 450.0f);
+    dl->PopClipRect();
+
+    // Extract custom variables (exclude global/system)
     std::vector<std::string> vars;
     auto extractVars = [&](const std::string& text) {
         std::regex re("\\*([^*]+)\\*");
@@ -5428,7 +5484,12 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
             std::string uMatch = match;
             std::transform(uMatch.begin(), uMatch.end(), uMatch.begin(), ::toupper);
             if (uMatch == "\xD0\x98\xD0\x9C\xD0\xAF" || uMatch == "\xD0\xA4\xD0\x90\xD0\x9C" || uMatch == "\xD0\xA2\xD0\x95\xD0\x93" || 
-                uMatch == "\xD0\x97\xD0\x92" || uMatch == "\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF" || uMatch == "ID") continue; // Exclude
+                uMatch == "\xD0\x97\xD0\x92" || uMatch == "\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF" || uMatch == "ID") continue;
+            bool isGlobal = false;
+            for (const auto& gv : BinderManager::Get().Variables) {
+                if (gv.first == match) { isGlobal = true; break; }
+            }
+            if (isGlobal) continue;
             bool exists = false;
             for (auto& v : vars) if (v == match) exists = true;
             if (!exists) vars.push_back(match);
@@ -5436,57 +5497,141 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     };
     extractVars(p.startText); extractVars(p.processText); extractVars(p.endText);
 
-    // Render Variables
-    float varY = fy + fh + 15;
-    for (size_t i=0; i<vars.size(); i++) {
-        float vx = px + 20 + (i%2)*230;
-        float vy = varY + (i/2)*45;
-        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(vx, vy), C_GRAY, vars[i].c_str());
-        char varBuf[256] = "";
-        if (activePatrol.variables.count(vars[i])) strcpy_s(varBuf, activePatrol.variables[vars[i]].c_str());
-        ImGui::SetCursorScreenPos(ImVec2(vx, vy+15));
-        ImGui::PushItemWidth(210);
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, C_INPUT);
-        if (ImGui::InputText((std::string("##v") + std::to_string(i)).c_str(), varBuf, 256)) {
-            activePatrol.variables[vars[i]] = varBuf;
+    // SVG: "ЗНАЧЕНИЯ ПЕРЕМЕННЫХ (МАКС. 4)" x=190 y=220, 11px bold gray
+    if (!vars.empty()) {
+        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(px + 20, o.y + 211),
+            IM_COL32(139, 148, 158, 255),
+            "\xD0\x97\xD0\x9D\xD0\x90\xD0\xA7\xD0\x95\xD0\x9D\xD0\x98\xD0\xAF \xD0\x9F\xD0\x95\xD0\xA0\xD0\x95\xD0\x9C\xD0\x95\xD0\x9D\xD0\x9D\xD0\xAB\xD0\xA5 (\xD0\x9C\xD0\x90\xD0\x9A\xD0\xA1. 4)");
+
+        // SVG: 2-column layout. Col1: label x=190, input x=260 w=120 h=22. Col2: label x=400, input x=470
+        for (size_t i = 0; i < vars.size() && i < 4; i++) {
+            int col = (int)(i % 2);
+            int row = (int)(i / 2);
+            float labelX = px + 20 + col * 210;
+            float inputX = px + 90 + col * 210;
+            float rowY = o.y + 230 + row * 30;
+
+            // SVG: variable name in gold-light #F3D399 12px bold
+            char varLabel[128]; snprintf(varLabel, sizeof(varLabel), "*%s*", vars[i].c_str());
+            dl->AddText(fontSegoeBold12, 12.0f, ImVec2(labelX, rowY + 5), IM_COL32(243, 211, 153, 255), varLabel);
+
+            // SVG: input box 120x22, fill=#080A0F stroke=#30363D 1 rx=4
+            dl->AddRectFilled(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), IM_COL32(8, 10, 15, 255), 4.0f);
+            dl->AddRect(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), IM_COL32(48, 54, 61, 255), 4.0f, 0, 1.0f);
+
+            // Interactive input
+            char varBuf[256] = "";
+            if (activePatrol.variables.count(vars[i])) strcpy_s(varBuf, activePatrol.variables[vars[i]].c_str());
+            ImGui::SetCursorScreenPos(ImVec2(inputX + 2, rowY + 1));
+            ImGui::PushItemWidth(116);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+            if (ImGui::InputText((std::string("##v") + std::to_string(i)).c_str(), varBuf, 256)) {
+                activePatrol.variables[vars[i]] = varBuf;
+            }
+            ImGui::PopStyleVar();
+            ImGui::PopStyleColor(2);
+            ImGui::PopItemWidth();
         }
-        ImGui::PopStyleColor();
-        ImGui::PopItemWidth();
     }
 
-    // Auto-send and Start/Stop
-    float btnY = py + 295;
-    ImGui::SetCursorScreenPos(ImVec2(px+20, btnY-35));
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, C_INPUT);
-    ImGui::PushStyleColor(ImGuiCol_CheckMark, C_GOLD);
-    ImGui::Checkbox("\xD0\x90\xD0\xB2\xD1\x82\xD0\xBE-\xD0\xBE\xD1\x82\xD0\xBF\xD1\x80\xD0\xB0\xD0\xB2\xD0\xBA\xD0\xB0", &activePatrol.autoSend); // Авто-отправка
-    ImGui::PopStyleColor(2);
+    // SVG separator: line x1=170 y1=270 x2=680 y2=270 stroke=#1F242E 1px
+    dl->AddLine(ImVec2(px, o.y + 270), ImVec2(px + panW, o.y + 270), IM_COL32(31, 36, 46, 255), 1.0f);
 
-    ImGui::SetCursorScreenPos(ImVec2(px+20, btnY));
+    // SVG: "Интервал доклада:" x=190 y=295, 12px bold gray
+    dl->AddText(fontSegoeBold12, 12.0f, ImVec2(px + 20, o.y + 285),
+        IM_COL32(139, 148, 158, 255),
+        "\xD0\x98\xD0\xBD\xD1\x82\xD0\xB5\xD1\x80\xD0\xB2\xD0\xB0\xD0\xBB \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xB0:");
+
+    // SVG interval input: rect x=310 y=280 w=40 h=22, text "10", "мин."
+    static int editInterval = 10;
+    static int lastSelIdx = -1;
+    if (lastSelIdx != selectedPatrolIndex) {
+        editInterval = p.defaultIntervalMin > 0 ? p.defaultIntervalMin : 10;
+        lastSelIdx = selectedPatrolIndex;
+    }
+    float intX = px + 140, intY = o.y + 280;
+    dl->AddRectFilled(ImVec2(intX, intY), ImVec2(intX + 40, intY + 22), IM_COL32(8, 10, 15, 255), 4.0f);
+    dl->AddRect(ImVec2(intX, intY), ImVec2(intX + 40, intY + 22), IM_COL32(48, 54, 61, 255), 4.0f, 0, 1.0f);
+
+    char intBuf[8]; snprintf(intBuf, sizeof(intBuf), "%d", editInterval);
+    ImGui::SetCursorScreenPos(ImVec2(intX + 2, intY + 1));
+    ImGui::PushItemWidth(36);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+    if (ImGui::InputText("##patrolInterval", intBuf, 8, ImGuiInputTextFlags_CharsDecimal)) {
+        editInterval = atoi(intBuf);
+        if (editInterval < 1) editInterval = 1;
+        if (editInterval > 60) editInterval = 60;
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(2);
+    ImGui::PopItemWidth();
+
+    // SVG: "мин." x=355 y=295, 12px normal gray
+    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(intX + 45, o.y + 285),
+        IM_COL32(139, 148, 158, 255), "\xD0\xBC\xD0\xB8\xD0\xBD.");
+
+    // SVG checkbox: rect x=190 y=315 w=14 h=14 input-box
+    float cbX = px + 20, cbY = o.y + 315;
+    ImGui::SetCursorScreenPos(ImVec2(cbX, cbY));
+    ImGui::InvisibleButton("##autoSendCheck", ImVec2(14, 14));
+    if (ImGui::IsItemClicked()) activePatrol.autoSend = !activePatrol.autoSend;
+
+    dl->AddRectFilled(ImVec2(cbX, cbY), ImVec2(cbX + 14, cbY + 14), IM_COL32(8, 10, 15, 255), 2.0f);
+    dl->AddRect(ImVec2(cbX, cbY), ImVec2(cbX + 14, cbY + 14), IM_COL32(48, 54, 61, 255), 2.0f, 0, 1.0f);
+    if (activePatrol.autoSend) {
+        dl->AddLine(ImVec2(cbX + 3, cbY + 7), ImVec2(cbX + 6, cbY + 11), C_GOLD, 2.0f);
+        dl->AddLine(ImVec2(cbX + 6, cbY + 11), ImVec2(cbX + 11, cbY + 3), C_GOLD, 2.0f);
+    }
+
+    // SVG: "Автоматически отправлять текст в рацию (иначе напоминание)" x=215 y=327, 12px normal gray
+    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(cbX + 25, cbY + 1),
+        IM_COL32(139, 148, 158, 255),
+        "\xD0\x90\xD0\xB2\xD1\x82\xD0\xBE\xD0\xBC\xD0\xB0\xD1\x82\xD0\xB8\xD1\x87\xD0\xB5\xD1\x81\xD0\xBA\xD0\xB8 \xD0\xBE\xD1\x82\xD0\xBF\xD1\x80\xD0\xB0\xD0\xB2\xD0\xBB\xD1\x8F\xD1\x82\xD1\x8C \xD1\x82\xD0\xB5\xD0\xBA\xD1\x81\xD1\x82 \xD0\xB2 \xD1\x80\xD0\xB0\xD1\x86\xD0\xB8\xD1\x8E (\xD0\xB8\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB5 \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5)");
+
+    // SVG button: rect x=190 y=355 w=470 h=40, btn-gold (#D2A65E fill-opacity=0.15, stroke=#D2A65E 1.5)
+    float btnY = o.y + 355;
+    ImGui::SetCursorScreenPos(ImVec2(px + 20, btnY));
     bool startBtn = ImGui::InvisibleButton("##startPatrol", ImVec2(470, 40));
     bool startHover = ImGui::IsItemHovered();
 
     if (activePatrol.active) {
-        dl->AddRectFilled(ImVec2(px+20, btnY), ImVec2(px+490, btnY+40), startHover ? IM_COL32(230,80,80,255) : C_RED, 4.0f);
-        const char* sTxt = "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\xAC";
-        ImVec2 sSz = fontSegoeBlack32->CalcTextSizeA(18.0f, FLT_MAX, 0.0f, sTxt);
-        dl->AddText(fontSegoeBlack32, 18.0f, ImVec2(px+20+(470-sSz.x)/2, btnY+(40-sSz.y)/2), C_WHITE, sTxt);
+        // Red stop button style
+        dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+            startHover ? IM_COL32(231, 76, 60, 70) : IM_COL32(231, 76, 60, 38), 4.0f);
+        dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+            IM_COL32(231, 76, 60, 255), 4.0f, 0, 1.5f);
+        const char* sTxt = "\xE2\x96\xA0 \xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\xAC";
+        ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, sTxt);
+        dl->AddText(fontSegoeBold14, 13.0f,
+            ImVec2(px + 20 + (470 - sSz.x) / 2, btnY + (40 - sSz.y) / 2),
+            IM_COL32(231, 76, 60, 255), sTxt);
         if (startBtn) activePatrol.active = false;
     } else {
-        dl->AddRectFilled(ImVec2(px+20, btnY), ImVec2(px+490, btnY+40), startHover ? IM_COL32(255,204,0,50) : IM_COL32(255,204,0,38), 4.0f); // Gold 15% transparency
-        dl->AddRect(ImVec2(px+20, btnY), ImVec2(px+490, btnY+40), C_GOLD, 4.0f, 0, 1.5f);
-        const char* sTxt = "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\xAC";
-        ImVec2 sSz = fontSegoeBlack32->CalcTextSizeA(18.0f, FLT_MAX, 0.0f, sTxt);
-        dl->AddText(fontSegoeBlack32, 18.0f, ImVec2(px+20+(470-sSz.x)/2, btnY+(40-sSz.y)/2), C_GOLD, sTxt);
+        // SVG: btn-gold style
+        dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+            startHover ? IM_COL32(210, 166, 94, 70) : IM_COL32(210, 166, 94, 38), 4.0f);
+        dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+            IM_COL32(210, 166, 94, 255), 4.0f, 0, 1.5f);
+        // SVG: "▶ НАЧАТЬ ПАТРУЛЬ" 13px bold gold #D2A65E text-anchor=middle
+        const char* sTxt = "\xE2\x96\xB6 \xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\xAC";
+        ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, sTxt);
+        dl->AddText(fontSegoeBold14, 13.0f,
+            ImVec2(px + 20 + (470 - sSz.x) / 2, btnY + (40 - sSz.y) / 2),
+            IM_COL32(210, 166, 94, 255), sTxt);
         if (startBtn) {
             activePatrol.active = true;
             activePatrol.data = p;
             activePatrol.currentStage = 0;
-            activePatrol.timeRemainingSec = p.defaultIntervalMin * 60.0f;
-            if (activePatrol.timeRemainingSec <= 0) activePatrol.timeRemainingSec = 600.0f; // fallback 10 mins
+            activePatrol.timeRemainingSec = (float)editInterval * 60.0f;
+            if (activePatrol.timeRemainingSec <= 0) activePatrol.timeRemainingSec = 600.0f;
         }
     }
 }
+
 
 void Gui::ExecutePatrolReport() {
     if (!activePatrol.active) return;
