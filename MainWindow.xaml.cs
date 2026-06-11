@@ -1177,8 +1177,11 @@ namespace FSB_helper_C__
         {
             if (sender is TextBox txt && txt.Parent is Grid grid)
             {
-                var svSyntax = grid.Children.OfType<ScrollViewer>().FirstOrDefault(x => x.Name == "svSyntax");
-                if (svSyntax != null) svSyntax.ScrollToHorizontalOffset(e.HorizontalOffset);
+                var svSyntax = grid.Children.OfType<ScrollViewer>().FirstOrDefault();
+                if (svSyntax != null) {
+                    svSyntax.ScrollToHorizontalOffset(e.HorizontalOffset);
+                    svSyntax.ScrollToVerticalOffset(e.VerticalOffset);
+                }
             }
         }
 
@@ -1196,7 +1199,7 @@ namespace FSB_helper_C__
         internal void StepVal_Loaded(object sender, RoutedEventArgs e) { FormatSyntax(sender as TextBox); }
         internal void StepVal_TextChanged(object sender, TextChangedEventArgs e) { FormatSyntax(sender as TextBox); }
         
-        private void FormatSyntax(TextBox txt)
+        private void FormatSyntax(TextBox txt, bool isReport = false)
         {
             if (txt == null || string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) return;
             if (txt.Parent is Grid grid)
@@ -1217,14 +1220,16 @@ namespace FSB_helper_C__
                     foreach (var part in parts)
                     {
                         if (string.IsNullOrEmpty(part)) continue;
-                        if (part == "*ВРЕМЯ*" || part == "*ID*")
+                        if (part == "*ВРЕМЯ*" || (part == "*ID*" && !isReport))
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = red });
                         else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
                         {
                             if (vars != null && vars.ContainsKey(part))
                                 tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
-                            else
+                            else if (isReport)
                                 tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
+                            else
+                                tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground });
                         }
                         else
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground }); // inherit explicitly
@@ -1260,10 +1265,12 @@ namespace FSB_helper_C__
                 if (!string.IsNullOrEmpty(curProf) && win.MasterData.ContainsKey(curProf))
                     vars = win.MasterData[curProf].Variables;
 
+                bool isReport = tb.DataContext is PatrolBlock;
+
                 foreach (var part in parts)
                 {
                     if (string.IsNullOrEmpty(part)) continue;
-                    if (part == "*ВРЕМЯ*" || part == "*ID*")
+                    if (part == "*ВРЕМЯ*" || (part == "*ID*" && !isReport))
                         tb.Inlines.Add(new Run(part) { Foreground = red });
                     else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
                     {
@@ -2132,7 +2139,7 @@ namespace FSB_helper_C__
                 UpdateLawsList(); 
                 UpdateBindGroups(); 
                 UpdateBindsList(); 
-                
+                UpdatePatrolsList();
                 // Update radial key in options UI
                 if (MasterData[CurrentProfile].Binds.TryGetValue("Radial", out var bi))
                     btnRadialKey.Content = bi.DisplayKey;
@@ -2548,7 +2555,7 @@ namespace FSB_helper_C__
                 if (cbSections != null) cbSections.Visibility = Visibility.Collapsed;
                 if (btnPatrolsInfo != null) btnPatrolsInfo.Visibility = Visibility.Visible;
                 
-                if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ СЦЕНАРИЙ"; }
+                if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ ДОКЛАД"; }
                 if (btnSectionDel != null) { btnSectionDel.Visibility = Visibility.Visible; btnSectionDel.Content = "ОЧИСТИТЬ РАЗДЕЛ"; }
                 
                 if (pnlPatrolsList != null) pnlPatrolsList.Visibility = Visibility.Visible;
@@ -2566,7 +2573,7 @@ namespace FSB_helper_C__
                 if (btnPatrolsInfo != null) btnPatrolsInfo.Visibility = Visibility.Collapsed;
                 if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ РАЗДЕЛ"; }
                 if (btnSectionDel != null) { btnSectionDel.Visibility = Visibility.Visible; btnSectionDel.Content = "УДАЛИТЬ РАЗДЕЛ"; }
-                if (lblSectionType != null) lblSectionType.Visibility = Visibility.Visible;
+                if (lblSectionType != null) /* lblSectionType.Visibility = Visibility.Visible; */
                 if (pnlPatrolsList != null) pnlPatrolsList.Visibility = Visibility.Collapsed;
                 UpdateLawsList();
             }
@@ -2575,7 +2582,7 @@ namespace FSB_helper_C__
         private void Section_Changed(object sender, SelectionChangedEventArgs e) 
         { 
             if (pnlEmptyLawsHint != null) pnlEmptyLawsHint.Visibility = Visibility.Collapsed;
-            if (cbSections.SelectedItem == null || string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) { pnlLaws2Col.Visibility = pnlLawsText.Visibility = pnlFineCalcList.Visibility = pnlWantedCalcList.Visibility = Visibility.Collapsed; lblSectionType.Text = ""; lblNoLaws.Visibility = Visibility.Visible; return; } 
+            if (cbSections.SelectedItem == null || string.IsNullOrEmpty(CurrentProfile) || !MasterData.ContainsKey(CurrentProfile)) { pnlLaws2Col.Visibility = pnlLawsText.Visibility = pnlFineCalcList.Visibility = pnlWantedCalcList.Visibility = Visibility.Collapsed; lblSectionType.Text = ""; if (lblNoLaws != null && btnToggleTabPatrols.IsChecked != true && btnToggleTabCalcs.IsChecked != true) { lblNoLaws.Visibility = Visibility.Visible; } return; } 
             lblNoLaws.Visibility = Visibility.Collapsed;
             btnSectionAdd.Visibility = Visibility.Visible;
             btnSectionDel.Visibility = Visibility.Visible;
@@ -2638,7 +2645,7 @@ namespace FSB_helper_C__
             }
 
             if (section.Type == "text") {
-                lblSectionType.Text = "[ Блокнот ]"; 
+                lblSectionType.Text = ""; 
                 pnlLawsText.Visibility = Visibility.Visible; 
                 _isLoadingRtf = true; 
                 rtbNotepad.Document.Blocks.Clear();
@@ -2657,7 +2664,7 @@ namespace FSB_helper_C__
 
             else {
                 bool is1col = (section.Type == "1col");
-                lblSectionType.Text = is1col ? "[ 1 столбец ]" : "[ 2 столбца ]"; 
+                lblSectionType.Text = ""; 
                 pnlLaws2Col.Visibility = Visibility.Visible;
                 
                 var left = new List<LawItem>();
@@ -3185,7 +3192,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
         private void Section_Delete_Click(object sender, RoutedEventArgs e) { 
             if (btnToggleTabPatrols.IsChecked == true) {
-                _dialogHost.ShowAlert("ОЧИСТИТЬ РАЗДЕЛ", $"Вы уверены, что хотите удалить ВСЕ сценарии?", () => {
+                _dialogHost.ShowAlert("ОЧИСТИТЬ РАЗДЕЛ", $"Вы уверены, что хотите удалить ВСЕ доклады?", () => {
                     if (!string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile)) {
                         if (MasterData[CurrentProfile].Patrols == null) MasterData[CurrentProfile].Patrols = new List<PatrolBlock>();
                         MasterData[CurrentProfile].Patrols.Clear();
@@ -4202,6 +4209,15 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             icFinesList.ItemsSource = null;
             icFinesList.ItemsSource = fines;
             txtEmptyFines.Visibility = (fines == null || fines.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+            if (bdrFinesList != null) bdrFinesList.Visibility = (fines == null || fines.Count == 0) ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines1 != null) hdrFines1.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines2 != null) hdrFines2.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines1 != null) hdrFines1.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines2 != null) hdrFines2.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines1 != null) hdrFines1.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines2 != null) hdrFines2.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines1 != null) hdrFines1.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrFines2 != null) hdrFines2.Visibility = txtEmptyFines.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void Fine_Add_Click(object sender, RoutedEventArgs e) {
@@ -4209,6 +4225,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             txtFineId.Text = "";
             rbTypeKoAP.IsChecked = true;
             rbTypeUK.IsChecked = false;
+            rbTypePDD.IsChecked = false;
+            rbTypeDK.IsChecked = false;
             txtFineName.Text = "";
             txtFineAmt.Text = "5000";
             chkFineRevoke.IsChecked = false;
@@ -4234,8 +4252,10 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             
             _tempFineEditId = fineId;
             txtFineId.Text = fine.id;
-            if (fine.type == "УК РФ" || fine.type == "УК") { rbTypeUK.IsChecked = true; rbTypeKoAP.IsChecked = false; }
-            else { rbTypeKoAP.IsChecked = true; rbTypeUK.IsChecked = false; }
+            if (fine.type == "УК РФ" || fine.type == "УК") { rbTypeUK.IsChecked = true; rbTypeKoAP.IsChecked = false; rbTypePDD.IsChecked = false; rbTypeDK.IsChecked = false; }
+            else if (fine.type == "ПДД") { rbTypePDD.IsChecked = true; rbTypeUK.IsChecked = false; rbTypeKoAP.IsChecked = false; rbTypeDK.IsChecked = false; }
+            else if (fine.type == "ДК") { rbTypeDK.IsChecked = true; rbTypeUK.IsChecked = false; rbTypeKoAP.IsChecked = false; rbTypePDD.IsChecked = false; }
+            else { rbTypeKoAP.IsChecked = true; rbTypeUK.IsChecked = false; rbTypePDD.IsChecked = false; rbTypeDK.IsChecked = false; }
             txtFineName.Text = fine.name;
             txtFineAmt.Text = fine.amount.ToString();
             chkFineRevoke.IsChecked = fine.revoke;
@@ -4260,8 +4280,10 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 }
                 _tempFineEditId = fine.id;
                 txtFineId.Text = fine.id;
-                if (fine.type == "УК РФ" || fine.type == "УК") { rbTypeUK.IsChecked = true; rbTypeKoAP.IsChecked = false; }
-                else { rbTypeKoAP.IsChecked = true; rbTypeUK.IsChecked = false; }
+                if (fine.type == "УК РФ" || fine.type == "УК") { rbTypeUK.IsChecked = true; rbTypeKoAP.IsChecked = false; rbTypePDD.IsChecked = false; rbTypeDK.IsChecked = false; }
+                else if (fine.type == "ПДД") { rbTypePDD.IsChecked = true; rbTypeUK.IsChecked = false; rbTypeKoAP.IsChecked = false; rbTypeDK.IsChecked = false; }
+                else if (fine.type == "ДК") { rbTypeDK.IsChecked = true; rbTypeUK.IsChecked = false; rbTypeKoAP.IsChecked = false; rbTypePDD.IsChecked = false; }
+                else { rbTypeKoAP.IsChecked = true; rbTypeUK.IsChecked = false; rbTypePDD.IsChecked = false; rbTypeDK.IsChecked = false; }
                 txtFineName.Text = fine.name;
                 txtFineAmt.Text = fine.amount.ToString();
                 chkFineRevoke.IsChecked = fine.revoke;
@@ -4287,7 +4309,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             }
             
             existing.id = fineId;
-            existing.type = rbTypeUK.IsChecked == true ? "УК" : "КоАП";
+            existing.type = rbTypeUK.IsChecked == true ? "УК" : (rbTypePDD.IsChecked == true ? "ПДД" : (rbTypeDK.IsChecked == true ? "ДК" : "КоАП"));
             existing.name = txtFineName.Text.Trim();
             existing.note = "";
             int.TryParse(txtFineAmt.Text.Replace(" ", "").Trim(), out int amt);
@@ -4310,6 +4332,15 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             icWantedList.ItemsSource = null;
             icWantedList.ItemsSource = wanted;
             txtEmptyWanted.Visibility = (wanted == null || wanted.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+            if (bdrWantedList != null) bdrWantedList.Visibility = (wanted == null || wanted.Count == 0) ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted1 != null) hdrWanted1.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted2 != null) hdrWanted2.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted1 != null) hdrWanted1.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted2 != null) hdrWanted2.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted1 != null) hdrWanted1.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted2 != null) hdrWanted2.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted1 != null) hdrWanted1.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        if (hdrWanted2 != null) hdrWanted2.Visibility = txtEmptyWanted.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void Wanted_Add_Click(object sender, RoutedEventArgs e) {
@@ -4376,8 +4407,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             Dialog_Close(null, null);
         }
         
-        private void OpenDialog(UIElement win) { Panel.SetZIndex(DialogOverlay, 1300); Panel.SetZIndex(win, 1310); DialogOverlay.Visibility = Visibility.Visible; WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinWantedEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = Visibility.Collapsed; win.Visibility = Visibility.Visible; DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); }
-        private async void Dialog_Close(object sender, RoutedEventArgs e) { this.PreviewKeyDown -= Window_PreviewKeyDown; DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); await Task.Delay(150); DialogOverlay.Visibility = Visibility.Collapsed; Panel.SetZIndex(DialogOverlay, 1000); WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinWantedEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = Visibility.Collapsed; }
+        private void OpenDialog(UIElement win) { Panel.SetZIndex(DialogOverlay, 1300); Panel.SetZIndex(win, 1310); DialogOverlay.Visibility = Visibility.Visible; WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinWantedEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = WinPatrolsGuide.Visibility = Visibility.Collapsed; win.Visibility = Visibility.Visible; DoubleAnimation fade = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); }
+        private async void Dialog_Close(object sender, RoutedEventArgs e) { this.PreviewKeyDown -= Window_PreviewKeyDown; DoubleAnimation fade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.15)); DialogOverlay.BeginAnimation(OpacityProperty, fade); await Task.Delay(150); DialogOverlay.Visibility = Visibility.Collapsed; Panel.SetZIndex(DialogOverlay, 1000); WinKeyWait.Visibility = WinGuide.Visibility = WinDevMenu.Visibility = WinImportLaws.Visibility = WinImportBinds.Visibility = WinImportProfiles.Visibility = WinImportConflict.Visibility = WinAdvancedActivation.Visibility = WinFineEdit.Visibility = WinWantedEdit.Visibility = WinSectionGuide.Visibility = WinExportLaws.Visibility = WinExportBinds.Visibility = WinExportProfiles.Visibility = WinPatrolsGuide.Visibility = Visibility.Collapsed; }
 
         // ======================= PATROLS LOGIC =======================
         private string _currentEditingPatrolId = null;
@@ -4389,14 +4420,23 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             icPatrolsList.ItemsSource = null;
             icPatrolsList.ItemsSource = profile.Patrols;
             txtEmptyPatrols.Visibility = (profile.Patrols.Count == 0) ? Visibility.Visible : Visibility.Collapsed;
+            if (bdrPatrolsList != null) bdrPatrolsList.Visibility = (profile.Patrols.Count == 0) ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols1 != null) hdrPatrols1.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols2 != null) hdrPatrols2.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols1 != null) hdrPatrols1.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols2 != null) hdrPatrols2.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols1 != null) hdrPatrols1.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols2 != null) hdrPatrols2.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols1 != null) hdrPatrols1.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+            if (hdrPatrols2 != null) hdrPatrols2.Visibility = txtEmptyPatrols.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void PatrolsInfo_Click(object sender, RoutedEventArgs e) {
-            _dialogHost.ShowInfo("ИНСТРУКЦИЯ", "Вы можете использовать переменные в докладах.\nОберните любой текст в *звездочки* (например, *ТЕГ* или *СЕКТОР*), чтобы потом быстро заполнять эти данные в оверлее во время игры.");
+            OpenDialog(WinPatrolsGuide);
         }
 
         private void PatrolEditor_TextChanged(object sender, TextChangedEventArgs e) {
-            if (sender is TextBox txt) FormatSyntax(txt);
+            if (sender is TextBox txt) FormatSyntax(txt, true);
         }
 
         private void PatrolEditor_Close_Click(object sender, RoutedEventArgs e) {
@@ -4416,7 +4456,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 profile.Patrols.Add(block);
             }
             
-            block.Name = txtPatrolName.Text.Trim() == "" ? "НОВЫЙ СЦЕНАРИЙ" : txtPatrolName.Text.Trim();
+            block.Name = txtPatrolName.Text.Trim() == "" ? "НОВЫЙ ДОКЛАД" : txtPatrolName.Text.Trim();
             block.StartText = txtPatrolStart.Text;
             block.ProcessText = txtPatrolProcess.Text;
             block.EndText = txtPatrolEnd.Text;
@@ -4452,7 +4492,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             var profile = MasterData[CurrentProfile];
             if (sender is Button btn && btn.Tag != null) {
                 string id = btn.Tag.ToString();
-                _dialogHost.ShowAlert("УДАЛЕНИЕ СЦЕНАРИЯ", "Вы действительно хотите удалить этот сценарий?", () => {
+                _dialogHost.ShowAlert("УДАЛЕНИЕ ДОКЛАДА", "Вы действительно хотите удалить этот доклад?", () => {
                     var block = profile.Patrols?.FirstOrDefault(p => p.id == id);
                     if (block != null) {
                         profile.Patrols.Remove(block);

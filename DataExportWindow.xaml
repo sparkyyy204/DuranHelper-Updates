@@ -4,7 +4,7 @@
         Title="ЭКСПОРТ ДАННЫХ ИЗ СИСТЕМЫ" Height="400" Width="400"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" ResizeMode="NoResize"
-        TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType">
+        TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="ClearType">
     
     <Grid Margin="15" VerticalAlignment="Center" HorizontalAlignment="Center">
         <!-- Shadow Layer -->

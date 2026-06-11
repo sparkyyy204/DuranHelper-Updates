@@ -38,7 +38,7 @@
         <Style TargetType="CheckBox"><Setter Property="FocusVisualStyle" Value="{x:Null}"/></Style>
         <Style TargetType="ComboBox"><Setter Property="FocusVisualStyle" Value="{x:Null}"/></Style>
         <Style TargetType="ListViewItem"><Setter Property="FocusVisualStyle" Value="{x:Null}"/></Style>
-        <Style TargetType="TextBox"><Setter Property="FocusVisualStyle" Value="{x:Null}"/><Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/><Setter Property="Padding" Value="5"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="BorderThickness" Value="0"/></Style>
+        <Style TargetType="TextBox"><Setter Property="FocusVisualStyle" Value="{x:Null}"/><Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/><Setter Property="Padding" Value="5"/><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="BorderThickness" Value="0"/><Setter Property="TextOptions.TextFormattingMode" Value="Ideal"/></Style>
 
         <Style x:Key="FlatBtn" TargetType="Button" BasedOn="{StaticResource BaseBtn}">
             <Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="Bold"/>

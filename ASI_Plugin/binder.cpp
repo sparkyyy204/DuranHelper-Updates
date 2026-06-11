@@ -257,6 +257,7 @@ void BinderManager::ReloadBinds() {
         Gui::toggleNeedsCtrl = tempToggle.needsCtrl;
         Gui::toggleNeedsShift = tempToggle.needsShift;
         std::string lastProfile = jSettings.value("LastProfile", "");
+        currentProfileName = lastProfile;
         if (lastProfile.empty()) return;
 
         // 2. Read Profiles.json
@@ -314,6 +315,7 @@ void BinderManager::ReloadBinds() {
                     step.action = sData.value("action", "");
                     step.value = sData.value("value", "");
                     step.isEnter = sData.value("isEnter", true);
+                    step.CursorOffset = sData.value("CursorOffset", 0);
                     b.steps.push_back(step);
                 }
             }

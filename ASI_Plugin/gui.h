@@ -115,8 +115,12 @@ struct ActivePatrol {
     int currentStage; // 0=start, 1=process, 2=end
     float timeRemainingSec;
     int intervalMin;
+    int totalMin;
+    float totalElapsedSec;
     bool autoSend;
     std::map<std::string, std::string> variables;
+    int reportsSent;
+    ULONGLONG lastTickTime;
 };
 
 class Gui {
@@ -130,6 +134,9 @@ public:
     
     // UI Modes
     static bool useGridMenu;
+
+    // Temporary edit variables for patrol UI
+    static std::map<std::string, std::string> editVariables;
 
     // Version
     static std::string versionStr;
@@ -239,6 +246,9 @@ public:
     static int binderDelay;            // ms between bind steps (0-1000, step 200)
     static bool rememberTab;           // remember last active tab
     static bool searchCurrentSection;   // search only in selected section
+    static bool clearSearchOnClose;
+    static bool closeOnClickOutside;
+    static ULONGLONG lastCloseTime;
     
     // Smart Quoting
     static bool quoteEnabled;

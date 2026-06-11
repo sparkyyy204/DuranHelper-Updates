@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="850" Background="Transparent"
-             TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType">
+             TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="ClearType">
     
     <Grid>
     <Grid Margin="30,20,10,20">
@@ -25,7 +25,7 @@
             <!-- Актуальность базы Badge -->
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal" Margin="0,5,10,0">
                 <TextBlock Text="Актуальность базы: " Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.7"/>
-                <TextBlock Text="31.05.2026" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="10.06.2026" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
 
@@ -165,6 +165,16 @@
                                         <Ellipse Canvas.Left="18.5" Canvas.Top="11.5" Width="3" Height="3" Fill="#8957e5"/>
                                         <Ellipse Canvas.Left="27.5" Canvas.Top="11.5" Width="3" Height="3" Fill="#8957e5"/>
                                     </Canvas>
+                                    
+                                    <!-- Patrols Icon (Orange) -->
+                                    <Canvas x:Name="IconPatrols" Visibility="Collapsed">
+                                        <Line X1="16" Y1="14" X2="16" Y2="6" Stroke="#ffa657" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Line X1="24" Y1="14" X2="24" Y2="10" Stroke="#ffa657" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Path Data="M 12 14 H 28 A 2 2 0 0 1 30 16 V 34 A 2 2 0 0 1 28 36 H 12 A 2 2 0 0 1 10 34 V 16 A 2 2 0 0 1 12 14 Z" Stroke="#ffa657" StrokeThickness="2" Fill="Transparent"/>
+                                        <Line X1="16" Y1="22" X2="24" Y2="22" Stroke="#ffa657" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Line X1="16" Y1="26" X2="24" Y2="26" Stroke="#ffa657" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        <Line X1="16" Y1="30" X2="24" Y2="30" Stroke="#ffa657" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                    </Canvas>
                                 </Canvas>
                             </Grid>
 
@@ -210,6 +220,11 @@
                             <Setter TargetName="IconProfile" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="IconBinds" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="IconBg" Property="Background" Value="#8957e5"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Type}" Value="patrols">
+                            <Setter TargetName="IconProfile" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="IconPatrols" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="IconBg" Property="Background" Value="#ffa657"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Type}" Value="profile">
                             <Setter TargetName="IconProfile" Property="Visibility" Value="Visible"/>
