@@ -1296,9 +1296,24 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
     dl->AddCircleFilled(z2[1], 4.0f, goldAcc);
     dl->AddCircleFilled(z2[3], 4.0f, goldAcc);
     
-    // Chevron accent
-    ImVec2 cv[3] = {ImVec2(o.x+75, o.y+84), ImVec2(o.x+112, o.y+119), ImVec2(o.x+75, o.y+154)};
-    for(int i=0; i<2; i++) dl->AddLine(cv[i], cv[i+1], goldAcc, 1.5f);
+    // Chevron accent 1 (Left)
+    ImVec2 cv1[3] = {ImVec2(o.x+75, o.y+84), ImVec2(o.x+112, o.y+119), ImVec2(o.x+75, o.y+154)};
+    for(int i=0; i<2; i++) dl->AddLine(cv1[i], cv1[i+1], goldAcc, 1.5f);
+
+    // Chevron accent 2 (Right)
+    ImVec2 cv2[3] = {ImVec2(o.x+660, o.y+340), ImVec2(o.x+630, o.y+360), ImVec2(o.x+670, o.y+390)};
+    for(int i=0; i<2; i++) dl->AddLine(cv2[i], cv2[i+1], goldAcc, 1.5f);
+    
+    // Extra side patterns (Left Edge)
+    ImVec2 e1[3] = {ImVec2(o.x+15, o.y+220), ImVec2(o.x+40, o.y+245), ImVec2(o.x+20, o.y+270)};
+    for(int i=0; i<2; i++) dl->AddLine(e1[i], e1[i+1], goldAcc, 1.5f);
+    dl->AddCircleFilled(e1[1], 3.0f, goldAcc);
+
+    // Extra side patterns (Right Edge)
+    ImVec2 e2[4] = {ImVec2(o.x+680, o.y+120), ImVec2(o.x+645, o.y+160), ImVec2(o.x+665, o.y+200), ImVec2(o.x+630, o.y+240)};
+    for(int i=0; i<3; i++) dl->AddLine(e2[i], e2[i+1], goldAcc, 1.5f);
+    dl->AddCircleFilled(e2[0], 3.0f, goldAcc);
+    dl->AddCircleFilled(e2[2], 3.0f, goldAcc);
     struct GridBtn {
         int id; // -2 for Settings
         const char* title;
@@ -1307,77 +1322,77 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
     };
     
     auto drawLawsIcon = [](ImDrawList* d, float cx, float cy, ImU32 col) {
-        d->AddLine(ImVec2(cx-18, cy+15), ImVec2(cx-18, cy-15), col, 2.0f);
-        d->AddLine(ImVec2(cx+18, cy+15), ImVec2(cx+18, cy-15), col, 2.0f);
-        d->AddLine(ImVec2(cx, cy+18), ImVec2(cx, cy-12), col, 2.0f);
-        d->AddLine(ImVec2(cx-18, cy-15), ImVec2(cx-8, cy-15), col, 2.0f);
-        d->AddLine(ImVec2(cx-8, cy-15), ImVec2(cx, cy-12), col, 2.0f);
-        d->AddLine(ImVec2(cx+18, cy-15), ImVec2(cx+8, cy-15), col, 2.0f);
-        d->AddLine(ImVec2(cx+8, cy-15), ImVec2(cx, cy-12), col, 2.0f);
-        d->AddLine(ImVec2(cx-18, cy+15), ImVec2(cx-8, cy+15), col, 2.0f);
-        d->AddLine(ImVec2(cx-8, cy+15), ImVec2(cx, cy+18), col, 2.0f);
-        d->AddLine(ImVec2(cx+18, cy+15), ImVec2(cx+8, cy+15), col, 2.0f);
-        d->AddLine(ImVec2(cx+8, cy+15), ImVec2(cx, cy+18), col, 2.0f);
-        d->AddLine(ImVec2(cx-14, cy-5), ImVec2(cx-4, cy-2), col, 2.0f);
-        d->AddLine(ImVec2(cx-14, cy+5), ImVec2(cx-4, cy+8), col, 2.0f);
-        d->AddLine(ImVec2(cx+14, cy-5), ImVec2(cx+4, cy-2), col, 2.0f);
-        d->AddLine(ImVec2(cx+14, cy+5), ImVec2(cx+4, cy+8), col, 2.0f);
+        d->AddLine(ImVec2(cx-22, cy+19), ImVec2(cx-22, cy-19), col, 2.5f);
+        d->AddLine(ImVec2(cx+22, cy+19), ImVec2(cx+22, cy-19), col, 2.5f);
+        d->AddLine(ImVec2(cx, cy+22), ImVec2(cx, cy-15), col, 2.5f);
+        d->AddLine(ImVec2(cx-22, cy-19), ImVec2(cx-10, cy-19), col, 2.5f);
+        d->AddLine(ImVec2(cx-10, cy-19), ImVec2(cx, cy-15), col, 2.5f);
+        d->AddLine(ImVec2(cx+22, cy-19), ImVec2(cx+10, cy-19), col, 2.5f);
+        d->AddLine(ImVec2(cx+10, cy-19), ImVec2(cx, cy-15), col, 2.5f);
+        d->AddLine(ImVec2(cx-22, cy+19), ImVec2(cx-10, cy+19), col, 2.5f);
+        d->AddLine(ImVec2(cx-10, cy+19), ImVec2(cx, cy+22), col, 2.5f);
+        d->AddLine(ImVec2(cx+22, cy+19), ImVec2(cx+10, cy+19), col, 2.5f);
+        d->AddLine(ImVec2(cx+10, cy+19), ImVec2(cx, cy+22), col, 2.5f);
+        d->AddLine(ImVec2(cx-17, cy-6), ImVec2(cx-5, cy-3), col, 2.5f);
+        d->AddLine(ImVec2(cx-17, cy+6), ImVec2(cx-5, cy+10), col, 2.5f);
+        d->AddLine(ImVec2(cx+17, cy-6), ImVec2(cx+5, cy-3), col, 2.5f);
+        d->AddLine(ImVec2(cx+17, cy+6), ImVec2(cx+5, cy+10), col, 2.5f);
     };
     
     auto drawFinesIcon = [](ImDrawList* d, float cx, float cy, ImU32 col) {
-        d->AddLine(ImVec2(cx-14, cy-20), ImVec2(cx+4, cy-20), col, 2.0f);
-        d->AddLine(ImVec2(cx+4, cy-20), ImVec2(cx+14, cy-10), col, 2.0f);
-        d->AddLine(ImVec2(cx+14, cy-10), ImVec2(cx+14, cy+20), col, 2.0f);
-        d->AddLine(ImVec2(cx+14, cy+20), ImVec2(cx-14, cy+20), col, 2.0f);
-        d->AddLine(ImVec2(cx-14, cy+20), ImVec2(cx-14, cy-20), col, 2.0f);
-        d->AddLine(ImVec2(cx+4, cy-20), ImVec2(cx+4, cy-10), col, 2.0f);
-        d->AddLine(ImVec2(cx+4, cy-10), ImVec2(cx+14, cy-10), col, 2.0f);
-        d->AddLine(ImVec2(cx-8, cy-5), ImVec2(cx+8, cy-5), col, 2.0f);
-        d->AddLine(ImVec2(cx-8, cy+2), ImVec2(cx+8, cy+2), col, 2.0f);
-        d->AddLine(ImVec2(cx-8, cy+9), ImVec2(cx+2, cy+9), col, 2.0f);
+        d->AddLine(ImVec2(cx-17, cy-25), ImVec2(cx+5, cy-25), col, 2.5f);
+        d->AddLine(ImVec2(cx+5, cy-25), ImVec2(cx+17, cy-12), col, 2.5f);
+        d->AddLine(ImVec2(cx+17, cy-12), ImVec2(cx+17, cy+25), col, 2.5f);
+        d->AddLine(ImVec2(cx+17, cy+25), ImVec2(cx-17, cy+25), col, 2.5f);
+        d->AddLine(ImVec2(cx-17, cy+25), ImVec2(cx-17, cy-25), col, 2.5f);
+        d->AddLine(ImVec2(cx+5, cy-25), ImVec2(cx+5, cy-12), col, 2.5f);
+        d->AddLine(ImVec2(cx+5, cy-12), ImVec2(cx+17, cy-12), col, 2.5f);
+        d->AddLine(ImVec2(cx-10, cy-6), ImVec2(cx+10, cy-6), col, 2.5f);
+        d->AddLine(ImVec2(cx-10, cy+3), ImVec2(cx+10, cy+3), col, 2.5f);
+        d->AddLine(ImVec2(cx-10, cy+11), ImVec2(cx+3, cy+11), col, 2.5f);
     };
 
     auto drawWantedIcon = [](ImDrawList* d, float cx, float cy, ImU32 col) {
         ImVec2 pts[11];
-        float R = 18.0f;
-        float r = 7.0f;
+        float R = 22.0f;
+        float r = 9.0f;
         for (int i=0; i<10; i++) {
             float a = i * 3.14159f / 5.0f - 3.14159f/2.0f;
             float rad = (i % 2 == 0) ? R : r;
             pts[i] = ImVec2(cx + cosf(a)*rad, cy + sinf(a)*rad);
         }
         pts[10] = pts[0];
-        d->AddPolyline(pts, 11, col, 0, 2.0f);
+        d->AddPolyline(pts, 11, col, 0, 2.5f);
     };
 
     auto drawBinderIcon = [](ImDrawList* d, float cx, float cy, ImU32 col) {
-        d->AddRect(ImVec2(cx-25, cy-15), ImVec2(cx+25, cy+15), col, 3.0f, 0, 2.0f);
-        d->AddRectFilled(ImVec2(cx-18, cy-8), ImVec2(cx-10, cy-4), col);
-        d->AddRectFilled(ImVec2(cx-6, cy-8), ImVec2(cx+6, cy-4), col);
-        d->AddRectFilled(ImVec2(cx+10, cy-8), ImVec2(cx+18, cy-4), col);
-        d->AddRectFilled(ImVec2(cx-18, cy+2), ImVec2(cx-10, cy+6), col);
-        d->AddRectFilled(ImVec2(cx-6, cy+2), ImVec2(cx+18, cy+6), col);
+        d->AddRect(ImVec2(cx-31, cy-19), ImVec2(cx+31, cy+19), col, 4.0f, 0, 2.5f);
+        d->AddRectFilled(ImVec2(cx-22, cy-10), ImVec2(cx-12, cy-5), col);
+        d->AddRectFilled(ImVec2(cx-7, cy-10), ImVec2(cx+7, cy-5), col);
+        d->AddRectFilled(ImVec2(cx+12, cy-10), ImVec2(cx+22, cy-5), col);
+        d->AddRectFilled(ImVec2(cx-22, cy+3), ImVec2(cx-12, cy+8), col);
+        d->AddRectFilled(ImVec2(cx-7, cy+3), ImVec2(cx+22, cy+8), col);
     };
 
     auto drawSettingsIcon = [](ImDrawList* d, float cx, float cy, ImU32 col) {
         // Gear
-        d->AddCircle(ImVec2(cx, cy), 12.0f, col, 16, 2.0f);
-        d->AddCircle(ImVec2(cx, cy), 4.5f, col, 10, 2.0f);
+        d->AddCircle(ImVec2(cx, cy), 15.0f, col, 16, 2.5f);
+        d->AddCircle(ImVec2(cx, cy), 6.0f, col, 10, 2.5f);
         for (int i=0; i<8; i++) {
             float a = i * 3.14159f / 4.0f;
-            d->AddLine(ImVec2(cx + cosf(a)*12.0f, cy + sinf(a)*12.0f),
-                       ImVec2(cx + cosf(a)*21.0f, cy + sinf(a)*21.0f), col, 2.5f);
+            d->AddLine(ImVec2(cx + cosf(a)*15.0f, cy + sinf(a)*15.0f),
+                       ImVec2(cx + cosf(a)*26.0f, cy + sinf(a)*26.0f), col, 3.0f);
         }
     };
 
     auto drawPatrolsIcon = [](ImDrawList* d, float cx, float cy, ImU32 col) {
         ImVec2 pts[6] = {
-            ImVec2(cx-15, cy-15), ImVec2(cx+15, cy-15),
-            ImVec2(cx+15, cy+5), ImVec2(cx, cy+20),
-            ImVec2(cx-15, cy+5), ImVec2(cx-15, cy-15)
+            ImVec2(cx-19, cy-19), ImVec2(cx+19, cy-19),
+            ImVec2(cx+19, cy+6), ImVec2(cx, cy+25),
+            ImVec2(cx-19, cy+6), ImVec2(cx-19, cy-19)
         };
-        d->AddPolyline(pts, 6, col, 0, 2.0f);
-        d->AddCircle(ImVec2(cx, cy-2), 5.0f, col, 16, 2.0f);
+        d->AddPolyline(pts, 6, col, 0, 2.5f);
+        d->AddCircle(ImVec2(cx, cy-3), 6.0f, col, 16, 2.5f);
     };
 
     std::vector<GridBtn> btns;
@@ -1397,21 +1412,21 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
         btns[3].x = btns[1].x; btns[3].y = startY + 145.0f;
     } else {
         int rows = (count > 3) ? 2 : 1;
-        float startY = rows == 2 ? 95.0f : 156.0f;
+        float startY = rows == 2 ? 85.0f : 156.0f;
         int topRow = count > 3 ? 3 : count;
         int botRow = count - topRow;
         
-        float topStartX = (700.0f - (topRow * 140.0f + (topRow - 1) * 40.0f)) / 2.0f;
+        float topStartX = (700.0f - (topRow * 160.0f + (topRow - 1) * 35.0f)) / 2.0f;
         for (int i=0; i<topRow; i++) {
-            btns[i].x = topStartX + i * 180.0f;
+            btns[i].x = topStartX + i * 195.0f;
             btns[i].y = startY;
         }
         
         if (botRow > 0) {
-            float botStartX = (700.0f - (botRow * 140.0f + (botRow - 1) * 40.0f)) / 2.0f;
+            float botStartX = (700.0f - (botRow * 160.0f + (botRow - 1) * 35.0f)) / 2.0f;
             for (int i=0; i<botRow; i++) {
-                btns[topRow + i].x = botStartX + i * 180.0f;
-                btns[topRow + i].y = startY + 145.0f;
+                btns[topRow + i].x = botStartX + i * 195.0f;
+                btns[topRow + i].y = startY + 160.0f;
             }
         }
     }
@@ -1419,8 +1434,8 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
     for (size_t i=0; i<btns.size(); i++) {
         float bx = o.x + btns[i].x;
         float by = o.y + btns[i].y;
-        float bw = 140;
-        float bh = 120;
+        float bw = 160;
+        float bh = 135;
         float cr = 12;
 
         ImGui::SetCursorScreenPos(ImVec2(bx, by));
@@ -1453,12 +1468,12 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
             dl->AddLine(poly[j], poly[(j+1)%8], borderCol, hover ? 2.0f : 1.5f);
         }
         
-        btns[i].drawIcon(dl, bx + bw/2.0f, by + 45.0f, iconCol);
+        btns[i].drawIcon(dl, bx + bw/2.0f, by + 50.0f, iconCol);
         
-        float fontSize = 11.0f;
+        float fontSize = 13.0f;
         const char* txt = btns[i].title;
-        ImVec2 ts = fontSegoeBold12->CalcTextSizeA(fontSize, FLT_MAX, 130.0f, txt);
-        dl->AddText(fontSegoeBold12, fontSize, ImVec2(bx + (bw - ts.x)/2.0f, by + 85.0f), textCol, txt, nullptr, 130.0f);
+        ImVec2 ts = fontSegoeBold14->CalcTextSizeA(fontSize, FLT_MAX, 150.0f, txt);
+        dl->AddText(fontSegoeBold14, fontSize, ImVec2(bx + (bw - ts.x)/2.0f, by + 95.0f), textCol, txt, nullptr, 150.0f);
     }
 
     // ====== Footer (Date, Time, Profile) ======
