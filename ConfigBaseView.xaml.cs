@@ -68,6 +68,7 @@ namespace FSB_helper_C__
             cmbCategory.Items.Add("Законы");
             cmbCategory.Items.Add("Бинды");
             cmbCategory.Items.Add("Калькулятор");
+            cmbCategory.Items.Add("Доклады");
             cmbCategory.SelectedIndex = 0;
 
             cmbServer.SelectionChanged += Filter_Changed;
@@ -284,6 +285,57 @@ namespace FSB_helper_C__
                                 catch { }
                             }
                         }
+                        else if (item.Type == "patrols")
+                        {
+                            if (p.Patrols == null || p.Patrols.Count == 0)
+                            {
+                                dataExists = false;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                                    if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+                                    string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                    string fileName = item.Id;
+                                    if (!fileName.EndsWith(".json")) fileName += ".json";
+                                    string fp = string.IsNullOrEmpty(srvNum) 
+                                        ? System.IO.Path.Combine(appDir, "ConfigBase", fileName) 
+                                        : System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                                        
+                                    if (System.IO.File.Exists(fp))
+                                    {
+                                        string jsonFile = System.IO.File.ReadAllText(fp);
+                                        var jObj = Newtonsoft.Json.Linq.JToken.Parse(jsonFile);
+                                        List<PatrolBlock> patrolsToCheck = null;
+                                        if (jObj is Newtonsoft.Json.Linq.JArray)
+                                        {
+                                            patrolsToCheck = JsonConvert.DeserializeObject<List<PatrolBlock>>(jsonFile);
+                                        }
+                                        else if ((jObj["patrols"] ?? jObj["Patrols"]) != null)
+                                        {
+                                            patrolsToCheck = (jObj["patrols"] ?? jObj["Patrols"]).ToObject<List<PatrolBlock>>();
+                                        }
+                                        
+                                        bool anyExists = false;
+                                        if (patrolsToCheck != null && patrolsToCheck.Count > 0 && p.Patrols != null)
+                                        {
+                                            foreach (var pat in patrolsToCheck)
+                                            {
+                                                if (p.Patrols.Any(existing => existing.Name == pat.Name))
+                                                {
+                                                    anyExists = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!anyExists) dataExists = false;
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
                         else if (item.Type == "binds")
                         {
                             if (p.Binds == null || p.Binds.Count == 0)
@@ -359,6 +411,7 @@ namespace FSB_helper_C__
                     case 2: cat = "laws"; break;
                     case 3: cat = "binds"; break;
                     case 4: cat = "fines"; break;
+                    case 5: cat = "patrols"; break;
                 }
                 if (!string.IsNullOrEmpty(cat)) query = query.Where(i => i.Type == cat);
             }
@@ -579,6 +632,46 @@ namespace FSB_helper_C__
                                         }
                                         catch { }
                                     }
+                                    else if (item.Type == "patrols")
+                                    {
+                                        try
+                                        {
+                                            string srvNum = System.Text.RegularExpressions.Regex.Match(item.Server ?? "", @"\d+").Value;
+                                            if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
+                                            string appDir = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName ?? "") ?? "";
+                                            string fileName = item.Id;
+                                            if (!fileName.EndsWith(".json")) fileName += ".json";
+                                            string fp = string.IsNullOrEmpty(srvNum) 
+                                                ? System.IO.Path.Combine(appDir, "ConfigBase", fileName) 
+                                                : System.IO.Path.Combine(appDir, "ConfigBase", srvNum, fileName);
+                                                
+                                            if (System.IO.File.Exists(fp))
+                                            {
+                                                string jsonFile = System.IO.File.ReadAllText(fp);
+                                                var jObj = Newtonsoft.Json.Linq.JToken.Parse(jsonFile);
+                                                List<PatrolBlock> patrolsToRemove = null;
+                                                if (jObj is Newtonsoft.Json.Linq.JArray)
+                                                {
+                                                    patrolsToRemove = JsonConvert.DeserializeObject<List<PatrolBlock>>(jsonFile);
+                                                }
+                                                else if ((jObj["patrols"] ?? jObj["Patrols"]) != null)
+                                                {
+                                                    patrolsToRemove = (jObj["patrols"] ?? jObj["Patrols"]).ToObject<List<PatrolBlock>>();
+                                                }
+                                                
+                                                if (patrolsToRemove != null && p.Patrols != null)
+                                                {
+                                                    foreach (var pat in patrolsToRemove)
+                                                    {
+                                                        p.Patrols.RemoveAll(existing => existing.Name == pat.Name);
+                                                    }
+                                                }
+                                                shouldSave = true;
+                                                shouldRefreshUi = true;
+                                            }
+                                        }
+                                        catch { }
+                                    }
                                     else if (item.Type == "binds")
                                     {
                                         try
@@ -668,7 +761,7 @@ namespace FSB_helper_C__
                     if (!string.IsNullOrEmpty(srvNum)) srvNum = srvNum.PadLeft(2, '0');
 
                     string fileName = item.Id;
-                    if (item.Type == "laws" || item.Type == "fines") {
+                    if (item.Type == "laws" || item.Type == "fines" || item.Type == "patrols") {
                         if (!fileName.EndsWith(".json")) fileName += ".json";
                     }
 
@@ -793,6 +886,36 @@ namespace FSB_helper_C__
                                     isUpdated = true; 
                                 }
                             }
+                        }
+
+                        if (isUpdated)
+                        {
+                            shouldSave = true;
+                            shouldRefreshUi = true;
+                        }
+                    }
+                    else if (item.Type == "patrols")
+                    {
+                        var jObj = Newtonsoft.Json.Linq.JToken.Parse(json);
+                        bool isUpdated = false;
+                        if (string.IsNullOrEmpty(main.CurrentProfile) || !main.MasterData.ContainsKey(main.CurrentProfile)) throw new Exception("Нет активного профиля для установки докладов");
+                        var p = main.MasterData[main.CurrentProfile];
+
+                        List<PatrolBlock> patrolsList = null;
+                        if (jObj is Newtonsoft.Json.Linq.JArray) {
+                            patrolsList = JsonConvert.DeserializeObject<List<PatrolBlock>>(json);
+                        } else if ((jObj["patrols"] ?? jObj["Patrols"]) != null) {
+                            patrolsList = (jObj["patrols"] ?? jObj["Patrols"]).ToObject<List<PatrolBlock>>();
+                        }
+
+                        if (patrolsList != null) {
+                            if (p.Patrols == null) p.Patrols = new List<PatrolBlock>();
+                            foreach (var pat in patrolsList) {
+                                p.Patrols.RemoveAll(existing => existing.Name == pat.Name);
+                                pat.id = Guid.NewGuid().ToString("N");
+                                p.Patrols.Add(pat);
+                            }
+                            isUpdated = true;
                         }
 
                         if (isUpdated)

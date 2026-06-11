@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:FSB_helper_C__"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1000"
-        TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType">
+        TextOptions.TextFormattingMode="Ideal" TextOptions.TextRenderingMode="ClearType">
              
     <UserControl.Resources>
         <local:InverseBoolConverter x:Key="InvBool"/>
@@ -91,7 +91,7 @@
                                 </Border.Style>
                                 <Grid>
                                     <ScrollViewer x:Name="svSyntax" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" IsHitTestVisible="False">
-                                        <TextBlock x:Name="tbSyntax" Foreground="{DynamicResource TextBrush}" FontSize="12" FontFamily="Segoe UI" Padding="8,6,8,6" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap">
+                                        <TextBlock x:Name="tbSyntax" Foreground="{DynamicResource TextBrush}" FontSize="12" FontFamily="Segoe UI" Padding="10,6,10,6" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Visibility" Value="Visible"/>

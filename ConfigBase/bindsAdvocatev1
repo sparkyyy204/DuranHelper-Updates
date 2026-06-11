@@ -1,0 +1,318 @@
+{
+  "Binds": {
+    "f0eb27c5-608d-4848-9f9d-c6e25b192518": {
+      "id": "f0eb27c5-608d-4848-9f9d-c6e25b192518",
+      "name": "Представиться",
+      "key": "Alt + 1",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "Здравствуйте, я Адвокат Правительства - *ИМЯФАМ*.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 1
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/do На груди висит бейджик с текстом \"Адвокат Правительства».",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "Вы нуждаетесь в моих услугах?",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "30feede7-0b74-4d5b-b341-c64eeb07b640": {
+      "id": "30feede7-0b74-4d5b-b341-c64eeb07b640",
+      "name": "Прайс-лист",
+      "key": "Alt + 2",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/me Достал из внутненнего кармана PriceList.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/todo Передавая PriceList человеку напротив*Пожалуйста, ознакомьтесь с ценами.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "КПЗ: граждане - 15.000 рублей, гос. служащие - 20.000 рублей...",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "мафия/банда - 30.000 рублей.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "Тюрьма: граждане - 30.000 рублей, гос. служащие - 30.000 рублей...",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 6,
+          "action": "CHAT",
+          "value": "мафия/банда - 30.000 рублей.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "da063b95-116d-482a-aa60-54971613b805": {
+      "id": "da063b95-116d-482a-aa60-54971613b805",
+      "name": "Запрос паспорта",
+      "key": "Alt + 3",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "Итак, если Вы согласны с моими условиями, скажите мне, что вы нарушили.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "А также предоставьте ваши документы, удостоверяющие личность.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/n /pass [мой id]",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "590c8261-5570-4524-812e-8d7509ea921e": {
+      "id": "590c8261-5570-4524-812e-8d7509ea921e",
+      "name": "Росписаться",
+      "key": "Alt + 4",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/me достал(а) планшет из кармана пиджака, затем октрыл(а) базу данных МВД",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/me ввёл(а) паспортные данные заключённого, затем заполнил(а) информацию по делу",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/do Информация заполнена по делу заполнена.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "Теперь Вам осталось поставить свою подпись.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "/todo Поворачивая планшет к человеку напротив*Распишитесь на планшете.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 6,
+          "action": "CHAT",
+          "value": "/n /me расписался",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "1355b1c1-0583-495f-b272-22d06f22cd19": {
+      "id": "1355b1c1-0583-495f-b272-22d06f22cd19",
+      "name": "Выпустить",
+      "key": "Alt + 5",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/me выключил(а) планшет, затем убрал(а) его в карман пиджака",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "Я готов выпустить Вас. Больше не нарушайте!",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "WAIT",
+          "value": "100",
+          "desc": "ПАУЗА",
+          "ColorCode": "#d2a65e",
+          "isEnter": false,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/free ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    }
+  },
+  "Groups": [],
+  "Variables": {
+    "*ID*": "Введенный ID",
+    "*ИМЯФАМ*": "Иван Иванов"
+  },
+  "RadialMenu": {
+    "Enabled": true,
+    "Mode": "Standard",
+    "SectorCount": 5,
+    "Sectors": [
+      {
+        "BindId": "f0eb27c5-608d-4848-9f9d-c6e25b192518",
+        "BindName": "Представиться",
+        "Icon": "star",
+        "RequiresId": false
+      },
+      {
+        "BindId": "30feede7-0b74-4d5b-b341-c64eeb07b640",
+        "BindName": "Прайс-лист",
+        "Icon": "document",
+        "RequiresId": false
+      },
+      {
+        "BindId": "590c8261-5570-4524-812e-8d7509ea921e",
+        "BindName": "Росписаться",
+        "Icon": "lightning",
+        "RequiresId": false
+      },
+      {
+        "BindId": "da063b95-116d-482a-aa60-54971613b805",
+        "BindName": "Запрос паспорта",
+        "Icon": "document",
+        "RequiresId": false
+      },
+      {
+        "BindId": "1355b1c1-0583-495f-b272-22d06f22cd19",
+        "BindName": "Выпустить",
+        "Icon": "car",
+        "RequiresId": false
+      }
+    ],
+    "GroupCount": 4,
+    "Groups": []
+  }
+}

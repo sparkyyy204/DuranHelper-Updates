@@ -14,6 +14,7 @@ struct BindStep {
     std::string action; // "text", "delay", "command"
     std::string value; // e.g. "Здравия желаю!" or "1500"
     bool isEnter = true;
+    int CursorOffset = 0;
 };
 
 struct BindItem {
@@ -41,6 +42,8 @@ struct BindItem {
 };
 
 class BinderManager {
+public:
+    std::string currentProfileName;
 public:
     static BinderManager& Get() {
         static BinderManager instance;

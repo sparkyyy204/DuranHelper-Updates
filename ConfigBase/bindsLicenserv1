@@ -1,0 +1,281 @@
+{
+  "Binds": {
+    "Radial": {
+      "id": "Radial",
+      "name": "Radial Menu",
+      "key": "НЕТ",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [],
+      "isAuto": false
+    },
+    "270a8617-7b95-4a2a-affb-79416f59aaa8": {
+      "id": "270a8617-7b95-4a2a-affb-79416f59aaa8",
+      "name": "Представиться",
+      "key": "Alt + 1",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "Здравствуйте, я Лицензёр Правительста - *ИМЯФАМ* .",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 3
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/do На груди висит бейджик с текстом «Лицензёр Правительства».",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 30
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "Вы нуждаетесь в моих услугах?",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "47a247d1-1242-426c-a6bc-3d3feec46191": {
+      "id": "47a247d1-1242-426c-a6bc-3d3feec46191",
+      "name": "Прайс-лист",
+      "key": "Alt + 2",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/me достал из внутненнего кармана PriceList",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/todo Передавая PriceList человеку напротив*Пожалуйста, ознакомьтесь с ценами.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "Права (Базовый уровень) - 10.000 рублей. Права (Проф. уровень) - 35.000 рублей.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "Лицензии: оружие - 50.000 рублей, рыболовство - 40.000 рублей...",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "охота - 30.000  рублей.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 23
+        },
+        {
+          "Index": 6,
+          "action": "CHAT",
+          "value": "Какую будем оформлять?",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "9bb82298-55d8-48c4-96f7-1176b5a664f5": {
+      "id": "9bb82298-55d8-48c4-96f7-1176b5a664f5",
+      "name": "Документ",
+      "key": "Alt + 3",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/do Кейс с документами в правой руке.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/me открыл(а) кейс, затем достал(а) лист лицензий и ручку",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/me закрыл(а) кейс, затем поставил(а) его на землю",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/do Кейс стоит на земле.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 5,
+          "action": "CHAT",
+          "value": "/me щёлкнул(а) ручкой, затем начал(а) заполнять лист лицензии",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 6,
+          "action": "CHAT",
+          "value": "Покажите пожалуйста Ваш паспорт.",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    },
+    "df9c2ecb-e5f3-482c-946d-718c34b8e0ca": {
+      "id": "df9c2ecb-e5f3-482c-946d-718c34b8e0ca",
+      "name": "Выдать лицензию",
+      "key": "Alt + 4",
+      "active": true,
+      "group": "ВСЕ",
+      "steps": [
+        {
+          "Index": 1,
+          "action": "CHAT",
+          "value": "/me переписал(а) данные из паспорта в лист лицензии",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 2,
+          "action": "CHAT",
+          "value": "/me достал(а) из кармана штамп \"Одобрено к выдаче\", затем поставил(а) печать на листе",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 3,
+          "action": "CHAT",
+          "value": "/todo Передавая лист лицензии человеку напротив*Пожалуйста, пользуйтесь!",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": true,
+          "IsLast": false,
+          "CursorOffset": 0
+        },
+        {
+          "Index": 4,
+          "action": "CHAT",
+          "value": "/givelic ",
+          "desc": "ЧАТ",
+          "ColorCode": "#1f6feb",
+          "isEnter": false,
+          "IsLast": true,
+          "CursorOffset": 0
+        }
+      ],
+      "isAuto": false
+    }
+  },
+  "Groups": [],
+  "Variables": {
+    "*ID*": "Введенный ID",
+    "*ИМЯФАМ*": "Иван Иванов"
+  },
+  "RadialMenu": {
+    "Enabled": true,
+    "Mode": "Standard",
+    "SectorCount": 4,
+    "Sectors": [
+      {
+        "BindId": "270a8617-7b95-4a2a-affb-79416f59aaa8",
+        "BindName": "Представиться",
+        "Icon": "star",
+        "RequiresId": false
+      },
+      {
+        "BindId": "9bb82298-55d8-48c4-96f7-1176b5a664f5",
+        "BindName": "Документ",
+        "Icon": "document",
+        "RequiresId": false
+      },
+      {
+        "BindId": "df9c2ecb-e5f3-482c-946d-718c34b8e0ca",
+        "BindName": "Выдать лицензию",
+        "Icon": "lightning",
+        "RequiresId": false
+      },
+      {
+        "BindId": "47a247d1-1242-426c-a6bc-3d3feec46191",
+        "BindName": "Прайс-лист",
+        "Icon": "document",
+        "RequiresId": false
+      }
+    ],
+    "GroupCount": 4,
+    "Groups": []
+  }
+}

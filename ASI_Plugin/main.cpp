@@ -49,6 +49,8 @@ typedef SHORT(WINAPI* GetAsyncKeyState_t)(int);
 kthook::kthook_signal<GetAsyncKeyState_t> hookGetAsyncKeyState;
 
 typedef BOOL(WINAPI* GetKeyboardState_t)(PBYTE);
+int g_AutoScreenshotTrigger = 0;
+void StartAutoScreenshot(); // Forward declaration - body after SendSAMPMessage/RunOnMainThread
 kthook::kthook_signal<GetKeyboardState_t> hookGetKeyboardState;
 
 typedef LRESULT(WINAPI* DispatchMessageA_t)(const MSG*);
@@ -171,7 +173,7 @@ void SendSAMPMessage(const char* msg) {
 }
 
 // Helper to print local message in SAMP chat
-static void AddLocalSAMPMessage(const char* msg) {
+void AddLocalSAMPMessage(const char* msg) {
     if (!msg || msg[0] == '\0') return;
     HMODULE hSamp = GetModuleHandleA("samp.dll");
     if (!hSamp) return;
@@ -189,12 +191,15 @@ static void AddLocalSAMPMessage(const char* msg) {
 }
 
 // Open SA-MP chat input and pre-fill with text using key simulation
+std::atomic<bool> g_IgnoreNextF6{false};
+
 void OpenChatWithText(const char* text, int cursorOffset = 0) {
     HWND hwnd = FindWindowA("Grand theft auto San Andreas", NULL);
     if (!hwnd) hwnd = GetForegroundWindow();
     if (!hwnd) { Log("OpenChatWithText: no window"); return; }
 
     // Press F6 to open chat input (F6 doesn't produce a character like T does)
+    g_IgnoreNextF6.store(true);
     PostMessage(hwnd, WM_KEYDOWN, VK_F6, 0x00400001);
     PostMessage(hwnd, WM_KEYUP, VK_F6, 0xC0400001);
 
@@ -254,6 +259,34 @@ static void ProcessMainThreadTasks() {
     }
 }
 
+// Auto-screenshot: /c 60 -> F8 -> ESC
+void StartAutoScreenshot() {
+    std::thread([]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        
+        RunOnMainThread([]() {
+            SendSAMPMessage("/c 60");
+        });
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        
+        HWND hwnd = FindWindowA("Grand theft auto San Andreas", NULL);
+        if (!hwnd) hwnd = GetForegroundWindow();
+        
+        if (hwnd) {
+            PostMessage(hwnd, WM_KEYDOWN, VK_F8, 0x00420001);
+            PostMessage(hwnd, WM_KEYUP, VK_F8, 0xC0420001);
+        }
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        
+        if (hwnd) {
+            PostMessage(hwnd, WM_KEYDOWN, VK_ESCAPE, 0x00010001);
+            PostMessage(hwnd, WM_KEYUP, VK_ESCAPE, 0xC0010001);
+        }
+    }).detach();
+}
+
 // ===== Fine Post-Processing Sequence (Revoke + Quote) =====
 static std::atomic<int> g_FineSequenceState{0}; // 0=idle, 1=waiting_revoke, 2=waiting_quote
 static std::atomic<bool> g_FineSequenceGo{false};
@@ -309,6 +342,10 @@ static bool __fastcall HookedRPC(void* pThis, void* /*edx*/, int* uniqueID, RakN
 }
 
 void StartFineSequence(const std::string& targetId, const std::string& articleMsg, bool doRevoke, bool doQuote, const std::string& quoteText) {
+    if (!Gui::binderEnabled) {
+        RunOnMainThread([]() { AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x94\xD0\xB2\xD0\xB8\xD0\xB6\xD0\xBE\xD0\xBA \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD0\xB5\xD1\x80\xD0\xB0 \xD0\xBE\xD1\x82\xD0\xBA\xD0\xBB\xD1\x8E\xD1\x87\xD0\xB5\xD0\xBD \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5 \xD1\x85\xD0\xB5\xD0\xBB\xD0\xBF\xD0\xB5\xD1\x80\xD0\xB0.").c_str()); });
+        return;
+    }
     g_FineSequenceCancel.store(false);
     std::thread([id = targetId, art = articleMsg, doRevoke, doQuote, quoteText]() {
         ThreadTracker tracker;
@@ -326,7 +363,7 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
                 AddLocalSAMPMessage(m.c_str());
                 if (Gui::notifyFineIssue) {
                     std::string nMsg = "\xD0\x9B\xD0\x98\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x92\xD0\xA3 \xD0\x98\xD0\x93\xD0\xA0\xD0\x9E\xD0\x9A\xD0\x90 \xD0\xA1 ID: " + id;
-                    Gui::AddNotification("CALCULATOR", nMsg, k_c, "\xD0\xBF\xD1\x80\xD0\xB8\xD0\xBD\xD1\x8F\xD1\x82\xD1\x8C", k_x, "\xD0\xBE\xD1\x82\xD0\xBA\xD0\xBB\xD0\xBE\xD0\xBD\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(239, 68, 68, 255));
+                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBF\xD1\x80\xD0\xB8\xD0\xBD\xD1\x8F\xD1\x82\xD1\x8C", k_x, "\xD0\xBE\xD1\x82\xD0\xBA\xD0\xBB\xD0\xBE\xD0\xBD\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(239, 68, 68, 255));
                 }
             });
 
@@ -404,7 +441,7 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
                 AddLocalSAMPMessage(m.c_str());
                 if (Gui::notifyFineIssue) {
                     std::string nMsg = "\xD0\x9F\xD0\xA0\xD0\x9E\xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4?";
-                    Gui::AddNotification("CALCULATOR", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
+                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
                 }
             });
 
@@ -547,7 +584,7 @@ void StartWantedSequence(const std::string& targetId, const std::string& article
         }
         
         // Step 3: Quote
-        if (doQuote && !quoteText.empty()) {
+        if (doQuote && !quoteText.empty() && Gui::binderEnabled) {
             g_WantedSequenceState.store(2);
             g_WantedSequenceGo.store(false);
             g_WantedSequenceStop.store(false);
@@ -561,7 +598,7 @@ void StartWantedSequence(const std::string& targetId, const std::string& article
                 AddLocalSAMPMessage(qReq.c_str());
                 if (Gui::notifyFineIssue) {
                     std::string nMsg = "\xD0\x9F\xD0\xA0\xD0\x9E\xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A?";
-                    Gui::AddNotification("CALCULATOR", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
+                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
                 }
             });
             
@@ -636,6 +673,10 @@ void StartWantedSequence(const std::string& targetId, const std::string& article
 
 // ===== Smart Quoting =====
 void Gui::ExecuteLawQuote(const std::string& utf8text) {
+    if (!Gui::binderEnabled) {
+        RunOnMainThread([]() { AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x94\xD0\xB2\xD0\xB8\xD0\xB6\xD0\xBE\xD0\xBA \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD0\xB5\xD1\x80\xD0\xB0 \xD0\xBE\xD1\x82\xD0\xBA\xD0\xBB\xD1\x8E\xD1\x87\xD0\xB5\xD0\xBD \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5 \xD1\x85\xD0\xB5\xD0\xBB\xD0\xBF\xD0\xB5\xD1\x80\xD0\xB0.").c_str()); });
+        return;
+    }
     Gui::Toggle(); // Use Toggle to correctly hide overlay and restore game state
     g_QuotingActive.store(true);
     g_CancelQuote.store(false);
@@ -744,6 +785,10 @@ std::atomic<bool> g_RecordingID{false};
 std::string g_EnteredID = "";
 
 void ExecuteBindActions(const BindItem& bind) {
+    if (!Gui::binderEnabled) {
+        RunOnMainThread([]() { AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x94\xD0\xB2\xD0\xB8\xD0\xB6\xD0\xBE\xD0\xBA \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD0\xB5\xD1\x80\xD0\xB0 \xD0\xBE\xD1\x82\xD0\xBA\xD0\xBB\xD1\x8E\xD1\x87\xD0\xB5\xD0\xBD \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5 \xD1\x85\xD0\xB5\xD0\xBB\xD0\xBF\xD0\xB5\xD1\x80\xD0\xB0.").c_str()); });
+        return;
+    }
     std::thread([b = bind]() {
         ThreadTracker tracker;
         g_RunningBindsCount++;
@@ -790,7 +835,7 @@ void ExecuteBindActions(const BindItem& bind) {
                 }
 
                 std::string cpText = UTF8ToCP1251(processedText.c_str());
-                int cursorOffset = 0;
+                int cursorOffset = step.CursorOffset;
                 bool idPos_was_found = false;
                 bool idReplaced = false;
 
@@ -972,7 +1017,8 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
 
     if (uMsg == WM_APP + 778) {
-        ProcessMainThreadTasks();
+        // Do not process tasks here (not thread-safe for D3D/SAMP).
+        // It serves only to wake the game from Idle mode if needed.
         return 0;
     }
     // Intercept Live Sync signal from C# Launcher
@@ -1027,6 +1073,20 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
     }
 
+    
+    // Prevent punching / shooting right after closing the overlay
+    if (!Gui::show && (GetTickCount64() - Gui::lastCloseTime < 300)) {
+        if (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_LBUTTONDBLCLK ||
+            uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP || uMsg == WM_RBUTTONDBLCLK ||
+            uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONUP || uMsg == WM_MBUTTONDBLCLK) {
+            // Zero GTA pad state immediately
+            *(uint8_t*)0xB73418 = 0; *(uint8_t*)0xB73404 = 0; // lmb
+            *(uint8_t*)0xB73419 = 0; *(uint8_t*)0xB73405 = 0; // rmb
+            *(uint8_t*)0xB7341A = 0; *(uint8_t*)0xB73406 = 0; // mmb
+            return 0; // Block from game completely
+        }
+    }
+
     // Refine generic modifier keys to specific Left/Right variants for matching binds (e.g. LCTRL)
     if (msgVk == VK_CONTROL) msgVk = (lParam & (1 << 24)) ? VK_RCONTROL : VK_LCONTROL;
     if (msgVk == VK_SHIFT) msgVk = MapVirtualKey((lParam & 0x00ff0000) >> 16, MAPVK_VSC_TO_VK_EX);
@@ -1038,6 +1098,10 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
     // Stop-Bind key: abort a running binder sequence
     if (isDown && !Gui::stopBindKeyStr.empty() && BinderManager::Get().StringToVK(Gui::stopBindKeyStr) == msgVk && !Gui::show) {
+        if (msgVk == VK_F6 && g_IgnoreNextF6.load()) {
+            g_IgnoreNextF6.store(false);
+            return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+        }
         extern std::atomic<bool> g_CancelBind;
         extern std::atomic<int> g_RunningBindsCount;
         
@@ -1087,14 +1151,9 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         return 0; // prevent game pause menu from opening
     }
 
-    if (isDown && msgVk == Gui::binderHintKey && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled && Gui::binderEnabled) {
-        bool hAlt = (msgVk == VK_MENU || msgVk == VK_LMENU || msgVk == VK_RMENU) ? Gui::binderHintNeedsAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
-        bool hCtrl = (msgVk == VK_CONTROL || msgVk == VK_LCONTROL || msgVk == VK_RCONTROL) ? Gui::binderHintNeedsCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
-        bool hShift = (msgVk == VK_SHIFT || msgVk == VK_LSHIFT || msgVk == VK_RSHIFT) ? Gui::binderHintNeedsShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
-        if (hAlt == Gui::binderHintNeedsAlt && hCtrl == Gui::binderHintNeedsCtrl && hShift == Gui::binderHintNeedsShift) {
-            Gui::ToggleBinderHint();
-            return 0;
-        }
+    if (isDown && msgVk == Gui::binderHintKey && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled) {
+        Gui::ToggleBinderHint();
+        return 0;
     }
 
     // ===== Radial Menu =====
@@ -1428,18 +1487,6 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
     }
 
-    // Patrol Hotkeys
-    if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled && !g_ChatOpen.load() && Gui::activePatrol.active) {
-        if (msgVk == 'Y' && !tAltDown && !tCtrlDown && !tShiftDown) {
-            Gui::ExecutePatrolReport();
-            return 0; // block from game
-        }
-        if (msgVk == 'N' && !tAltDown && !tCtrlDown && !tShiftDown) {
-            Gui::activePatrol.active = false;
-            return 0; // block from game
-        }
-    }
-
     // Binds Engine (hotkey binds — skip auto binds)
     if (isDown && !Gui::show && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled && Gui::binderEnabled) {
         WPARAM preciseKey = msgVk;
@@ -1616,6 +1663,9 @@ static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
     static IDirect3DDevice9* currentDevice = nullptr;
     static bool firstEndScene = true;
 
+    // Process queued main thread tasks safely here
+    ProcessMainThreadTasks();
+
     if (firstEndScene) {
         Log("Hooked_EndScene: First call executed on device " + std::to_string((uintptr_t)pDevice));
         firstEndScene = false;
@@ -1674,9 +1724,17 @@ static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
         Log("Hooked_EndScene: ImGui initialization complete.");
     }
 
-    if (Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen) {
+    static bool wasMouseBlocked = false;
+    bool shouldBlockMouse = Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen || (GetTickCount64() - Gui::lastCloseTime < 300);
+    
+    if (shouldBlockMouse) {
         *(float*)0xB6EC1C = 0.0f;
         *(float*)0xB6EC18 = 0.0f;
+        wasMouseBlocked = true;
+    } else if (wasMouseBlocked) {
+        if (savedSensX > 0.0001f) *(float*)0xB6EC1C = savedSensX;
+        if (savedSensY > 0.0001f) *(float*)0xB6EC18 = savedSensY;
+        wasMouseBlocked = false;
     }
 
     if (!g_StateBlock) {
@@ -1738,6 +1796,43 @@ static IDirect3DDevice9* GetGameDevice() {
 }
 
 static void MainThread() {
+    // ===== RADMIR IP VERIFICATION =====
+    const char* official_ips[] = {
+        "185.169.134.139", "185.169.134.140", "80.66.71.76", "80.66.71.77",
+        "185.169.134.35", "185.169.134.36", "80.66.71.74", "80.66.71.75",
+        "185.169.134.123", "185.169.134.124", "80.66.71.80", "80.66.71.81",
+        "80.66.71.78", "80.66.71.79", "80.66.71.82", "80.66.71.83",
+        "80.66.71.84", "80.66.71.61", "80.66.71.71", "80.66.71.91", "80.66.71.92",
+        "127.0.0.1", "localhost" // Allow local testing
+    };
+    bool ip_valid = false;
+    char* cmdLine = GetCommandLineA();
+    if (cmdLine) {
+        for (const char* ip : official_ips) {
+            if (strstr(cmdLine, ip)) {
+                ip_valid = true;
+                break;
+            }
+        }
+    }
+    
+    if (!ip_valid) {
+        Gui::versionStr = "1.0.1";
+        Gui::scriptEnabled = false;
+        Gui::binderEnabled = false;
+        
+        CreateThread(NULL, 0, [](LPVOID) -> DWORD {
+            // Wait 10 seconds then crash
+            Sleep(10000);
+            *(int*)0xDEADBEEF = 0;
+            return 0;
+        }, NULL, 0, NULL);
+        
+        // Block everything else in MainThread from running! 
+        return; 
+    }
+    // ==================================
+
     while (!GetModuleHandleA("samp.dll")) Sleep(100);
     Log("MainThread: samp.dll found. Setting up hooks...");
 
@@ -1775,7 +1870,7 @@ static void MainThread() {
         if (setCursorPosAddr) {
             hookSetCursorPos.set_dest((SetCursorPos_t)setCursorPosAddr);
             hookSetCursorPos.before += [](const auto& hook, int& X, int& Y) -> std::optional<BOOL> {
-                if (Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen) {
+                if (Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen || (GetTickCount64() - Gui::lastCloseTime < 300)) {
                     return TRUE; // Block — return TRUE without calling original
                 }
                 return std::nullopt; // Call original
@@ -1788,7 +1883,7 @@ static void MainThread() {
     hookCPadUpdate.set_cb([](const auto& hook) {
         hook.get_trampoline()(); // Let GTA SA read the hardware controller mappings
         
-        if (Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen) {
+        if (Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen || (GetTickCount64() - Gui::lastCloseTime < 300)) {
             bool wantTextInput = false;
             if (ImGui::GetCurrentContext() != nullptr) {
                 wantTextInput = ImGui::GetIO().WantTextInput;
@@ -1919,6 +2014,12 @@ static void MainThread() {
                 }
             }
 
+            if ((msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN) && msg->wParam == Gui::binderHintKey && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled) {
+                Gui::ToggleBinderHint();
+                MSG* m = const_cast<MSG*>(msg); m->message = WM_NULL;
+                return 0;
+            }
+
             if ((msg->message == WM_KEYDOWN || msg->message == WM_KEYUP) && msg->wParam == VK_ESCAPE && Gui::show) {
                 if (msg->message == WM_KEYUP) Gui::HandleEscape();
                 MSG* m = const_cast<MSG*>(msg); m->message = WM_NULL;
@@ -1984,6 +2085,12 @@ static void MainThread() {
                     MSG* m = const_cast<MSG*>(msg); m->message = WM_NULL;
                     return 0;
                 }
+            }
+
+            if ((msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN) && msg->wParam == Gui::binderHintKey && !Gui::radialMenuOpen && !Gui::radialIdInputOpen && Gui::scriptEnabled) {
+                Gui::ToggleBinderHint();
+                MSG* m = const_cast<MSG*>(msg); m->message = WM_NULL;
+                return 0;
             }
             return std::nullopt;
         };

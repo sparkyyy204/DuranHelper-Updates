@@ -16,6 +16,9 @@
 #include "json.hpp"
 
 extern std::atomic<bool> g_CancelQuote;
+extern void AddLocalSAMPMessage(const char* text);
+extern std::string UTF8ToCP1251(const char* utf8);
+extern void RunOnMainThread(std::function<void()> func);
 extern float g_ImGuiGlobalScale;
 
 using json = nlohmann::ordered_json;
@@ -26,6 +29,7 @@ extern void StartWantedSequence(const std::string& targetId, const std::string& 
 
 // ===== Static Member Initialization =====
 extern HWND g_hWnd;
+std::map<std::string, std::string> Gui::editVariables;
 bool Gui::show = false;
 bool Gui::showBinderHint = false;
 bool Gui::clearNextFrame = false;
@@ -34,9 +38,9 @@ int Gui::activeTab = -1;
 bool Gui::useGridMenu = false;
 
 std::vector<PatrolData> Gui::patrols;
-ActivePatrol Gui::activePatrol = {false, {}, 0, 0.0f, 0, false, {}};
+ActivePatrol Gui::activePatrol = {false, {}, 0, 0.0f, 0, 0, 0.0f, true, {}, 0, 0};
 int Gui::selectedPatrolIndex = 0;
-std::string Gui::versionStr = "4.1.0";
+std::string Gui::versionStr = "4.2.0";
 
 ImFont* Gui::fontArialBlack24 = nullptr;
 ImFont* Gui::fontSegoeBold12 = nullptr;
@@ -126,6 +130,9 @@ int Gui::currentTheme = 0;
 int Gui::binderDelay = 1000;
 bool Gui::rememberTab = true;
 bool Gui::searchCurrentSection = true;
+bool Gui::clearSearchOnClose = false;
+bool Gui::closeOnClickOutside = false;
+ULONGLONG Gui::lastCloseTime = 0;
 
 bool Gui::quoteEnabled = true;
 bool Gui::quoteNotepad = true;
@@ -1032,17 +1039,20 @@ void Gui::Toggle() {
         }
     }
     show = !show;
+    if (!show) {
+        lastCloseTime = GetTickCount64();
+    }
     if (show) {
         showBinderHint = false; // Exclusivity
-        savedSensX = *(float*)0xB6EC1C;
-        savedSensY = *(float*)0xB6EC18;
-        clearNextFrame = true; // Signal Render() to aggressively clear text inputs
+        float cx = *(float*)0xB6EC1C;
+        float cy = *(float*)0xB6EC18;
+        if (cx > 0.0001f || cx < -0.0001f) savedSensX = cx;
+        if (cy > 0.0001f || cy < -0.0001f) savedSensY = cy;
+        if (clearSearchOnClose) clearNextFrame = true; // Signal Render() to aggressively clear text inputs
         overlayErrorTimer = 0.0f; // Clear errors on toggle
     } else {
-        if (savedSensX >= 0.0f) *(float*)0xB6EC1C = savedSensX;
-        if (savedSensY >= 0.0f) *(float*)0xB6EC18 = savedSensY;
         if (!rememberTab) {
-            activeTab = useGridMenu ? -1 : 0;      // Reset to Menu or Laws tab
+            activeTab = -1;      // Reset to Menu or Laws tab
             showSettings = false;  // Also close settings panel
         }
         showLawDropdown = false;
@@ -1060,7 +1070,7 @@ void Gui::Toggle() {
 }
 
 void Gui::HandleEscape() {
-    if (useGridMenu && (activeTab != -1 || showSettings)) {
+    if (true && (activeTab != -1 || showSettings)) {
         activeTab = -1;
         showSettings = false;
         showLawDropdown = false;
@@ -1071,9 +1081,17 @@ void Gui::HandleEscape() {
 }
 
 void Gui::ToggleBinderHint() {
-    showBinderHint = !showBinderHint;
-    if (showBinderHint) {
-        if (show) Toggle(); // Exclusivity
+    static uint64_t lastToggle = 0;
+    if (GetTickCount64() - lastToggle < 300) return;
+    lastToggle = GetTickCount64();
+
+    if (!showBinderHint) {
+        // We are opening the hint. If the overlay is open, close it first.
+        if (show) Toggle();
+        showBinderHint = true;
+    } else {
+        // We are closing the hint.
+        showBinderHint = false;
     }
 }
 
@@ -1114,6 +1132,14 @@ void Gui::DrawHudFrame(ImDrawList* dl, ImVec2 o) {
         dl->AddLine(ImVec2(o.x+startX, o.y+y), ImVec2(o.x+endX, o.y+y), C_GRID, 1.0f);
     }
 
+    // Header bar (polygon so it doesn't overlap clipped corners)
+    ImVec2 hdrPoly[] = {
+        {o.x, o.y+CORNER}, {o.x+CORNER, o.y}, {o.x+W-CORNER, o.y}, {o.x+W, o.y+CORNER},
+        {o.x+W, o.y+HEADER_H}, {o.x, o.y+HEADER_H}
+    };
+    dl->AddConvexPolyFilled(hdrPoly, 6, C_HEADER);
+    dl->AddLine(ImVec2(o.x, o.y+HEADER_H), ImVec2(o.x+W, o.y+HEADER_H), C_BORDER, 2.0f);
+
     // Border (drawn with individual lines to prevent sharp miter spikes at clipped corners)
     for (int i = 0; i < 8; i++) {
         dl->AddLine(poly[i], poly[(i+1)%8], C_LINE, 2.0f);
@@ -1122,14 +1148,6 @@ void Gui::DrawHudFrame(ImDrawList* dl, ImVec2 o) {
     // Gold accent top-left вЂ” offset 1px outward so line sits above edge, no inner glow
     dl->AddLine(ImVec2(o.x-1, o.y+CORNER), ImVec2(o.x+CORNER, o.y-1), C_GOLD, 3.0f);
     dl->AddLine(ImVec2(o.x+CORNER, o.y-1), ImVec2(o.x+250.0f, o.y-1), C_GOLD, 3.0f);
-
-    // Header bar (polygon so it doesn't overlap clipped corners)
-    ImVec2 hdrPoly[] = {
-        {o.x, o.y+CORNER}, {o.x+CORNER, o.y}, {o.x+W-CORNER, o.y}, {o.x+W, o.y+CORNER},
-        {o.x+W, o.y+HEADER_H}, {o.x, o.y+HEADER_H}
-    };
-    dl->AddConvexPolyFilled(hdrPoly, 6, C_HEADER);
-    dl->AddLine(ImVec2(o.x, o.y+HEADER_H), ImVec2(o.x+W, o.y+HEADER_H), C_BORDER, 2.0f);
 
     // "DURAN HELPER" - SVG: x=20 y=32 font-size=20 (using size 24.0f to match visual weight)
     float duranW = fontArialBlack24->CalcTextSizeA(24.0f, FLT_MAX, 0.0f, "DURAN ").x;
@@ -1140,7 +1158,7 @@ void Gui::DrawHudFrame(ImDrawList* dl, ImVec2 o) {
     float verW = fontSegoeBold12->CalcTextSizeA(verFontSize, FLT_MAX, 0.0f, ver.c_str()).x + 10.0f;
 
     float startX = o.x + 20.0f;
-    if (useGridMenu) {
+    if (true) {
         float totalW = duranW + helperW + 12.0f + verW;
         startX = o.x + (W - totalW) / 2.0f;
     }
@@ -1262,6 +1280,25 @@ void Gui::DrawGridBackButton(ImDrawList* dl, ImVec2 o) {
 }
 
 void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
+
+    // ====== Background Patterns ======
+    ImU32 goldAcc = IM_COL32(243, 211, 153, 40); // Subtle gold, same as launcher Opacity 0.5 roughly
+    
+    // Zigzag 1 (Top chaotic line)
+    ImVec2 z1[5] = {ImVec2(o.x+37, o.y+189), ImVec2(o.x+150, o.y+119), ImVec2(o.x+262, o.y+154), ImVec2(o.x+412, o.y+84), ImVec2(o.x+562, o.y+133)};
+    for(int i=0; i<4; i++) dl->AddLine(z1[i], z1[i+1], goldAcc, 1.5f);
+    dl->AddCircleFilled(z1[1], 4.0f, goldAcc);
+    dl->AddCircleFilled(z1[3], 4.0f, goldAcc);
+    
+    // Zigzag 2 (Bottom chaotic line)
+    ImVec2 z2[5] = {ImVec2(o.x+75, o.y+329), ImVec2(o.x+187, o.y+259), ImVec2(o.x+337, o.y+294), ImVec2(o.x+487, o.y+224), ImVec2(o.x+637, o.y+273)};
+    for(int i=0; i<4; i++) dl->AddLine(z2[i], z2[i+1], goldAcc, 1.5f);
+    dl->AddCircleFilled(z2[1], 4.0f, goldAcc);
+    dl->AddCircleFilled(z2[3], 4.0f, goldAcc);
+    
+    // Chevron accent
+    ImVec2 cv[3] = {ImVec2(o.x+75, o.y+84), ImVec2(o.x+112, o.y+119), ImVec2(o.x+75, o.y+154)};
+    for(int i=0; i<2; i++) dl->AddLine(cv[i], cv[i+1], goldAcc, 1.5f);
     struct GridBtn {
         int id; // -2 for Settings
         const char* title;
@@ -1343,16 +1380,43 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
         d->AddCircle(ImVec2(cx, cy-2), 5.0f, col, 16, 2.0f);
     };
 
-    GridBtn btns[] = {
-        {0, "\xD0\x97\xD0\x90\xD0\x9A\xD0\x9E\xD0\x9D\xD0\xAB", 100, 95, drawLawsIcon},
-        {1, "\xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4\xD0\xAB", 280, 95, drawFinesIcon},
-        {4, "\xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A", 460, 95, drawWantedIcon},
-        {2, "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\x95\xD0\xA0", 100, 240, drawBinderIcon},
-        {5, "\xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\x98/\xD0\x9F\xD0\x9E\xD0\xA1\xD0\xA2\xD0\xAB", 280, 240, drawPatrolsIcon},
-        {-2, "\xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x99\xD0\x9A\xD0\x98", 460, 240, drawSettingsIcon}
-    };
+    std::vector<GridBtn> btns;
+    if (showTabLaws) btns.push_back({0, "\xD0\x97\xD0\x90\xD0\x9A\xD0\x9E\xD0\x9D\xD0\xAB", 0, 0, drawLawsIcon});
+    if (showTabFines) btns.push_back({1, "\xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4\xD0\xAB", 0, 0, drawFinesIcon});
+    if (showTabWanted) btns.push_back({4, "\xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A", 0, 0, drawWantedIcon});
+    if (showTabBinder) btns.push_back({2, "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\x95\xD0\xA0", 0, 0, drawBinderIcon});
+    btns.push_back({5, "\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\xAB", 0, 0, drawPatrolsIcon});
+    btns.push_back({-2, "\xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x99\xD0\x9A\xD0\x98", 0, 0, drawSettingsIcon});
 
-    for (int i=0; i<6; i++) {
+    int count = (int)btns.size();
+    if (count == 4) {
+        float startY = 432.0f / 2.0f - (2 * 120.0f + 25.0f) / 2.0f;
+        btns[0].x = (700.0f - (2 * 140.0f + 40.0f)) / 2.0f; btns[0].y = startY;
+        btns[1].x = btns[0].x + 180.0f; btns[1].y = startY;
+        btns[2].x = btns[0].x; btns[2].y = startY + 145.0f;
+        btns[3].x = btns[1].x; btns[3].y = startY + 145.0f;
+    } else {
+        int rows = (count > 3) ? 2 : 1;
+        float startY = rows == 2 ? 95.0f : 156.0f;
+        int topRow = count > 3 ? 3 : count;
+        int botRow = count - topRow;
+        
+        float topStartX = (700.0f - (topRow * 140.0f + (topRow - 1) * 40.0f)) / 2.0f;
+        for (int i=0; i<topRow; i++) {
+            btns[i].x = topStartX + i * 180.0f;
+            btns[i].y = startY;
+        }
+        
+        if (botRow > 0) {
+            float botStartX = (700.0f - (botRow * 140.0f + (botRow - 1) * 40.0f)) / 2.0f;
+            for (int i=0; i<botRow; i++) {
+                btns[topRow + i].x = botStartX + i * 180.0f;
+                btns[topRow + i].y = startY + 145.0f;
+            }
+        }
+    }
+
+    for (size_t i=0; i<btns.size(); i++) {
         float bx = o.x + btns[i].x;
         float by = o.y + btns[i].y;
         float bw = 140;
@@ -1396,6 +1460,73 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
         ImVec2 ts = fontSegoeBold12->CalcTextSizeA(fontSize, FLT_MAX, 130.0f, txt);
         dl->AddText(fontSegoeBold12, fontSize, ImVec2(bx + (bw - ts.x)/2.0f, by + 85.0f), textCol, txt, nullptr, 130.0f);
     }
+
+    // ====== Footer (Date, Time, Profile) ======
+    time_t t = time(NULL);
+    struct tm tmBuf;
+    localtime_s(&tmBuf, &t);
+    
+    char dateBuf[64];
+    snprintf(dateBuf, sizeof(dateBuf), "%02d.%02d.%04d  %02d:%02d", 
+             tmBuf.tm_mday, tmBuf.tm_mon + 1, tmBuf.tm_year + 1900,
+             tmBuf.tm_hour, tmBuf.tm_min);
+             
+    std::string profileLabel = "\xD0\x9F\xD1\x80\xD0\xBE\xD1\x84\xD0\xB8\xD0\xBB\xD1\x8C: ";
+    std::string profileValue = BinderManager::Get().currentProfileName;
+    std::string separator = "   |   ";
+    
+    ImVec2 dateSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, dateBuf);
+    ImVec2 sepSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, separator.c_str());
+    ImVec2 plabSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, profileLabel.c_str());
+    ImVec2 pvalSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, profileValue.c_str());
+    
+    float totalW = dateSz.x + sepSz.x + plabSz.x + pvalSz.x;
+    float cutH = 30.0f;
+    float cutW = totalW + 40.0f; // Width at the top flat part of trapezoid
+    float centerX = o.x + W/2.0f;
+    float bottomY = o.y + H; // Exact bottom of the window
+    
+    // Trapezoid cutout perfectly matching bottom border (CCW order for correct ImGui anti-aliasing)
+    // We bring the bottom Y back to 'bottomY' so the main window border can serve as the bottom edge,
+    // exactly like how the top bar works.
+    ImVec2 fillPts[4] = {
+        ImVec2(centerX + cutW/2 + cutH - 1.0f, bottomY - 1.0f), // Bottom right
+        ImVec2(centerX + cutW/2, bottomY - cutH),        // Top right
+        ImVec2(centerX - cutW/2, bottomY - cutH),        // Top left
+        ImVec2(centerX - cutW/2 - cutH + 1.0f, bottomY - 1.0f)  // Bottom left
+    };
+    // Draw the background of the trapezoid using C_HEADER so it matches the top bar perfectly
+    dl->AddConvexPolyFilled(fillPts, 4, C_HEADER);
+    
+    // Draw the border. We use 'false' for open to not double-draw the bottom line,
+    // avoiding the thickness bug. The main window border will show at the bottom perfectly.
+    ImVec2 borderPts[4] = {
+        ImVec2(centerX - cutW/2 - cutH, bottomY),
+        ImVec2(centerX - cutW/2, bottomY - cutH),
+        ImVec2(centerX + cutW/2, bottomY - cutH),
+        ImVec2(centerX + cutW/2 + cutH, bottomY)
+    };
+    
+    // Inner main window border
+    // Draw lines individually to balance anti-aliased visual thickness
+    dl->AddLine(borderPts[0], borderPts[1], C_LINE, 1.5f); // Left slanted
+    dl->AddLine(borderPts[1], borderPts[2], C_LINE, 2.0f); // Top horizontal
+    dl->AddLine(borderPts[2], borderPts[3], C_LINE, 1.5f); // Right slanted
+    
+    
+    float textY = bottomY - cutH + (cutH - 14.0f) / 2.0f - 1.0f;
+    float cx = centerX - totalW / 2.0f;
+    
+    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(cx, textY), C_GRAY, dateBuf);
+    cx += dateSz.x;
+    
+    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(cx, textY), IM_COL32(80, 80, 80, 255), separator.c_str());
+    cx += sepSz.x;
+    
+    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(cx, textY), C_GRAY, profileLabel.c_str());
+    cx += plabSz.x;
+    
+    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(cx, textY), C_GOLD, profileValue.c_str());
 }
 
 // ===== Laws Tab ===== SVG: search x=25,y=80 w=450 h=34; dropdown x=495,y=80 w=320 h=34; articles y=135
@@ -1406,49 +1537,31 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
     
     // Empty state
     if (lawSections.empty()) {
-        // Disabled search bar (Matched active measurements)
-        dl->AddRectFilled(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_HEADER, 6.0f);
-        dl->AddRect(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_BORDER, 6.0f, 0, 1.5f);
-        // Search icon
-        dl->AddCircle(ImVec2(o.x+35, o.y+80), 4.0f, C_GRAY2, 12, 2.0f);
-        dl->AddLine(ImVec2(o.x+38, o.y+83), ImVec2(o.x+42, o.y+87), C_GRAY2, 2.0f);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x+50, o.y+73), IM_COL32(74,80,89,255),
-            "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB5\xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD1\x83\xD0\xBF\xD0\xB5\xD0\xBD...");
-        
-        // Disabled dropdown - same pos/size as active (x=470, w=210)
-        dl->AddRectFilled(ImVec2(o.x+470, o.y+65), ImVec2(o.x+680, o.y+95), C_HEADER, 6.0f);
-        dl->AddRect(ImVec2(o.x+470, o.y+65), ImVec2(o.x+680, o.y+95), C_BORDER, 6.0f, 0, 1.5f);
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(o.x+485, o.y+75), IM_COL32(74,80,89,255),
-            "\xD0\x91\xD0\xB0\xD0\xB7\xD0\xB0 \xD0\xBD\xD0\xB5 \xD0\xB2\xD1\x8B\xD0\xB1\xD1\x80\xD0\xB0\xD0\xBD\xD0\xB0");
-        // Chevron
-        dl->AddLine(ImVec2(o.x+662, o.y+77), ImVec2(o.x+668, o.y+83), IM_COL32(74,80,89,255), 2.0f);
-        dl->AddLine(ImVec2(o.x+668, o.y+83), ImVec2(o.x+674, o.y+77), IM_COL32(74,80,89,255), 2.0f);
-        
-        // Center icon: document
-        float icx = o.x + 350, icy = o.y + 230;
-        // Document outline
-        dl->AddLine(ImVec2(icx-25, icy-40), ImVec2(icx+10, icy-40), C_BORDER, 4.0f);
-        dl->AddLine(ImVec2(icx+10, icy-40), ImVec2(icx+30, icy-20), C_BORDER, 4.0f);
-        dl->AddLine(ImVec2(icx+30, icy-20), ImVec2(icx+30, icy+40), C_BORDER, 4.0f);
-        dl->AddLine(ImVec2(icx+30, icy+40), ImVec2(icx-35, icy+40), C_BORDER, 4.0f);
-        dl->AddLine(ImVec2(icx-35, icy+40), ImVec2(icx-35, icy-30), C_BORDER, 4.0f);
-        dl->AddLine(ImVec2(icx-35, icy-30), ImVec2(icx-25, icy-40), C_BORDER, 4.0f);
-        // Fold corner
-        dl->AddLine(ImVec2(icx+10, icy-40), ImVec2(icx+10, icy-20), C_BORDER, 4.0f);
-        dl->AddLine(ImVec2(icx+10, icy-20), ImVec2(icx+30, icy-20), C_BORDER, 4.0f);
-        // Text lines inside doc
-        dl->AddLine(ImVec2(icx-15, icy-10), ImVec2(icx+15, icy-10), C_LINE, 4.0f);
-        dl->AddLine(ImVec2(icx-15, icy+5), ImVec2(icx+15, icy+5), C_LINE, 4.0f);
-        dl->AddLine(ImVec2(icx-15, icy+20), ImVec2(icx+5, icy+20), C_LINE, 4.0f);
-        
-        // Text
-        const char* emtTxt = "\xD0\x91\xD0\x90\xD0\x97\xD0\x90 \xD0\x97\xD0\x90\xD0\x9A\xD0\x9E\xD0\x9D\xD0\x9E\xD0\x92 \xD0\x9F\xD0\xA3\xD0\xA1\xD0\xA2\xD0\x90"; // Р вЂР С’Р вЂ”Р С’ Р вЂ”Р С’Р С™Р С›Р СњР С›Р вЂ™ Р СџР Р€Р РЋР СћР С’
-        ImVec2 t1 = fontSegoeBold20->CalcTextSizeA(16.0f, FLT_MAX, 0.0f, emtTxt);
-        dl->AddText(fontSegoeBold20, 16.0f, ImVec2(icx - t1.x/2, icy+75), C_GRAY, emtTxt);
-        
-        const char* emtSub = "\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80 \xD0\xB8 \xD0\xBD\xD0\xB0\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x84\xD0\xB8\xD0\xBB\xD1\x8C \xD1\x81 \xD0\xA3\xD0\x9A / \xD0\x9A\xD0\xBE\xD0\x90\xD0\x9F."; // Р С›РЎвЂљР С”РЎР‚Р С•Р в„–РЎвЂљР Вµ Р В»Р В°РЎС“Р Р…РЎвЂЎР ВµРЎР‚...
-        ImVec2 t2 = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, emtSub);
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(icx - t2.x/2, icy+95), IM_COL32(92,99,112,255), emtSub);
+        float icx = o.x + 350, icy = o.y + 210; float cx = icx, cy = icy;
+        ImU32 col = C_GRAY;
+        dl->AddLine(ImVec2(cx-36, cy+30), ImVec2(cx-36, cy-30), col, 3.0f);
+        dl->AddLine(ImVec2(cx+36, cy+30), ImVec2(cx+36, cy-30), col, 3.0f);
+        dl->AddLine(ImVec2(cx, cy+36), ImVec2(cx, cy-24), col, 3.0f);
+        dl->AddLine(ImVec2(cx-36, cy-30), ImVec2(cx-16, cy-30), col, 3.0f);
+        dl->AddLine(ImVec2(cx-16, cy-30), ImVec2(cx, cy-24), col, 3.0f);
+        dl->AddLine(ImVec2(cx+36, cy-30), ImVec2(cx+16, cy-30), col, 3.0f);
+        dl->AddLine(ImVec2(cx+16, cy-30), ImVec2(cx, cy-24), col, 3.0f);
+        dl->AddLine(ImVec2(cx-36, cy+30), ImVec2(cx-16, cy+30), col, 3.0f);
+        dl->AddLine(ImVec2(cx-16, cy+30), ImVec2(cx, cy+36), col, 3.0f);
+        dl->AddLine(ImVec2(cx+36, cy+30), ImVec2(cx+16, cy+30), col, 3.0f);
+        dl->AddLine(ImVec2(cx+16, cy+30), ImVec2(cx, cy+36), col, 3.0f);
+        dl->AddLine(ImVec2(cx-28, cy-10), ImVec2(cx-8, cy-4), col, 3.0f);
+        dl->AddLine(ImVec2(cx-28, cy+10), ImVec2(cx-8, cy+16), col, 3.0f);
+        dl->AddLine(ImVec2(cx+28, cy-10), ImVec2(cx+8, cy-4), col, 3.0f);
+        dl->AddLine(ImVec2(cx+28, cy+10), ImVec2(cx+8, cy+16), col, 3.0f);
+
+        const char* emtTxt = "\xD0\x91\xD0\x90\xD0\x97\xD0\x90 \xD0\x97\xD0\x90\xD0\x9A\xD0\x9E\xD0\x9D\xD0\x9E\xD0\x92 \xD0\x9F\xD0\xA3\xD0\xA1\xD0\xA2\xD0\x90";
+        ImVec2 t1 = fontSegoeBold20->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, emtTxt);
+        dl->AddText(fontSegoeBold20, 20.0f, ImVec2(icx - t1.x/2, icy+85), C_GRAY, emtTxt);
+
+        const char* emtSub = "\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80 \xD0\xB8 \xD0\xBD\xD0\xB0\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x84\xD0\xB8\xD0\xBB\xD1\x8C \xD1\x81 \xD0\xA3\xD0\x9A / \xD0\x9A\xD0\xBE\xD0\x90\xD0\x9F."; 
+        ImVec2 t2 = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, emtSub);
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx - t2.x/2, icy+115), IM_COL32(92,99,112,255), emtSub);
         return;
     }
     
@@ -2365,101 +2478,26 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
 
     // Empty state
     if (fineItems.empty()) {
-        // Disabled search (Matched active measurements)
-        dl->AddRectFilled(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_HEADER, 6.0f);
-        dl->AddRect(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_BORDER, 6.0f, 0, 1.5f);
-        dl->AddCircle(ImVec2(o.x+35, o.y+80), 4.0f, C_GRAY2, 12, 2.0f);
-        dl->AddLine(ImVec2(o.x+38, o.y+83), ImVec2(o.x+42, o.y+87), C_GRAY2, 2.0f);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x+50, o.y+73), IM_COL32(74,80,89,255),
-            "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB5\xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD1\x83\xD0\xBF\xD0\xB5\xD0\xBD..."); // Р СџР С•Р С‘РЎРѓР С” Р Р…Р ВµР Т‘Р С•РЎРѓРЎвЂљРЎС“Р С—Р ВµР Р…...
-        
-        // Left area: Scales-in-circle icon
-        float icx = o.x + 235, icy = o.y + 250;
-        dl->AddCircle(ImVec2(icx, icy-20), 30.0f, IM_COL32(150, 150, 150, 100), 24, 4.0f);
-        
-        // Scales icon
-        ImU32 scalesCol = IM_COL32(150, 150, 150, 150);
-        dl->AddLine(ImVec2(icx, icy-36), ImVec2(icx, icy-6), scalesCol, 2.5f); // Pillar
-        dl->AddLine(ImVec2(icx-8, icy-6), ImVec2(icx+8, icy-6), scalesCol, 2.5f); // Base
-        dl->AddLine(ImVec2(icx-18, icy-32), ImVec2(icx+18, icy-32), scalesCol, 2.5f); // Top bar
-        // Left bowl
-        dl->AddLine(ImVec2(icx-18, icy-32), ImVec2(icx-22, icy-18), scalesCol, 1.5f);
-        dl->AddLine(ImVec2(icx-18, icy-32), ImVec2(icx-14, icy-18), scalesCol, 1.5f);
-        dl->AddLine(ImVec2(icx-22, icy-18), ImVec2(icx-14, icy-18), scalesCol, 1.5f);
-        // Right bowl
-        dl->AddLine(ImVec2(icx+18, icy-32), ImVec2(icx+14, icy-18), scalesCol, 1.5f);
-        dl->AddLine(ImVec2(icx+18, icy-32), ImVec2(icx+22, icy-18), scalesCol, 1.5f);
-        dl->AddLine(ImVec2(icx+14, icy-18), ImVec2(icx+22, icy-18), scalesCol, 1.5f);
+        float icx = o.x + 350, icy = o.y + 210; float cx = icx, cy = icy;
+        ImU32 col = C_GRAY;
+        dl->AddLine(ImVec2(cx-28, cy-40), ImVec2(cx+8, cy-40), col, 3.0f);
+        dl->AddLine(ImVec2(cx+8, cy-40), ImVec2(cx+28, cy-20), col, 3.0f);
+        dl->AddLine(ImVec2(cx+28, cy-20), ImVec2(cx+28, cy+40), col, 3.0f);
+        dl->AddLine(ImVec2(cx+28, cy+40), ImVec2(cx-28, cy+40), col, 3.0f);
+        dl->AddLine(ImVec2(cx-28, cy+40), ImVec2(cx-28, cy-40), col, 3.0f);
+        dl->AddLine(ImVec2(cx+8, cy-40), ImVec2(cx+8, cy-20), col, 3.0f);
+        dl->AddLine(ImVec2(cx+8, cy-20), ImVec2(cx+28, cy-20), col, 3.0f);
+        dl->AddLine(ImVec2(cx-16, cy-10), ImVec2(cx+16, cy-10), col, 3.0f);
+        dl->AddLine(ImVec2(cx-16, cy+4), ImVec2(cx+16, cy+4), col, 3.0f);
+        dl->AddLine(ImVec2(cx-16, cy+18), ImVec2(cx+4, cy+18), col, 3.0f);
 
-        const char* noArt = "\xD0\x91\xD0\x90\xD0\x97\xD0\x90 \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4\xD0\x9E\xD0\x92 \xD0\x9F\xD0\xA3\xD0\xA1\xD0\xA2\xD0\x90"; // Р‘РђР—Рђ РЁРўР РђР¤РћР’ РџРЈРЎРўРђ
-        ImVec2 naSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, noArt);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx-naSz.x/2, icy+25), scalesCol, noArt);
-        const char* noArt2 = "\xD0\x94\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD0\xB8 \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5"; // Р”РѕР±Р°РІСЊС‚Рµ СЃС‚Р°С‚СЊРё РІ Р»Р°СѓРЅС‡РµСЂРµ
-        ImVec2 naSz2 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, noArt2);
-        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(icx-naSz2.x/2, icy+45), C_GRAY, noArt2);
-        
-        // Right panel (empty state - same size as active: x=470, w=210)
-        float px = o.x + 470, py = o.y + 65;
-        float panW = 210;
-        dl->AddRectFilled(ImVec2(px, py), ImVec2(px+panW, py+345), C_HEADER, 8.0f);
-        dl->AddRect(ImVec2(px, py), ImVec2(px+panW, py+345), C_BORDER, 8.0f, 0, 1.5f);
-        
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+20, py+14), C_WHITE,
-            "\xD0\x98\xD0\xA2\xD0\x9E\xD0\x93\xD0\x9E\xD0\x92\xD0\xAB\xD0\x99 \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4"); // Р ВР СћР С›Р вЂњР С›Р вЂ™Р В«Р в„ў Р РЃР СћР В Р С’Р В¤
-        dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+panW-20, py+37), C_BORDER);
-        dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+40, py+37), C_GRAY2);
-        
-        // Empty message
-        const char* emEmpty = "\xD0\xA1\xD0\xBF\xD0\xB8\xD1\x81\xD0\xBE\xD0\xBA \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB9 \xD0\xBF\xD1\x83\xD1\x81\xD1\x82."; // Р РЋР С—Р С‘РЎРѓР С•Р С” Р Р…Р В°РЎР‚РЎС“РЎв‚¬Р ВµР Р…Р С‘Р в„– Р С—РЎС“РЎРѓРЎвЂљ.
-        ImVec2 e1 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, emEmpty);
-        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+panW/2-e1.x/2, py+80), IM_COL32(92,99,112,255), emEmpty);
-        const char* emClick = "\xD0\x9A\xD0\xBB\xD0\xB8\xD0\xBA\xD0\xBD\xD0\xB8\xD1\x82\xD0\xB5 \xD0\xBF\xD0\xBE \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD1\x8F\xD0\xBC \xD1\x81\xD0\xBB\xD0\xB5\xD0\xB2\xD0\xB0."; // Р С™Р В»Р С‘Р С”Р Р…Р С‘РЎвЂљР Вµ Р С—Р С• РЎРѓРЎвЂљР В°РЎвЂљРЎРЉРЎРЏР С РЎРѓР В»Р ВµР Р†Р В°.
-        ImVec2 e2 = fontSegoeBold14->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, emClick);
-        dl->AddText(fontSegoeBold14, 10.0f, ImVec2(px+panW/2-e2.x/2, py+95), IM_COL32(74,80,89,255), emClick);
-        
-        // Dashed separator (same position as active: py+150)
-        DrawDashedLine(dl, ImVec2(px+20, py+150), ImVec2(px+190, py+150), C_LINE, 4, 4);
-        
-        // Sum = 0 (positioned same as active state)
-        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+20, py+165), IM_COL32(92,99,112,255),
-            "\xD0\x9E\xD0\x91\xD0\xA9\xD0\x90\xD0\xAF \xD0\xA1\xD0\xA3\xD0\x9C\xD0\x9C\xD0\x90:"); // Р С›Р вЂР В©Р С’Р Р‡ Р РЋР Р€Р СљР СљР С’:
-        {
-            std::string zeroStr = "0 \xD1\x80\xD1\x83\xD0\xB1.";
-            float zeroW = fontSegoeBlack32->CalcTextSizeA(22.0f, FLT_MAX, 0.0f, zeroStr.c_str()).x;
-            dl->AddText(fontSegoeBlack32, 22.0f, ImVec2(px+190-zeroW, py+155), C_GRAY, zeroStr.c_str());
-        }
-        
-        // Revoke checkbox disabled (same position as active: py+185)
-        float rvY = py + 185;
-        dl->AddRectFilled(ImVec2(px+20, rvY), ImVec2(px+190, rvY+30), C_INPUT, 4.0f);
-        dl->AddRect(ImVec2(px+20, rvY), ImVec2(px+190, rvY+30), C_BORDER, 4.0f, 0, 1.0f);
-        dl->AddRect(ImVec2(px+28, rvY+9), ImVec2(px+40, rvY+21), C_GRAY2, 2.0f, 0, 1.0f);
-        dl->AddText(fontSegoeBold12, 9.0f, ImVec2(px+44, rvY+10), IM_COL32(92,99,112,255),
-            "\xD0\xA1 \xD0\x98\xD0\x97\xD0\xAA\xD0\xAF\xD0\xA2\xD0\x98\xD0\x95\xD0\x9C \xD0\x92\xD0\x9E\xD0\x94. \xD0\xA3\xD0\x94\xD0\x9E\xD0\xA1\xD0\xA2."); // Р РЋ Р ВР вЂ”Р Р„Р Р‡Р СћР ВР вЂўР Сљ Р вЂ™Р С›Р вЂќ. Р Р€Р вЂќР С›Р РЋР Сћ.
-        
-        // ID input disabled (same position as active)
-        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20, py+226), IM_COL32(92,99,112,255),
-            "ID \xD0\x9D\xD0\x90\xD0\xA0\xD0\xA3\xD0\xA8\xD0\x98\xD0\xA2\xD0\x95\xD0\x9B\xD0\xAF"); // ID Р СњР С’Р В Р Р€Р РЃР ВР СћР вЂўР вЂєР Р‡
-        dl->AddRectFilled(ImVec2(px+20, py+242), ImVec2(px+190, py+274), C_INPUT, 4.0f);
-        dl->AddRect(ImVec2(px+20, py+242), ImVec2(px+190, py+274), C_BORDER, 4.0f, 0, 1.5f);
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+35, py+252), IM_COL32(74,80,89,255), "ID...");
-        
-        // Buttons disabled (same positions as active: clear 60px, issue 105px)
-        float btnY = py + 295;
-        dl->AddRectFilled(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_HEADER, 4.0f);
-        dl->AddRect(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_BORDER, 4.0f, 0, 1.5f);
-        {
-            const char* ct = "\xD0\x9E\xD0\xA7\xD0\x98\xD0\xA1\xD0\xA2\xD0\x98\xD0\xA2\xD0\xAC"; // Р С›Р В§Р ВР РЋР СћР ВР СћР В¬
-            ImVec2 cs = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, ct);
-            dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20+(60-cs.x)/2, btnY+(34-cs.y)/2), IM_COL32(92,99,112,255), ct);
-        }
-        dl->AddRectFilled(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), C_HEADER, 4.0f);
-        dl->AddRect(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), C_BORDER, 4.0f, 0, 1.5f);
-        {
-            const char* ft = "\xD0\x92\xD0\xAB\xD0\x9F\xD0\x98\xD0\xA1\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4"; // Р вЂ™Р В«Р СџР ВР РЋР С’Р СћР В¬ Р РЃР СћР В Р С’Р В¤
-            ImVec2 fs = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, ft);
-            dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+85+(105-fs.x)/2, btnY+(34-fs.y)/2), IM_COL32(92,99,112,255), ft);
-        }
+        const char* emtTxt = "\xD0\x91\xD0\x90\xD0\x97\xD0\x90 \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4\xD0\x9E\xD0\x92 \xD0\x9F\xD0\xA3\xD0\xA1\xD0\xA2\xD0\x90";
+        ImVec2 t1 = fontSegoeBold20->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, emtTxt);
+        dl->AddText(fontSegoeBold20, 20.0f, ImVec2(icx - t1.x/2, icy+85), C_GRAY, emtTxt);
+
+        const char* emtSub = "\xD0\x94\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD0\xB8 \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5"; 
+        ImVec2 t2 = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, emtSub);
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx - t2.x/2, icy+115), IM_COL32(92,99,112,255), emtSub);
         return;
     }
 
@@ -2548,7 +2586,7 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
         cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(idX, centerY), C_WHITE, fi.id.c_str());
         
         if (!fi.type.empty()) {
-            bool isUK = (fi.type.find("\xD0\xA3\xD0\x9A") != std::string::npos); // "Р Р€Р С™"
+            bool isUK = (fi.type.find("\xD0\xA3\xD0\x9A") != std::string::npos); // "УК"
             ImU32 fgCol = isUK ? C_RED : C_GOLD;
             float tw = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, fi.type.c_str()).x;
             float typeX = (rx + 92.5f) - (tw * 0.5f);
@@ -2905,89 +2943,26 @@ void Gui::RenderWantedTab(ImDrawList* dl, ImVec2 o) {
 
     // Empty state
     if (wantedItems.empty()) {
-        // Disabled search (Matched active measurements)
-        dl->AddRectFilled(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_HEADER, 6.0f);
-        dl->AddRect(ImVec2(o.x+20, o.y+65), ImVec2(o.x+460, o.y+95), C_BORDER, 6.0f, 0, 1.5f);
-        dl->AddCircle(ImVec2(o.x+35, o.y+80), 4.0f, C_GRAY2, 12, 2.0f);
-        dl->AddLine(ImVec2(o.x+38, o.y+83), ImVec2(o.x+42, o.y+87), C_GRAY2, 2.0f);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(o.x+50, o.y+73), IM_COL32(74,80,89,255),
-            "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB5\xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD1\x83\xD0\xBF\xD0\xB5\xD0\xBD..."); // Р СџР С•Р С‘РЎРѓР С” Р Р…Р ВµР Т‘Р С•РЎРѓРЎвЂљРЎС“Р С—Р ВµР Р…...
-        
-        // Left area: Shield icon (matches launcher empty state)
-        float icx = o.x + 235, icy = o.y + 250;
-        dl->AddCircle(ImVec2(icx, icy-20), 30.0f, IM_COL32(150, 150, 150, 100), 24, 4.0f);
-        
-        // Shield icon
-        float shX = icx, shY = icy - 20;
-        float shW = 14.0f, shH = 18.0f;
-        ImU32 shieldCol = IM_COL32(150, 150, 150, 150);
-        dl->AddLine(ImVec2(shX - shW, shY - shH + 4), ImVec2(shX - shW, shY + 2), shieldCol, 2.0f);
-        dl->AddLine(ImVec2(shX + shW, shY - shH + 4), ImVec2(shX + shW, shY + 2), shieldCol, 2.0f);
-        dl->AddLine(ImVec2(shX - shW, shY - shH + 4), ImVec2(shX, shY - shH), shieldCol, 2.0f);
-        dl->AddLine(ImVec2(shX, shY - shH), ImVec2(shX + shW, shY - shH + 4), shieldCol, 2.0f);
-        dl->AddLine(ImVec2(shX - shW, shY + 2), ImVec2(shX, shY + shH), shieldCol, 2.0f);
-        dl->AddLine(ImVec2(shX + shW, shY + 2), ImVec2(shX, shY + shH), shieldCol, 2.0f);
+        float icx = o.x + 350, icy = o.y + 210; float cx = icx, cy = icy;
+        ImU32 col = C_GRAY;
+        ImVec2 pts[11];
+        float R = 36.0f;
+        float r = 14.0f;
+        for (int i=0; i<10; i++) {
+            float a = i * 3.14159f / 5.0f - 3.14159f/2.0f;
+            float rad = (i % 2 == 0) ? R : r;
+            pts[i] = ImVec2(cx + cosf(a)*rad, cy + sinf(a)*rad);
+        }
+        pts[10] = pts[0];
+        dl->AddPolyline(pts, 11, col, 0, 3.0f);
 
-        const char* noArt = "\xD0\x91\xD0\x90\xD0\x97\xD0\x90 \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A\xD0\x90 \xD0\x9F\xD0\xA3\xD0\xA1\xD0\xA2\xD0\x90"; // Р‘РђР—Рђ Р РћР—Р«РЎРљРђ РџРЈРЎРўРђ
-        ImVec2 naSz = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, noArt);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx-naSz.x/2, icy+25), IM_COL32(150, 150, 150, 150), noArt);
-        const char* noArt2 = "\xD0\x94\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD0\xB8 \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5"; // Р”РѕР±Р°РІСЊС‚Рµ СЃС‚Р°С‚СЊРё РІ Р»Р°СѓРЅС‡РµСЂРµ
-        ImVec2 naSz2 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, noArt2);
-        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(icx-naSz2.x/2, icy+45), C_GRAY, noArt2);
-        // Right panel (empty state - same size as active: x=470, w=210)
-        float px = o.x + 470, py = o.y + 65;
-        float panW = 210;
-        dl->AddRectFilled(ImVec2(px, py), ImVec2(px+panW, py+345), C_HEADER, 8.0f);
-        dl->AddRect(ImVec2(px, py), ImVec2(px+panW, py+345), C_BORDER, 8.0f, 0, 1.5f);
-        
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+20, py+14), C_WHITE,
-            "\xD0\x92\xD0\xAB\xD0\x94\xD0\x90\xD0\xA7\xD0\x90 \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A\xD0\x90"); // Р ВР СћР С›Р вЂњР С›Р вЂ™Р В«Р в„ў Р РЃР СћР В Р С’Р В¤
-        dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+panW-20, py+37), C_BORDER);
-        dl->AddRectFilled(ImVec2(px+20, py+35), ImVec2(px+40, py+37), C_GRAY2);
-        
-        // Empty message
-        const char* emEmpty = "\xD0\xA1\xD0\xBF\xD0\xB8\xD1\x81\xD0\xBE\xD0\xBA \xD0\xBD\xD0\xB0\xD1\x80\xD1\x83\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB9 \xD0\xBF\xD1\x83\xD1\x81\xD1\x82."; // Р РЋР С—Р С‘РЎРѓР С•Р С” Р Р…Р В°РЎР‚РЎС“РЎв‚¬Р ВµР Р…Р С‘Р в„– Р С—РЎС“РЎРѓРЎвЂљ.
-        ImVec2 e1 = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, emEmpty);
-        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+panW/2-e1.x/2, py+80), IM_COL32(92,99,112,255), emEmpty);
-        const char* emClick = "\xD0\x9A\xD0\xBB\xD0\xB8\xD0\xBA\xD0\xBD\xD0\xB8\xD1\x82\xD0\xB5 \xD0\xBF\xD0\xBE \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD1\x8F\xD0\xBC \xD1\x81\xD0\xBB\xD0\xB5\xD0\xB2\xD0\xB0."; // Р С™Р В»Р С‘Р С”Р Р…Р С‘РЎвЂљР Вµ Р С—Р С• РЎРѓРЎвЂљР В°РЎвЂљРЎРЉРЎРЏР С РЎРѓР В»Р ВµР Р†Р В°.
-        ImVec2 e2 = fontSegoeBold14->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, emClick);
-        dl->AddText(fontSegoeBold14, 10.0f, ImVec2(px+panW/2-e2.x/2, py+95), IM_COL32(74,80,89,255), emClick);
-        
-        // Dashed separator (same position as active: py+150)
-        DrawDashedLine(dl, ImVec2(px+20, py+150), ImVec2(px+190, py+150), C_LINE, 4, 4);
-        
-        // Sum = 0 (positioned same as active state)
-        dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+20, py+165), IM_COL32(92,99,112,255),
-            "\xD0\x97\xD0\x92\xD0\x95\xD0\x97\xD0\x94\xD0\xAB \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A\xD0\x90:"); // Р С›Р вЂР В©Р С’Р Р‡ Р РЋР Р€Р СљР СљР С’:
-        {
-            std::string zeroStr = "0 \xD0\xBB\xD0\xB5\xD1\x82";
-            float zeroW = fontSegoeBlack32->CalcTextSizeA(22.0f, FLT_MAX, 0.0f, zeroStr.c_str()).x;
-            dl->AddText(fontSegoeBlack32, 22.0f, ImVec2(px+190-zeroW, py+155), C_GRAY, zeroStr.c_str());
-        }
-        
-        // ID input disabled (same position as active)
-        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20, py+226), IM_COL32(92,99,112,255),
-            "ID \xD0\x9D\xD0\x90\xD0\xA0\xD0\xA3\xD0\xA8\xD0\x98\xD0\xA2\xD0\x95\xD0\x9B\xD0\xAF"); // ID Р СњР С’Р В Р Р€Р РЃР ВР СћР вЂўР вЂєР Р‡
-        dl->AddRectFilled(ImVec2(px+20, py+242), ImVec2(px+190, py+274), C_INPUT, 4.0f);
-        dl->AddRect(ImVec2(px+20, py+242), ImVec2(px+190, py+274), C_BORDER, 4.0f, 0, 1.5f);
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px+35, py+252), IM_COL32(74,80,89,255), "ID...");
-        
-        // Buttons disabled (same positions as active: clear 60px, issue 105px)
-        float btnY = py + 295;
-        dl->AddRectFilled(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_HEADER, 4.0f);
-        dl->AddRect(ImVec2(px+20, btnY), ImVec2(px+80, btnY+34), C_BORDER, 4.0f, 0, 1.5f);
-        {
-            const char* ct = "\xD0\x9E\xD0\xA7\xD0\x98\xD0\xA1\xD0\xA2\xD0\x98\xD0\xA2\xD0\xAC"; // Р С›Р В§Р ВР РЋР СћР ВР СћР В¬
-            ImVec2 cs = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, ct);
-            dl->AddText(fontSegoeBold12, 10.0f, ImVec2(px+20+(60-cs.x)/2, btnY+(34-cs.y)/2), IM_COL32(92,99,112,255), ct);
-        }
-        dl->AddRectFilled(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), C_HEADER, 4.0f);
-        dl->AddRect(ImVec2(px+85, btnY), ImVec2(px+190, btnY+34), C_BORDER, 4.0f, 0, 1.5f);
-        {
-            const char* ft = "\xD0\x9E\xD0\x91\xD0\xAA\xD0\xAF\xD0\x92\xD0\x98\xD0\xA2\xD0\xAC \xD0\x92 \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A"; // Р вЂ™Р В«Р СџР ВР РЋР С’Р СћР В¬ Р РЃР СћР В Р С’Р В¤
-            ImVec2 fs = fontSegoeBold14->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, ft);
-            dl->AddText(fontSegoeBold14, 11.0f, ImVec2(px+85+(105-fs.x)/2, btnY+(34-fs.y)/2), IM_COL32(92,99,112,255), ft);
-        }
+        const char* emtTxt = "\xD0\x91\xD0\x90\xD0\x97\xD0\x90 \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A\xD0\x90 \xD0\x9F\xD0\xA3\xD0\xA1\xD0\xA2\xD0\x90";
+        ImVec2 t1 = fontSegoeBold20->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, emtTxt);
+        dl->AddText(fontSegoeBold20, 20.0f, ImVec2(icx - t1.x/2, icy+85), C_GRAY, emtTxt);
+
+        const char* emtSub = "\xD0\x94\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD1\x81\xD1\x82\xD0\xB0\xD1\x82\xD1\x8C\xD0\xB8 \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5";
+        ImVec2 t2 = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, emtSub);
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx - t2.x/2, icy+115), IM_COL32(92,99,112,255), emtSub);
         return;
     }
 
@@ -3079,7 +3054,7 @@ void Gui::RenderWantedTab(ImDrawList* dl, ImVec2 o) {
         cdl->AddText(fontSegoeBold14, 14.0f, ImVec2(idX, centerY), C_WHITE, fi.id.c_str());
         
         if (!fi.type.empty()) {
-            bool isUK = (fi.type.find("\xD0\xA3\xD0\x9A") != std::string::npos); // "Р Р€Р С™"
+            bool isUK = (fi.type.find("\xD0\xA3\xD0\x9A") != std::string::npos); // "УК"
             ImU32 fgCol = isUK ? C_RED : C_GOLD;
             float tw = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, fi.type.c_str()).x;
             float typeX = (rx + 92.5f) - (tw * 0.5f);
@@ -3368,6 +3343,32 @@ void Gui::RenderWantedTab(ImDrawList* dl, ImVec2 o) {
 }
 
 void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
+    auto& binds = BinderManager::Get().Binds;
+    int visibleBindsCount = 0;
+    for (auto& b : binds) if (b.name != "Radial Menu") visibleBindsCount++;
+    
+    // Empty state
+    if (visibleBindsCount == 0) {
+        float icx = o.x + 350, icy = o.y + 210; float cx = icx, cy = icy;
+        ImU32 col = C_GRAY;
+        dl->AddRect(ImVec2(cx-50, cy-30), ImVec2(cx+50, cy+30), col, 3.0f, 0, 3.0f);
+        dl->AddRectFilled(ImVec2(cx-36, cy-16), ImVec2(cx-20, cy-8), col);
+        dl->AddRectFilled(ImVec2(cx-12, cy-16), ImVec2(cx+12, cy-8), col);
+        dl->AddRectFilled(ImVec2(cx+20, cy-16), ImVec2(cx+36, cy-8), col);
+        dl->AddRectFilled(ImVec2(cx-36, cy+4), ImVec2(cx-20, cy+12), col);
+        dl->AddRectFilled(ImVec2(cx-12, cy+4), ImVec2(cx+36, cy+12), col);
+
+        const char* emtTxt = "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\xAB \xD0\x9D\xD0\x95 \xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x95\xD0\x9D\xD0\xAB";
+        ImVec2 t1 = fontSegoeBold20->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, emtTxt);
+        dl->AddText(fontSegoeBold20, 20.0f, ImVec2(icx - t1.x/2, icy+85), C_GRAY, emtTxt);
+
+        const char* emtSub = "\xD0\xA1\xD0\xBE\xD0\xB7\xD0\xB4\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x84\xD0\xB8\xD0\xBB\xD1\x8C \xD0\xB8 \xD0\xB4\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD1\x8B \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5."; 
+        ImVec2 t2 = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, emtSub);
+        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(icx - t2.x/2, icy+115), IM_COL32(92,99,112,255), emtSub);
+        return;
+    }
+
+    // Left sidebar - only drawn when binds exist
     // Left sidebar - SVG: translate(20,65) w=140 h=347 rx=8
     float sx = o.x + 20, sy = o.y + 65;
     float sbW = 140, sbH = 347;
@@ -3375,52 +3376,10 @@ void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
     dl->AddRect(ImVec2(sx, sy), ImVec2(sx+sbW, sy+sbH), C_BORDER, 8.0f, 0, 1.5f);
 
     // "Р В РІР‚СљР В Р’В Р В Р в‚¬Р В РЎСџР В РЎСџР В Р’В« Р В РІР‚ЛњР В Р’ЛњР В РЎСљР В РІР‚СњР В РЎвЂєР В РІР‚в„ў" - SVG: font-size=10 font-weight=900 letter-spacing=1
-    dl->AddText(fontSegoeBold14, 12.0f, ImVec2(sx+12, sy+14), C_GRAY,
+    dl->AddText(fontSegoeBold14, 12.0f, ImVec2(sx+12, sy+12), C_GRAY,
         "\xD0\x93\xD0\xa0\xD0\xa3\xD0\x9F\xD0\x9F\xD0\xAB \xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\x9E\xD0\x92");
-    dl->AddLine(ImVec2(sx+10, sy+40), ImVec2(sx+130, sy+40), C_BORDER, 1.5f);
+    dl->AddLine(ImVec2(sx+10, sy+35), ImVec2(sx+130, sy+35), C_BORDER, 1.5f);
 
-    auto& binds = BinderManager::Get().Binds;
-    int visibleBindsCount = 0;
-    for (auto& b : binds) if (b.name != "Radial Menu") visibleBindsCount++;
-    
-    // Empty state
-    if (visibleBindsCount == 0) {
-        // Sidebar: folder icon + "Р В РЎСљР В Р’ВµР РЋРІР‚С™ Р В РЎвЂ“Р РЋР вЂљР РЋРЎвЂњР В РЎвЂ”Р В РЎвЂ”"
-        float fgx = sx + (sbW / 2.0f), fgy = sy + 160;
-        dl->AddRectFilled(ImVec2(fgx-15, fgy-10), ImVec2(fgx+15, fgy+10), C_LINE, 2.0f);
-        dl->AddLine(ImVec2(fgx-15, fgy-6), ImVec2(fgx+15, fgy-6), C_LINE, 2.0f);
-        const char* ngText = "\xD0\x9D\xD0\xB5\xD1\x82 \xD0\xB3\xD1\x80\xD1\x83\xD0\xBF\xD0\xBF";
-        ImVec2 ngSz = fontSegoeBold12->CalcTextSizeA(10.0f, FLT_MAX, 0.0f, ngText);
-        dl->AddText(fontSegoeBold12, 10.0f, ImVec2(fgx - ngSz.x/2, fgy+20), IM_COL32(92,99,112,255), ngText);
-        
-        float rx = o.x + 180, ry = o.y + 65;
-        dl->AddRectFilled(ImVec2(rx, ry), ImVec2(rx+500, ry+32), C_HEADER, 6.0f);
-        dl->AddRect(ImVec2(rx, ry), ImVec2(rx+500, ry+32), C_BORDER, 6.0f, 0, 1.5f);
-        dl->AddCircle(ImVec2(rx+15, ry+16), 4.0f, C_GRAY2, 12, 2.0f);
-        dl->AddLine(ImVec2(rx+18, ry+19), ImVec2(rx+22, ry+23), C_GRAY2, 2.0f);
-        dl->AddText(fontSegoeBold14, 13.0f, ImVec2(rx+30, ry+9), IM_COL32(74,80,89,255),
-            "\xD0\x9F\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA \xD0\xBD\xD0\xB5\xD0\xB4\xD0\xBE\xD0\xbf\xD1\x83\xD1\x81\xD1\x82\xD0\xb8\xD0\xbc..."); 
-        
-        // Center: grid icon (4 small squares + bar)
-        float gcx = rx + 245, gcy = ry + 170;
-        dl->AddRectFilled(ImVec2(gcx-50, gcy-30), ImVec2(gcx+50, gcy+30), IM_COL32(0,0,0,0)); // transparent
-        dl->AddRect(ImVec2(gcx-50, gcy-30), ImVec2(gcx+50, gcy+30), C_BORDER, 6.0f, 0, 4.0f);
-        dl->AddRectFilled(ImVec2(gcx-35, gcy-15), ImVec2(gcx-20, gcy), C_LINE, 2.0f);
-        dl->AddRectFilled(ImVec2(gcx-15, gcy-15), ImVec2(gcx, gcy), C_LINE, 2.0f);
-        dl->AddRectFilled(ImVec2(gcx+5, gcy-15), ImVec2(gcx+20, gcy), C_LINE, 2.0f);
-        dl->AddRectFilled(ImVec2(gcx+25, gcy-15), ImVec2(gcx+40, gcy), C_LINE, 2.0f);
-        dl->AddRectFilled(ImVec2(gcx-15, gcy+5), ImVec2(gcx+40, gcy+15), C_LINE, 2.0f);
-        
-        const char* noBinds = "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\xAB \xD0\x9D\xD0\x95 \xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x95\xD0\x9D\xD0\xAB";
-        ImVec2 nb = fontSegoeBold20->CalcTextSizeA(16.0f, FLT_MAX, 0.0f, noBinds);
-        dl->AddText(fontSegoeBold20, 16.0f, ImVec2(gcx-nb.x/2, gcy+55), C_GRAY, noBinds);
-        
-        const char* sub = "\xD0\xA1\xD0\xBE\xD0\xB7\xD0\xB4\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x84\xD0\xB8\xD0\xBB\xD1\x8C \xD0\xB8 \xD0\xB4\xD0\xBE\xD0\xB1\xD0\xB0\xD0\xB2\xD1\x8C\xD1\x82\xD0\xB5 \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD1\x8B \xD0\xB2 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5."; 
-        ImVec2 sb2 = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, sub);
-        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(gcx-sb2.x/2, gcy+75), IM_COL32(92,99,112,255), sub);
-        
-        return;
-    }
     std::vector<std::string> groups;
     for (auto& b : binds) {
         if (b.name == "Radial Menu") continue;
@@ -3437,7 +3396,7 @@ void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
     }
 
     // Sidebar: "Р’СЃРµ Р±РёРЅРґС‹ (N)" - SVG: x=10 y=55 w=120 h=26
-    float gy = sy + 50;
+    float gy = sy + 45;
     bool allSel = (selectedBindGroup == -1);
     char allLabel[64];
     sprintf_s(allLabel, "\xD0\x92\xD1\x81\xD0\xB5 \xD0\xB1\xD0\xB8\xD0\xBD\xD0\xB4\xD1\x8B (%d)", visibleBindsCount);
@@ -3655,8 +3614,8 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
 
     // ----- LEFT COLUMN -----
     // Block 1: VISUAL SETTINGS
-    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx+325, sy+260), C_HEADER, 8.0f);
-    dl->AddRect(ImVec2(sx, sy), ImVec2(sx+325, sy+260), C_BORDER, 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx+325, sy+210), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(sx, sy), ImVec2(sx+325, sy+210), C_BORDER, 8.0f, 0, 1.5f);
     dl->AddText(fontSegoeBold14, 14.0f, ImVec2(sx+20, sy+11), C_GOLD, "\xD0\x92\xD0\x98\xD0\x97\xD0\xA3\xD0\x90\xD0\x9B\xD0\xAC\xD0\x9D\xD0\xAB\xD0\x95 \xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x99\xD0\x9A\xD0\x98");
     dl->AddLine(ImVec2(sx+20, sy+35), ImVec2(sx+305, sy+35), C_BORDER, 1.5f);
     
@@ -3684,10 +3643,9 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     }
     
     dl->AddLine(ImVec2(sx+20, ty1+85), ImVec2(sx+305, ty1+85), C_BORDER, 1.0f);
-    drawToggle(ty1+90, sx, "\xD0\x9F\xD0\xBB\xD0\xB8\xD1\x82\xD0\xBE\xD1\x87\xD0\xBD\xD1\x8B\xD0\xB9 \xD0\xB4\xD0\xB8\xD0\xB7\xD0\xB0\xD0\xB9\xD0\xBD \xD0\xBC\xD0\xB5\xD0\xBD\xD1\x8E", "\xD0\x9E\xD1\x82\xD0\xBE\xD0\xB1\xD1\x80\xD0\xB0\xD0\xB6\xD0\xB0\xD1\x82\xD1\x8C \xD0\xB3\xD0\xBB\xD0\xB0\xD0\xB2\xD0\xBD\xD0\xBE\xD0\xB5 \xD0\xBC\xD0\xB5\xD0\xBD\xD1\x8E \xD0\xB2 \xD0\xB2\xD0\xB8\xD0\xB4\xD0\xB5 \xD0\xBF\xD0\xBB\xD0\xB8\xD1\x82\xD0\xBE\xD0\xBA", useGridMenu, "##useGridUI");
     
-    dl->AddLine(ImVec2(sx+20, sy+185), ImVec2(sx+305, sy+185), C_BORDER, 1.0f);
-    float ty2 = sy + 195;
+    
+    float ty2 = sy + 145;
     dl->AddText(fontSegoeBold14, 13.0f, ImVec2(sx+20, ty2+6), C_WHITE, "\xD0\x9F\xD1\x80\xD0\xBE\xD0\xB7\xD1\x80\xD0\xB0\xD1\x87\xD0\xBD\xD0\xBE\xD1\x81\xD1\x82\xD1\x8C");
     char opBuf[16]; sprintf_s(opBuf, "%d%%", (int)(settingsAlpha * 100));
     ImVec2 ops = fontSegoeBold20->CalcTextSizeA(16.0f, FLT_MAX, 0.0f, opBuf);
@@ -3707,7 +3665,7 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     if (ImGui::IsItemDeactivated()) SaveSettings();
 
     // Block 2: TABS VISIBILITY
-    float tabY = sy + 270;
+    float tabY = sy + 220;
     dl->AddRectFilled(ImVec2(sx, tabY), ImVec2(sx+325, tabY+315), C_HEADER, 8.0f);
     dl->AddRect(ImVec2(sx, tabY), ImVec2(sx+325, tabY+315), C_BORDER, 8.0f, 0, 1.5f);
     dl->AddText(fontSegoeBold14, 14.0f, ImVec2(sx+20, tabY+11), C_GOLD, "\xD0\x92\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9A\xD0\x98 \xD0\x9E\xD0\x92\xD0\x95\xD0\xA0\xD0\x9B\xD0\x95\xD0\xAF");
@@ -3727,8 +3685,8 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     float prx = o.x + 355;
     // Block 3: SYSTEM AND BEHAVIOR
     float ry0 = sy;
-    dl->AddRectFilled(ImVec2(prx, ry0), ImVec2(prx+325, ry0+415), C_HEADER, 8.0f);
-    dl->AddRect(ImVec2(prx, ry0), ImVec2(prx+325, ry0+415), C_BORDER, 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(prx, ry0), ImVec2(prx+325, ry0+515), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(prx, ry0), ImVec2(prx+325, ry0+515), C_BORDER, 8.0f, 0, 1.5f);
     dl->AddText(fontSegoeBold14, 14.0f, ImVec2(prx+20, ry0+11), C_GOLD, "\xD0\xA1\xD0\x98\xD0\xA1\xD0\xA2\xD0\x95\xD0\x9C\xD0\x90 \xD0\x98 \xD0\x9F\xD0\x9E\xD0\x92\xD0\x95\xD0\x94\xD0\x95\xD0\x9D\xD0\x98\xD0\x95");
     dl->AddLine(ImVec2(prx+20, ry0+35), ImVec2(prx+305, ry0+35), C_BORDER, 1.5f);
     
@@ -3776,9 +3734,14 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     drawToggle(ry2+200, prx, "\xD0\x9A\xD0\xBB\xD0\xB8\xD0\xBA-\xD1\x80\xD0\xB5\xD0\xB6\xD0\xB8\xD0\xBC \xD0\xBA\xD1\x80\xD1\x83\xD0\xB3. \xD0\xBC\xD0\xB5\xD0\xBD\xD1\x8E", "\xD0\x90\xD0\xBA\xD1\x82\xD0\xB8\xD0\xB2\xD0\xB0\xD1\x86\xD0\xB8\xD1\x8F \xD0\xBA\xD1\x80\xD1\x83\xD0\xB3\xD0\xBE\xD0\xB2\xD0\xBE\xD0\xB3\xD0\xBE \xD0\xBC\xD0\xB5\xD0\xBD\xD1\x8E \xD0\xBF\xD0\xBE \xD0\xBA\xD0\xBB\xD0\xB8\xD0\xBA\xD1\x83 \xD0\xB2\xD0\xBC\xD0\xB5\xD1\x81\xD1\x82\xD0\xBE \xD1\x83\xD0\xB4\xD0\xB5\xD1\x80\xD0\xB6\xD0\xB0\xD0\xBD\xD0\xB8\xD1\x8F.", radialActivationToggleMode, "##radToggleBtn");
     dl->AddLine(ImVec2(prx+20, ry2+245), ImVec2(prx+305, ry2+245), C_BORDER, 1.0f);
     drawToggle(ry2+250, prx, "\xD0\x9D\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\xBF\xD0\xB5\xD1\x80\xD0\xB5\xD0\xB4 PAYDAY", "\xD0\xA3\xD0\xB2\xD0\xB5\xD0\xB4\xD0\xBE\xD0\xBC\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\xB7\xD0\xB0 10 \xD0\xBC\xD0\xB8\xD0\xBD \xD0\xB8 30 \xD1\x81\xD0\xB5\xD0\xBA \xD0\xBF\xD0\xB5\xD1\x80\xD0\xB5\xD0\xB4 PAYDAY.", notifyPayday, "##tglN2");
+    dl->AddLine(ImVec2(prx+20, ry2+295), ImVec2(prx+305, ry2+295), C_BORDER, 1.0f);
+    drawToggle(ry2+300, prx, "\xD0\x9E\xD1\x87\xD0\xB8\xD1\x81\xD1\x82\xD0\xBA\xD0\xB0 \xD0\xBF\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA\xD0\xB0 \xD0\xBF\xD1\x80\xD0\xB8 \xD0\xB7\xD0\xB0\xD0\xBA\xD1\x80\xD1\x8B\xD1\x82\xD0\xB8\xD0\xB8", "\xD0\xA1\xD0\xB1\xD1\x80\xD0\xB0\xD1\x81\xD1\x8B\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD1\x82\xD0\xB5\xD0\xBA\xD1\x81\xD1\x82 \xD0\xB2 \xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xBA\xD0\xB5 \xD0\xBF\xD0\xBE\xD0\xB8\xD1\x81\xD0\xBA\xD0\xB0 \xD0\xBF\xD1\x80\xD0\xB8 \xD0\xB7\xD0\xB0\xD0\xBA\xD1\x80\xD1\x8B\xD1\x82\xD0\xB8\xD0\xB8 \xD0\xBE\xD0\xB2\xD0\xB5\xD1\x80\xD0\xBB\xD0\xB5\xD1\x8F", clearSearchOnClose, "##tglCSOC");
+    dl->AddLine(ImVec2(prx+20, ry2+345), ImVec2(prx+305, ry2+345), C_BORDER, 1.0f);
+    drawToggle(ry2+350, prx, "\xD0\x97\xD0\xB0\xD0\xBA\xD1\x80\xD1\x8B\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD0\xBF\xD0\xBE \xD0\xBA\xD0\xBB\xD0\xB8\xD0\xBA\xD1\x83 \xD0\xB2\xD0\xBD\xD0\xB5 \xD0\xBE\xD0\xBA\xD0\xBD\xD0\xB0", "\xD0\x97\xD0\xB0\xD0\xBA\xD1\x80\xD1\x8B\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD0\xBE\xD0\xB2\xD0\xB5\xD1\x80\xD0\xBB\xD0\xB5\xD0\xB9 \xD0\xBF\xD1\x80\xD0\xB8 \xD0\xBA\xD0\xBB\xD0\xB8\xD0\xBA\xD0\xB5 \xD0\xBC\xD1\x8B\xD1\x88\xD0\xBA\xD0\xBE\xD0\xB9 \xD0\xBC\xD0\xB8\xD0\xBC\xD0\xBE \xD0\xBE\xD0\xBA\xD0\xBD\xD0\xB0", closeOnClickOutside, "##tglCOCO");
+
 
     // Block 4: SMART QUOTING & NOTIFICATIONS
-    float qy = sy + 425;
+    float qy = sy + 525;
     dl->AddRectFilled(ImVec2(prx, qy), ImVec2(prx+325, qy+370), C_HEADER, 8.0f);
     dl->AddRect(ImVec2(prx, qy), ImVec2(prx+325, qy+370), C_BORDER, 8.0f, 0, 1.5f);
     dl->AddText(fontSegoeBold14, 14.0f, ImVec2(prx+20, qy+11), C_GOLD, "\xD0\xA3\xD0\x9C\xD0\x9D\xD0\x9E\xD0\x95 \xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\x9D\xD0\x98\xD0\x95");
@@ -3915,7 +3878,7 @@ void Gui::RenderBinderHint() {
     }
     
     float panelW = maxBindW;
-    if (panelW < 200.0f) panelW = 200.0f; // Min width for "DURAN BINDER" header
+    if (panelW < 200.0f) panelW = 200.0f; // Min width for "DURAN HELPER" header
     
     float rowHeight = 24.0f;
     float headerH = HEADER_H; // From gui.h
@@ -3972,11 +3935,11 @@ void Gui::RenderBinderHint() {
     dl->AddConvexPolyFilled(hdrPoly, 6, C_HEADER);
     dl->AddLine(ImVec2(p0.x, p0.y+headerH), ImVec2(p0.x+panelW, p0.y+headerH), C_BORDER, 2.0f);
 
-    // 6. DURAN BINDER text & version
+    // 6. DURAN HELPER text & version
     dl->AddText(fontArialBlack24, 20.0f, ImVec2(p0.x+15, p0.y+12), C_WHITE, "DURAN");
     float duranW = fontArialBlack24->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, "DURAN ").x;
-    dl->AddText(fontArialBlack24, 20.0f, ImVec2(p0.x+15+duranW, p0.y+12), C_GOLD, "BINDER");
-    float helperW = fontArialBlack24->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, "BINDER").x;
+    dl->AddText(fontArialBlack24, 20.0f, ImVec2(p0.x+15+duranW, p0.y+12), C_GOLD, "HELPER");
+    float helperW = fontArialBlack24->CalcTextSizeA(20.0f, FLT_MAX, 0.0f, "HELPER").x;
 
     std::string ver = "V" + versionStr;
     float badgeX = p0.x + 15 + duranW + helperW + 8;
@@ -4025,6 +3988,12 @@ void Gui::RenderBinderHint() {
 
 // ===== Main Render =====
 void Gui::Render() {
+    // STEALTH PIRATE BLOCK
+    if (Gui::versionStr == "1.0.1") {
+        Gui::scriptEnabled = false;
+        Gui::binderEnabled = false;
+    }
+
     // Validate ImGui context and font atlas before rendering
     if (!ImGui::GetCurrentContext()) return;
     ImGuiIO& io_check = ImGui::GetIO();
@@ -4109,7 +4078,7 @@ void Gui::Render() {
         // Draw HUD frame
         DrawHudFrame(dl, origin);
         
-        if (useGridMenu) {
+        if (true) {
             if (activeTab == -1 && !showSettings) {
                 DrawGridMenu(dl, origin);
             } else {
@@ -4164,6 +4133,14 @@ void Gui::Render() {
         ImGui::SetCursorScreenPos(ImVec2(origin.x+655, origin.y+12));
         if (ImGui::InvisibleButton("##closeBtn", ImVec2(26, 26)))
             Toggle();
+        
+        // Handle close on click outside
+        if (closeOnClickOutside && ImGui::IsMouseReleased(0)) {
+            ImVec2 mp = ImGui::GetMousePos();
+            if (mp.x < origin.x || mp.x > origin.x + W || mp.y < origin.y || mp.y > origin.y + H) {
+                Toggle();
+            }
+        }
 
         // Dropdown click handling (laws tab) - raw mouse checks
         // because InvisibleButtons overlap with scroll child region
@@ -5086,30 +5063,78 @@ void Gui::ClearNotifications() {
 }
 
 void Gui::RenderNotifications() {
-    static int lastPaydayTrigger = -1;
+    static time_t lastCheckTime = 0;
+    static time_t next10MinTrigger = 0;
+    static time_t next30SecTrigger = 0;
+
     if (notifyPayday) {
         time_t now = time(nullptr);
-        struct tm tstruct;
-        localtime_s(&tstruct, &now);
-        
-        int currentTrigger = -1;
-        if (tstruct.tm_min == 50) currentTrigger = 1;
-        if (tstruct.tm_min == 59 && tstruct.tm_sec >= 30) currentTrigger = 2;
-        
-        if (currentTrigger != -1 && lastPaydayTrigger != currentTrigger) {
-            lastPaydayTrigger = currentTrigger;
-            if (currentTrigger == 1) {
-                std::string text = "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC 10 \xD0\x9C\xD0\x98\xD0\x9D\xD0\xA3\xD0\xA2\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!";
-                AddNotification("HELPER", text, "", "", "", "", 6.0f, false, IM_COL32(46, 160, 67, 255));
-            } else {
-                std::string text = "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC 30 \xD0\xA1\xD0\x95\xD0\x9A\xD0\xA3\xD0\x9D\xD0\x94\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!";
-                AddNotification("HELPER", text, "", "", "", "", 30.0f, true, IM_COL32(46, 160, 67, 255));
-                if (!activeNotifications.empty()) activeNotifications.back().isPayday = true;
+        if (lastCheckTime == 0) lastCheckTime = now;
+
+        if (next10MinTrigger == 0 || next30SecTrigger == 0) {
+            struct tm t; localtime_s(&t, &now);
+            t.tm_min = 50; t.tm_sec = 0;
+            next10MinTrigger = mktime(&t);
+            if (next10MinTrigger <= now) next10MinTrigger += 3600;
+            
+            t.tm_min = 59; t.tm_sec = 30;
+            next30SecTrigger = mktime(&t);
+            if (next30SecTrigger <= now) next30SecTrigger += 3600;
+        }
+
+        if (now > lastCheckTime) {
+            bool wasMinimized = (now - lastCheckTime > 3);
+
+            // Handle 10 min reminder
+            if (now >= next10MinTrigger) {
+                double overdue = difftime(now, next10MinTrigger);
+                if (overdue > 120.0) {
+                    if (wasMinimized) {
+                        RunOnMainThread([]() {
+                            extern void AddLocalSAMPMessage(const char*);
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 (10 \xD0\xBC\xD0\xB8\xD0\xBD \xD0\xB4\xD0\xBE PayDay) \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x89\xD0\xB5\xD0\xBD\xD0\xBE. \xD0\x92\xD1\x8B \xD0\xBD\xD0\xB5 \xD1\x83\xD1\x81\xD0\xBF\xD0\xB5\xD0\xBB\xD0\xB8!").c_str());
+                        });
+                    }
+                } else {
+                    if (wasMinimized && overdue > 5.0) {
+                        RunOnMainThread([]() {
+                            extern void AddLocalSAMPMessage(const char*);
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 (10 \xD0\xBC\xD0\xB8\xD0\xBD) \xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
+                        });
+                    }
+                    std::string text = "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC 10 \xD0\x9C\xD0\x98\xD0\x9D\xD0\xA3\xD0\xA2\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!";
+                    AddNotification("HELPER", text, "", "", "", "", 6.0f, false, IM_COL32(46, 160, 67, 255));
+                }
+                next10MinTrigger += 3600;
+                while (next10MinTrigger <= now) next10MinTrigger += 3600;
+            }
+
+            // Handle 30 sec reminder
+            if (now >= next30SecTrigger) {
+                double overdue = difftime(now, next30SecTrigger);
+                if (overdue > 30.0) {
+                    if (wasMinimized) {
+                        RunOnMainThread([]() {
+                            extern void AddLocalSAMPMessage(const char*);
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0. PayDay \xD1\x83\xD0\xB6\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x88\xD0\xB5\xD0\xBB, \xD0\xB2\xD1\x8B \xD0\xBD\xD0\xB5 \xD1\x83\xD1\x81\xD0\xBF\xD0\xB5\xD0\xBB\xD0\xB8!").c_str());
+                        });
+                    }
+                } else {
+                    if (wasMinimized && overdue > 5.0) {
+                        RunOnMainThread([]() {
+                            extern void AddLocalSAMPMessage(const char*);
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 (30 \xD1\x81\xD0\xB5\xD0\xBA) \xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
+                        });
+                    }
+                    std::string text = "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC 30 \xD0\xA1\xD0\x95\xD0\x9A\xD0\xA3\xD0\x9D\xD0\x94\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!";
+                    AddNotification("HELPER", text, "", "", "", "", 30.0f - (float)overdue, true, IM_COL32(46, 160, 67, 255));
+                    if (!activeNotifications.empty()) activeNotifications.back().isPayday = true;
+                }
+                next30SecTrigger += 3600;
+                while (next30SecTrigger <= now) next30SecTrigger += 3600;
             }
         }
-        if (tstruct.tm_min == 0) {
-            lastPaydayTrigger = -1;
-        }
+        lastCheckTime = now;
     }
 
     if (activeNotifications.empty()) return;
@@ -5125,7 +5150,8 @@ void Gui::RenderNotifications() {
     
     ImDrawList* dl = ImGui::GetWindowDrawList();
     
-    float startY = ds.y - 140.0f; // offset from bottom
+    float startY = ds.y - 140.0f;
+    if (activePatrol.active) startY -= 130.0f; // offset from bottom and patrol widget
     
     for (auto it = activeNotifications.begin(); it != activeNotifications.end(); ) {
         it->duration -= dt;
@@ -5135,7 +5161,7 @@ void Gui::RenderNotifications() {
         }
         
         bool hasKeys = !it->keyAccept.empty() || !it->keyCancel.empty();
-        float notifW = 420.0f;
+        float notifW = 380.0f;
         float notifH = hasKeys ? 115.0f : (it->hasProgress ? 90.0f : 75.0f);
         float startX = (ds.x - notifW) * 0.5f;
 
@@ -5267,156 +5293,249 @@ void Gui::RenderNotifications() {
 }
 
 void Gui::RenderPatrolWidget() {
-    if (!activePatrol.active) return;
+	if (!activePatrol.active) return;
 
-    // Position widget bottom-center (like notifications)
-    ImVec2 screenSz = ImGui::GetIO().DisplaySize;
-    static float pwX = -1.0f, pwY = -1.0f;
-    float w = 380.0f, h = 120.0f, c = 12.0f;
-    if (pwX < 0) { pwX = (screenSz.x - w) * 0.5f; pwY = screenSz.y - 140.0f; }
+	// Position widget bottom-center (like notifications)
+	ImVec2 screenSz = ImGui::GetIO().DisplaySize;
+	static float pwX = -1.0f, pwY = -1.0f;
+	float w = 380.0f, h = 120.0f, c = 12.0f;
+	if (pwX < 0) { pwX = (screenSz.x - w) * 0.5f; pwY = screenSz.y - 140.0f; }
 
-    // Draggable when overlay is open
-    if (show) {
-        ImGui::SetCursorScreenPos(ImVec2(pwX, pwY));
-        ImGui::InvisibleButton("##PatrolWidgetDrag", ImVec2(w, h));
-        if (ImGui::IsItemActive()) {
-            pwX += ImGui::GetIO().MouseDelta.x;
-            pwY += ImGui::GetIO().MouseDelta.y;
-        }
-    }
+	// Draggable when overlay is open - needs proper window context to avoid "Debug" artifact
+	if (show) {
+		ImGui::SetNextWindowPos(ImVec2(pwX, pwY));
+		ImGui::SetNextWindowSize(ImVec2(w, h));
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, 0);
+		ImGui::PushStyleColor(ImGuiCol_Border, 0);
+		ImGui::Begin("##PatrolWidgetDragArea", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoFocusOnAppearing);
+		ImGui::InvisibleButton("##PatrolWidgetDrag", ImVec2(w, h));
+		if (ImGui::IsItemActive()) {
+			pwX += ImGui::GetIO().MouseDelta.x;
+			pwY += ImGui::GetIO().MouseDelta.y;
+		}
+		ImGui::End();
+		ImGui::PopStyleColor(2);
+	}
 
-    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+	ImDrawList* dl = ImGui::GetBackgroundDrawList();
 
-    // Octagon (same style as notification)
-    ImVec2 poly[] = {
-        {pwX, pwY+c}, {pwX+c, pwY}, {pwX+w-c, pwY}, {pwX+w, pwY+c},
-        {pwX+w, pwY+h-c}, {pwX+w-c, pwY+h}, {pwX+c, pwY+h}, {pwX, pwY+h-c}
-    };
+	// Octagon (same style as notification)
+	ImVec2 poly[] = {
+		{pwX, pwY+c}, {pwX+c, pwY}, {pwX+w-c, pwY}, {pwX+w, pwY+c},
+		{pwX+w, pwY+h-c}, {pwX+w-c, pwY+h}, {pwX+c, pwY+h}, {pwX, pwY+h-c}
+	};
 
-    // Gold accent (drawn first, then bg covers inner half — same as notification)
-    dl->AddLine(ImVec2(pwX-1.0f, pwY+c), ImVec2(pwX+c, pwY-1.0f), C_GOLD, 3.0f);
-    dl->AddLine(ImVec2(pwX+c, pwY-1.0f), ImVec2(pwX+150.0f, pwY-1.0f), C_GOLD, 3.0f);
+	// Gold accent (drawn first, then bg covers inner half - same as notification)
+	dl->AddLine(ImVec2(pwX-1.0f, pwY+c), ImVec2(pwX+c, pwY-1.0f), C_GOLD, 3.0f);
+	dl->AddLine(ImVec2(pwX+c, pwY-1.0f), ImVec2(pwX+150.0f, pwY-1.0f), C_GOLD, 3.0f);
 
-    // Background
-    dl->AddConvexPolyFilled(poly, 8, C_BG);
-    for (int i = 0; i < 8; i++)
-        dl->AddLine(poly[i], poly[(i+1)%8], C_BORDER, 1.5f);
+	// Background
+	dl->AddConvexPolyFilled(poly, 8, C_BG);
+	for (int i = 0; i < 8; i++)
+		dl->AddLine(poly[i], poly[(i+1)%8], C_BORDER, 1.5f);
 
-    // Grid (clipped like notification)
-    for (float x = 0; x < w; x += 30) {
-        float sy2 = 0, ey2 = h;
-        if (x < c) { sy2 = c - x; ey2 = h - (c - x); }
-        else if (x > w - c) { sy2 = x - (w - c); ey2 = h - (x - (w - c)); }
-        dl->AddLine(ImVec2(pwX+x, pwY+sy2), ImVec2(pwX+x, pwY+ey2), C_GRID, 1.0f);
-    }
-    for (float y = 0; y < h; y += 30) {
-        float sx2 = 0, ex2 = w;
-        if (y < c) { sx2 = c - y; ex2 = w - (c - y); }
-        else if (y > h - c) { sx2 = y - (h - c); ex2 = w - (y - (h - c)); }
-        dl->AddLine(ImVec2(pwX+sx2, pwY+y), ImVec2(pwX+ex2, pwY+y), C_GRID, 1.0f);
-    }
+	// Grid (clipped like notification)
+	for (float x = 0; x < w; x += 30) {
+		float sy2 = 0, ey2 = h;
+		if (x < c) { sy2 = c - x; ey2 = h - (c - x); }
+		else if (x > w - c) { sy2 = x - (w - c); ey2 = h - (x - (w - c)); }
+		dl->AddLine(ImVec2(pwX+x, pwY+sy2), ImVec2(pwX+x, pwY+ey2), C_GRID, 1.0f);
+	}
+	for (float y = 0; y < h; y += 30) {
+		float sx2 = 0, ex2 = w;
+		if (y < c) { sx2 = c - y; ex2 = w - (c - y); }
+		else if (y > h - c) { sx2 = y - (h - c); ex2 = w - (y - (h - c)); }
+		dl->AddLine(ImVec2(pwX+sx2, pwY+y), ImVec2(pwX+ex2, pwY+y), C_GRID, 1.0f);
+	}
 
-    // Header block (same as notification: height 34)
-    float HEADER_H = 34.0f;
-    ImVec2 hdrPoly[] = {
-        {pwX, pwY+c}, {pwX+c, pwY}, {pwX+w-c, pwY}, {pwX+w, pwY+c},
-        {pwX+w, pwY+HEADER_H}, {pwX, pwY+HEADER_H}
-    };
-    dl->AddConvexPolyFilled(hdrPoly, 6, C_HEADER);
-    dl->AddLine(ImVec2(pwX, pwY+HEADER_H), ImVec2(pwX+w, pwY+HEADER_H), C_BORDER, 2.0f);
+	// Header block (same as notification: height 34)
+	float HEADER_H = 34.0f;
+	ImVec2 hdrPoly[] = {
+		{pwX, pwY+c}, {pwX+c, pwY}, {pwX+w-c, pwY}, {pwX+w, pwY+c},
+		{pwX+w, pwY+HEADER_H}, {pwX, pwY+HEADER_H}
+	};
+	dl->AddConvexPolyFilled(hdrPoly, 6, C_HEADER);
+	dl->AddLine(ImVec2(pwX, pwY+HEADER_H), ImVec2(pwX+w, pwY+HEADER_H), C_BORDER, 2.0f);
 
-    // Header text: DURAN (white) + PATROL (gold) — centered, same font as notification (fontArialBlack24 18px)
-    std::string duranTxt = "DURAN";
-    std::string patrolTxt = "PATROL";
-    float duranW = fontArialBlack24->CalcTextSizeA(18.0f, FLT_MAX, 0.0f, duranTxt.c_str()).x;
-    float patrolW = fontArialBlack24->CalcTextSizeA(18.0f, FLT_MAX, 0.0f, patrolTxt.c_str()).x;
-    float totalHeaderW = duranW + 6.0f + patrolW;
-    float headerX = pwX + (w - totalHeaderW) * 0.5f;
-    float headerY = pwY + 8.0f;
+	// Header text: DURAN (white) + PATROL (gold) - centered, same font as notification (fontArialBlack24 18px)
+	std::string duranTxt = "DURAN";
+	std::string patrolTxt = "HELPER";
+	float duranW = fontArialBlack24->CalcTextSizeA(18.0f, FLT_MAX, 0.0f, duranTxt.c_str()).x;
+	float patrolW = fontArialBlack24->CalcTextSizeA(18.0f, FLT_MAX, 0.0f, patrolTxt.c_str()).x;
+	float totalHeaderW = duranW + 6.0f + patrolW;
+	float headerX = pwX + (w - totalHeaderW) * 0.5f;
+	float headerY = pwY + 8.0f;
 
-    dl->AddText(fontArialBlack24, 18.0f, ImVec2(headerX, headerY), C_WHITE, duranTxt.c_str());
-    dl->AddText(fontArialBlack24, 18.0f, ImVec2(headerX + duranW + 6.0f, headerY), C_GOLD, patrolTxt.c_str());
+	dl->AddText(fontArialBlack24, 18.0f, ImVec2(headerX, headerY), C_WHITE, duranTxt.c_str());
+	dl->AddText(fontArialBlack24, 18.0f, ImVec2(headerX + duranW + 6.0f, headerY), C_GOLD, patrolTxt.c_str());
 
-    // Version badge — dynamic, same style as notification (top-right)
-    std::string ver = "V" + versionStr;
-    float verFontSize = 11.0f;
-    float verW = fontSegoeBold12->CalcTextSizeA(verFontSize, FLT_MAX, 0.0f, ver.c_str()).x + 10.0f;
-    float badgeH = 15.0f;
-    float badgeX = pwX + w - 15.0f - verW;
-    float badgeY2 = pwY + 10.0f;
-    dl->AddRectFilled(ImVec2(badgeX, badgeY2), ImVec2(badgeX + verW, badgeY2 + badgeH), C_RED_BG, 4.0f);
-    dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY2 + 1.0f), C_RED, ver.c_str());
+	// Version badge - dynamic, same style as notification (top-right)
+	std::string ver = "V" + versionStr;
+	float verFontSize = 11.0f;
+	float verW = fontSegoeBold12->CalcTextSizeA(verFontSize, FLT_MAX, 0.0f, ver.c_str()).x + 10.0f;
+	float badgeH = 15.0f;
+	float badgeX = pwX + w - 15.0f - verW;
+	float badgeY2 = pwY + 10.0f;
+	dl->AddRectFilled(ImVec2(badgeX, badgeY2), ImVec2(badgeX + verW, badgeY2 + badgeH), C_RED_BG, 4.0f);
+	dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY2 + 1.0f), C_RED, ver.c_str());
 
-    // Timer countdown
-    if (activePatrol.timeRemainingSec > 0) activePatrol.timeRemainingSec -= ImGui::GetIO().DeltaTime;
-    if (activePatrol.timeRemainingSec < 0) activePatrol.timeRemainingSec = 0;
-    int mins = (int)activePatrol.timeRemainingSec / 60;
-    int secs = (int)activePatrol.timeRemainingSec % 60;
-    char tBuf[16]; sprintf_s(tBuf, "%02d:%02d", mins, secs);
+	// Timer countdown using real wall-clock time (works when game minimized)
+	ULONGLONG now = GetTickCount64();
+	if (activePatrol.lastTickTime == 0) activePatrol.lastTickTime = now;
+	float dt = (float)(now - activePatrol.lastTickTime) / 1000.0f;
+	activePatrol.lastTickTime = now;
 
-    // Timer — white 32px, centered text area below header
-    float timerY = pwY + HEADER_H + 6.0f;
-    dl->AddText(fontSegoeBlack32, 32.0f, ImVec2(pwX + 15, timerY), C_WHITE, tBuf);
+	// Detect if game was minimized (dt > 3 seconds means frame gap)
+	bool wasMinimized = (dt > 3.0f);
+	float overdueSec = 0.0f;
+	if (wasMinimized && activePatrol.timeRemainingSec > 0 && dt > activePatrol.timeRemainingSec) {
+		overdueSec = dt - activePatrol.timeRemainingSec; // how late the report is
+	}
 
-    // Timer subtitle
-    dl->AddText(fontSegoeBold12, 9.0f, ImVec2(pwX + 15, timerY + 34),
-        IM_COL32(107, 115, 127, 255),
-        "\xD0\x94\xD0\x9E \xD0\xA1\xD0\x9B\xD0\x95\xD0\x94\xD0\xA3\xD0\xAE\xD0\xA9\xD0\x95\xD0\x93\xD0\x9E \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90");
+	activePatrol.totalElapsedSec += dt;
+	if (activePatrol.timeRemainingSec > 0) activePatrol.timeRemainingSec -= dt;
 
-    // Variables box — right side
-    float vbx = pwX + 180, vby = pwY + HEADER_H + 5;
-    dl->AddRectFilled(ImVec2(vbx, vby), ImVec2(vbx + 185, vby + 42), IM_COL32(17, 21, 29, 255), 4.0f);
-    dl->AddRect(ImVec2(vbx, vby), ImVec2(vbx + 185, vby + 42), C_BORDER, 4.0f, 0, 1.5f);
+	// Auto-fire next stage
+	if (activePatrol.timeRemainingSec <= 0) {
+		if (activePatrol.totalMin > 0 && activePatrol.totalElapsedSec >= activePatrol.totalMin * 60.0f) {
+			// End of patrol
+			if (wasMinimized && overdueSec > 120.0f) {
+				// Past 2min tolerance - skip final report
+				RunOnMainThread([]() {
+					extern void AddLocalSAMPMessage(const char*);
+					AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x89\xD0\xB5\xD0\xBD. \xD0\x9F\xD0\xBE\xD0\xB3\xD1\x80\xD0\xB5\xD1\x88\xD0\xBD\xD0\xBE\xD1\x81\xD1\x82\xD1\x8C (2 \xD0\xBC\xD0\xB8\xD0\xBD) \xD0\xBF\xD1\x80\xD0\xB5\xD0\xB2\xD1\x8B\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB0.").c_str());
+				});
+			} else {
+				if (wasMinimized && overdueSec > 0) {
+					RunOnMainThread([]() {
+						extern void AddLocalSAMPMessage(const char*);
+						AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4 \xD0\xBE\xD1\x82\xD0\xBF\xD1\x80\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD \xD0\xB2 \xD0\xBF\xD1\x80\xD0\xB5\xD0\xB4\xD0\xB5\xD0\xBB\xD0\xB0\xD1\x85 \xD0\xBF\xD0\xBE\xD0\xB3\xD1\x80\xD0\xB5\xD1\x88\xD0\xBD\xD0\xBE\xD1\x81\xD1\x82\xD0\xB8 (2 \xD0\xBC\xD0\xB8\xD0\xBD).").c_str());
+					});
+				}
+				activePatrol.currentStage = 2; // END
+				ExecutePatrolReport();
+			}
+			activePatrol.active = false;
+		} else {
+			if (wasMinimized && overdueSec > 120.0f) {
+				// Past 2min tolerance - skip report, schedule next
+				RunOnMainThread([]() {
+					extern void AddLocalSAMPMessage(const char*);
+					AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x89\xD0\xB5\xD0\xBD. \xD0\x9F\xD0\xBE\xD0\xB3\xD1\x80\xD0\xB5\xD1\x88\xD0\xBD\xD0\xBE\xD1\x81\xD1\x82\xD1\x8C (2 \xD0\xBC\xD0\xB8\xD0\xBD) \xD0\xBF\xD1\x80\xD0\xB5\xD0\xB2\xD1\x8B\xD1\x88\xD0\xB5\xD0\xBD\xD0\xB0.").c_str());
+				});
+				// Recalculate next report time
+				float intervalSec = (float)activePatrol.intervalMin * 60.0f;
+				if (intervalSec > 0.0f) {
+					float elapsed = activePatrol.totalElapsedSec;
+					float nextReportSec = ceil(elapsed / intervalSec) * intervalSec;
+					if (nextReportSec <= elapsed) nextReportSec += intervalSec;
+					activePatrol.timeRemainingSec = nextReportSec - elapsed;
+				}
+			} else {
+				if (wasMinimized && overdueSec > 0) {
+					RunOnMainThread([]() {
+						extern void AddLocalSAMPMessage(const char*);
+						AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4 \xD0\xBE\xD1\x82\xD0\xBF\xD1\x80\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD \xD0\xB2 \xD0\xBF\xD1\x80\xD0\xB5\xD0\xB4\xD0\xB5\xD0\xBB\xD0\xB0\xD1\x85 \xD0\xBF\xD0\xBE\xD0\xB3\xD1\x80\xD0\xB5\xD1\x88\xD0\xBD\xD0\xBE\xD1\x81\xD1\x82\xD0\xB8 (2 \xD0\xBC\xD0\xB8\xD0\xBD).").c_str());
+					});
+				}
+				activePatrol.currentStage = 1; // PROCESS
+				ExecutePatrolReport();
+			}
+		}
+	}
 
-    float vty = vby + 7;
-    for (auto& kv : activePatrol.variables) {
-        char kBuf[128]; sprintf_s(kBuf, "%s: ", kv.first.c_str());
-        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(vbx + 10, vty), IM_COL32(139, 148, 158, 255), kBuf);
-        float kW = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, kBuf).x;
-        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(vbx + 10 + kW, vty), IM_COL32(243, 211, 153, 255), kv.second.c_str());
-        vty += 16;
-    }
+	if (activePatrol.timeRemainingSec < 0) activePatrol.timeRemainingSec = 0;
+	int mins = (int)activePatrol.timeRemainingSec / 60;
+	int secs = (int)activePatrol.timeRemainingSec % 60;
+	char tBuf[16]; sprintf_s(tBuf, "%02d:%02d", mins, secs);
 
-    // Hotkey buttons — notification DrawKeyBadge style, centered
-    float keysY = pwY + h - 28.0f;
+	int totalMins = 0;
+	int totalSecs = 0;
+	bool hasTotalTime = activePatrol.totalMin > 0;
+	if (hasTotalTime) {
+		float totalRem = (activePatrol.totalMin * 60.0f) - activePatrol.totalElapsedSec;
+		if (totalRem < 0) totalRem = 0;
+		totalMins = (int)totalRem / 60;
+		totalSecs = (int)totalRem % 60;
+	}
+	char totBuf[16]; sprintf_s(totBuf, "%02d:%02d", totalMins, totalSecs);
 
-    auto DrawKeyBadge = [&](float x, float y, const char* keyStr, const char* actionStr, ImU32 accColor) -> float {
-        float kwReal = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, keyStr).x;
-        float keyW = kwReal + 16.0f;
-        if (keyW < 40.0f) keyW = 40.0f;
-        float axReal = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, actionStr).x;
-        float totalW = keyW + 10.0f + axReal;
+	float timerY = pwY + HEADER_H + 19.0f;
+	float leftAreaW = 165.0f;
 
-        dl->AddRectFilled(ImVec2(x, y), ImVec2(x + keyW, y + 24), C_BOX, 4.0f);
-        dl->AddRect(ImVec2(x, y), ImVec2(x + keyW, y + 24), accColor, 4.0f, 0, 1.0f);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(x + (keyW - kwReal)/2, y + 3), C_GOLD, keyStr);
-        dl->AddText(fontSegoeBold14, 14.0f, ImVec2(x + keyW + 10.0f, y + 3), C_WHITE, actionStr);
+	if (hasTotalTime) {
+		// Draw side-by-side
+		float b1x = pwX + leftAreaW * 0.28f;
+		float b2x = pwX + leftAreaW * 0.72f;
 
-        return totalW;
-    };
+		float ntW = fontSegoeBlack32->CalcTextSizeA(30.0f, FLT_MAX, 0.0f, tBuf).x;
+		dl->AddText(fontSegoeBlack32, 30.0f, ImVec2(b1x - ntW*0.5f, timerY + 4), C_WHITE, tBuf);
+		float nsW = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, "\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94").x;
+		dl->AddText(fontSegoeBold12, 11.0f, ImVec2(b1x - nsW*0.5f, timerY + 32), IM_COL32(107, 115, 127, 255), "\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94");
 
-    // Measure both
-    float accW = DrawKeyBadge(0, -1000, "Y",
-        "\xD0\x94\xD0\x9E\xD0\x9B\xD0\x9E\xD0\x96\xD0\x98\xD0\xA2\xD0\xAC", C_GOLD);
-    float canW = DrawKeyBadge(0, -1000, "N",
-        "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC", IM_COL32(239, 68, 68, 255));
-    float keysTotalW = accW + 20.0f + canW;
-    float kx = pwX + (w - keysTotalW) * 0.5f;
+		float ttW = fontSegoeBlack32->CalcTextSizeA(30.0f, FLT_MAX, 0.0f, totBuf).x;
+		dl->AddText(fontSegoeBlack32, 30.0f, ImVec2(b2x - ttW*0.5f, timerY + 4), C_GOLD, totBuf);
+		float tsW = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, "\xD0\x9A\xD0\x9E\xD0\x9D\xD0\x95\xD0\xA6").x;
+		dl->AddText(fontSegoeBold12, 11.0f, ImVec2(b2x - tsW*0.5f, timerY + 32), IM_COL32(107, 115, 127, 255), "\xD0\x9A\xD0\x9E\xD0\x9D\xD0\x95\xD0\xA6");
+		
+		// Add a vertical divider between them
+		dl->AddLine(ImVec2(pwX + leftAreaW * 0.5f, timerY + 6), ImVec2(pwX + leftAreaW * 0.5f, timerY + 38), C_BORDER, 1.0f);
+	} else {
+		// Just the single big timer
+		float ntW = fontSegoeBlack32->CalcTextSizeA(36.0f, FLT_MAX, 0.0f, tBuf).x;
+		dl->AddText(fontSegoeBlack32, 36.0f, ImVec2(pwX + leftAreaW*0.5f - ntW*0.5f, timerY), C_WHITE, tBuf);
+		const char* sub = "\xD0\x94\xD0\x9E \xD0\xA1\xD0\x9B\xD0\x95\xD0\x94\xD0\xA3\xD0\xAE\xD0\xA9\xD0\x95\xD0\x93\xD0\x9E \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90";
+		float nsW = fontSegoeBold12->CalcTextSizeA(11.0f, FLT_MAX, 0.0f, sub).x;
+		dl->AddText(fontSegoeBold12, 11.0f, ImVec2(pwX + leftAreaW*0.5f - nsW*0.5f, timerY + 34), IM_COL32(107, 115, 127, 255), sub);
+	}
 
-    // Draw "Y ДОЛОЖИТЬ" (accept style - gold)
-    kx += DrawKeyBadge(kx, keysY, "Y",
-        "\xD0\x94\xD0\x9E\xD0\x9B\xD0\x9E\xD0\x96\xD0\x98\xD0\xA2\xD0\xAC", C_GOLD) + 20.0f;
-    // Draw "N ЗАВЕРШИТЬ" (cancel style - red)
-    DrawKeyBadge(kx, keysY, "N",
-        "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC", IM_COL32(239, 68, 68, 255));
+	// Stats and Action box right side
+	float vbx = pwX + 175, vby = pwY + HEADER_H + 11;
+	dl->AddRectFilled(ImVec2(vbx, vby), ImVec2(vbx + 195, pwY + h - 14), C_BOX, 4.0f);
+	dl->AddRect(ImVec2(vbx, vby), ImVec2(vbx + 195, pwY + h - 14), C_BORDER, 4.0f, 0, 1.5f);
+
+	float vty = vby + 5;
+	char sentBuf[64]; snprintf(sentBuf, sizeof(sentBuf), "\xD0\x9E\xD0\xA2\xD0\x9F\xD0\xA0\xD0\x90\xD0\x92\xD0\x9B\xD0\x95\xD0\x9D\xD0\x9E: %d", activePatrol.reportsSent);
+	char sentBuf2[128]; snprintf(sentBuf2, sizeof(sentBuf2), "%s \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9E\xD0\x92", sentBuf);
+	dl->AddText(fontSegoeBold14, 11.0f, ImVec2(vbx + 8, vty), IM_COL32(139, 148, 158, 255), sentBuf2);
+	vty += 15;
+	
+	if (activePatrol.totalMin > 0 && activePatrol.intervalMin > 0) {
+		int totalReports = (activePatrol.totalMin / activePatrol.intervalMin) + 1;
+		int rem = totalReports - activePatrol.reportsSent;
+		if (rem < 0) rem = 0;
+		char remBuf[64]; snprintf(remBuf, sizeof(remBuf), "\xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC: %d", rem);
+		char remBuf2[128]; snprintf(remBuf2, sizeof(remBuf2), "%s \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9E\xD0\x92", remBuf);
+		dl->AddText(fontSegoeBold14, 11.0f, ImVec2(vbx + 8, vty), IM_COL32(139, 148, 158, 255), remBuf2);
+		vty += 15;
+	}
+
+	dl->AddLine(ImVec2(vbx, vty + 4), ImVec2(vbx + 195, vty + 4), C_BORDER, 1.0f);
+	vty += 8;
+
+	const char* actionTxt = "\xD0\x9E\xD0\xA7\xD0\x95\xD0\xA0\xD0\x95\xD0\x94\xD0\x9D\xD0\x9E\xD0\x99 \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94";
+	bool isLastReport = false;
+	if (activePatrol.totalMin > 0) {
+		if (activePatrol.intervalMin > 0) {
+			int totalReports = (activePatrol.totalMin / activePatrol.intervalMin) + 1;
+			if ((totalReports - activePatrol.reportsSent) <= 1) isLastReport = true;
+		} else if ((activePatrol.totalElapsedSec + activePatrol.timeRemainingSec) + 1.0f >= activePatrol.totalMin * 60.0f) {
+			isLastReport = true;
+		}
+	}
+	if (isLastReport) {
+		actionTxt = "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x95\xD0\x9D\xD0\x98\xD0\x95 \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9E\xD0\x92";
+	}
+	char actionBuf[128];
+	snprintf(actionBuf, sizeof(actionBuf), "\xD0\xA1\xD0\x9B\xD0\x95\xD0\x94. \xD0\x94\xD0\x95\xD0\x99\xD0\xA1\xD0\xA2\xD0\x92\xD0\x98\xD0\x95: %s", actionTxt);
+	dl->AddText(fontSegoeBold14, 11.0f, ImVec2(vbx + 8, vty), IM_COL32(243, 211, 153, 255), actionBuf);
+
 }
 
 void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     if (patrols.empty()) selectedPatrolIndex = 0;
     else if (selectedPatrolIndex >= (int)patrols.size()) selectedPatrolIndex = patrols.size() - 1;
     if (selectedPatrolIndex < 0) selectedPatrolIndex = 0;
-
-    // No extra back button — DrawGridBackButton is already called by the main render loop
 
     // Empty state (same style as laws tab)
     if (patrols.empty()) {
@@ -5439,7 +5558,7 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
         ImVec2 t1 = fontSegoeBold20->CalcTextSizeA(16.0f, FLT_MAX, 0.0f, emtTxt);
         dl->AddText(fontSegoeBold20, 16.0f, ImVec2(icx - t1.x/2, icy+75), C_GRAY, emtTxt);
 
-        const char* emtSub = "\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80 \xD0\xB8 \xD0\xBD\xD0\xB0\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD1\x81\xD1\x86\xD0\xB5\xD0\xBD\xD0\xB0\xD1\x80\xD0\xB8\xD0\xB8 \xD0\xBF\xD0\xB0\xD1\x82\xD1\x80\xD1\x83\xD0\xBB\xD0\xB5\xD0\xB9.";
+        const char* emtSub = "\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBB\xD0\xB0\xD1\x83\xD0\xBD\xD1\x87\xD0\xB5\xD1\x80 \xD0\xB8 \xD0\xBD\xD0\xB0\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x82\xD0\xB5 \xD1\x81\xD1\x86\xD0\xB5\xD0\xBD\xD0\xB0\xD1\x80\xD0\xB8\xD0\xB8 \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2.";
         ImVec2 t2 = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, emtSub);
         dl->AddText(fontSegoeBold14, 12.0f, ImVec2(icx - t2.x/2, icy+95), IM_COL32(92,99,112,255), emtSub);
         return;
@@ -5448,70 +5567,103 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     // SVG left sidebar: rect x=20 y=65 w=140 h=347, panel fill=#11151D stroke=#1F242E 1.5 rx=8
     float sx = o.x + 20, sy = o.y + 65;
     float sbW = 140, sbH = 347;
-    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx + sbW, sy + sbH), IM_COL32(17, 21, 29, 255), 8.0f);
-    dl->AddRect(ImVec2(sx, sy), ImVec2(sx + sbW, sy + sbH), IM_COL32(31, 36, 46, 255), 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(sx, sy), ImVec2(sx + sbW, sy + sbH), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(sx, sy), ImVec2(sx + sbW, sy + sbH), C_BORDER, 8.0f, 0, 1.5f);
 
-    // SVG: "ТИПЫ ДОКЛАДОВ" x=32 y=85, 11px bold gray
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(o.x + 32, o.y + 76), IM_COL32(139, 148, 158, 255),
-        "\xD0\xA2\xD0\x98\xD0\x9F\xD0\xAB \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9E\xD0\x92");
+    // СПИСОК ДОКЛАДОВ
+    dl->AddText(fontSegoeBold14, 12.0f, ImVec2(o.x + 28, o.y + 76), IM_COL32(139, 148, 158, 255),
+        "\xD0\xA1\xD0\x9F\xD0\x98\xD0\xA1\xD0\x9E\xD0\x9A \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9E\xD0\x92");
 
-    // SVG separator: line x1=30 y1=95 x2=150 y2=95 stroke=#1F242E 1.5
-    dl->AddLine(ImVec2(o.x + 30, o.y + 95), ImVec2(o.x + 150, o.y + 95), IM_COL32(31, 36, 46, 255), 1.5f);
+    // SVG separator: exactly like Binder tab
+    dl->AddLine(ImVec2(o.x + 30, o.y + 100), ImVec2(o.x + 150, o.y + 100), C_BORDER, 1.5f);
 
-    // Sidebar items
-    ImGui::SetCursorScreenPos(ImVec2(sx + 5, o.y + 100));
-    ImGui::BeginChild("##PatrolsSidebar", ImVec2(sbW - 10, sbH - 40), false, ImGuiWindowFlags_NoBackground);
+    // Sidebar items (shifted down to avoid overlap)
+    ImGui::SetCursorScreenPos(ImVec2(sx + 10, o.y + 110));
+    // Provide proper window context to avoid "Debug" artifact
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, 0);
+    ImGui::PushStyleColor(ImGuiCol_Border, 0);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 4));
+    ImGui::BeginChild("##PatrolsSidebar", ImVec2(sbW - 20, sbH - 45), false, ImGuiWindowFlags_NoBackground);
     for (int i = 0; i < (int)patrols.size(); i++) {
         bool isSel = (selectedPatrolIndex == i);
         ImVec2 cp = ImGui::GetCursorScreenPos();
-        ImGui::InvisibleButton((std::string("##p") + std::to_string(i)).c_str(), ImVec2(130, 30));
-        if (ImGui::IsItemClicked()) selectedPatrolIndex = i;
+        ImGui::InvisibleButton((std::string("##p") + std::to_string(i)).c_str(), ImVec2(120, 28));
+        if (ImGui::IsItemClicked()) {
+            if (activePatrol.active && selectedPatrolIndex != i) {
+                overlayErrorMsg = "\xD0\xA1\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xB0 \xD0\xB7\xD0\xB0\xD0\xB2\xD0\xB5\xD1\x80\xD1\x88\xD0\xB8\xD1\x82\xD0\xB5 \xD1\x82\xD0\xB5\xD0\xBA\xD1\x83\xD1\x89\xD0\xB8\xD0\xB9 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x86\xD0\xB5\xD1\x81\xD1\x81 \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2.";
+                overlayErrorColor = IM_COL32(239, 68, 68, 255);
+                overlayErrorTimer = 3.0f;
+            } else {
+                selectedPatrolIndex = i;
+            }
+        }
         bool hover = ImGui::IsItemHovered();
         ImDrawList* cdl = ImGui::GetWindowDrawList();
+        
         if (isSel) {
-            cdl->AddRectFilled(ImVec2(cp.x, cp.y), ImVec2(cp.x + 130, cp.y + 30), IM_COL32(31, 36, 46, 255), 4.0f);
+            cdl->AddRectFilled(cp, ImVec2(cp.x + 120, cp.y + 28), C_GOLD_BG, 6.0f);
+            cdl->AddRectFilled(cp, ImVec2(cp.x + 2, cp.y + 28), C_GOLD, 2.0f);
         } else if (hover) {
-            cdl->AddRectFilled(ImVec2(cp.x, cp.y), ImVec2(cp.x + 130, cp.y + 30), IM_COL32(31, 36, 46, 128), 4.0f);
+            cdl->AddRectFilled(cp, ImVec2(cp.x + 120, cp.y + 28), IM_COL32(255, 255, 255, 10), 6.0f);
         }
-        ImU32 textCol = isSel ? C_WHITE : (hover ? C_WHITE : IM_COL32(139, 148, 158, 255));
-        cdl->AddText(fontSegoeBold12, 12.0f, ImVec2(cp.x + 10, cp.y + 9), textCol, patrols[i].name.c_str());
+        ImU32 textCol = isSel ? C_GOLD : C_WHITE;
+        cdl->AddText(fontSegoeBold14, 11.0f, ImVec2(cp.x + 10, cp.y + 6), textCol, patrols[i].name.c_str());
     }
     ImGui::EndChild();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(2);
 
     // SVG right panel: rect x=170 y=65 w=510 h=347
     float px = o.x + 170, py = o.y + 65;
     float panW = 510;
-    dl->AddRectFilled(ImVec2(px, py), ImVec2(px + panW, py + 347), IM_COL32(17, 21, 29, 255), 8.0f);
-    dl->AddRect(ImVec2(px, py), ImVec2(px + panW, py + 347), IM_COL32(31, 36, 46, 255), 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(px, py), ImVec2(px + panW, py + 347), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(px, py), ImVec2(px + panW, py + 347), C_BORDER, 8.0f, 0, 1.5f);
 
     auto& p = patrols[selectedPatrolIndex];
 
-    // SVG panel header: name 14px bold white
-    dl->AddText(fontSegoeBold14, 14.0f, ImVec2(px + 20, py + 14), C_WHITE, p.name.c_str());
-
-    // SVG separator at y=100
-    dl->AddLine(ImVec2(px, o.y + 100), ImVec2(px + panW, o.y + 100), IM_COL32(31, 36, 46, 255), 1.0f);
-
     // SVG: "ФОРМАТ ДОКЛАДА" 11px bold gray
-    dl->AddText(fontSegoeBold12, 11.0f, ImVec2(px + 20, o.y + 111),
+    dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px + 20, o.y + 76),
         IM_COL32(139, 148, 158, 255),
         "\xD0\xA4\xD0\x9E\xD0\xA0\xD0\x9C\xD0\x90\xD0\xA2 \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90");
 
-    // SVG format box: 470x65, fill=#080A0F stroke=#30363D
-    float fx = px + 20, fy = o.y + 130;
-    dl->AddRectFilled(ImVec2(fx, fy), ImVec2(fx + 470, fy + 65), IM_COL32(8, 10, 15, 255), 4.0f);
-    dl->AddRect(ImVec2(fx, fy), ImVec2(fx + 470, fy + 65), IM_COL32(48, 54, 61, 255), 4.0f, 0, 1.0f);
+    // SVG format box: 470x86
+    float fx = px + 20, fy = o.y + 96;
+    dl->AddRectFilled(ImVec2(fx, fy), ImVec2(fx + 470, fy + 86), C_INPUT, 4.0f);
+    dl->AddRect(ImVec2(fx, fy), ImVec2(fx + 470, fy + 86), C_BORDER, 4.0f, 0, 1.0f);
 
-    // Format text lines: text-norm gray 11px
-    dl->PushClipRect(ImVec2(fx + 1, fy + 1), ImVec2(fx + 469, fy + 64), true);
-    char fmtBuf[512];
-    snprintf(fmtBuf, sizeof(fmtBuf), "\xD0\x9D\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xBE: %s", p.startText.c_str());
-    dl->AddText(fontSegoeRegular13, 11.0f, ImVec2(fx + 10, fy + 8), IM_COL32(139, 148, 158, 255), fmtBuf, nullptr, 450.0f);
-    snprintf(fmtBuf, sizeof(fmtBuf), "\xD0\x92 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x86\xD0\xB5\xD1\x81\xD1\x81\xD0\xB5: %s", p.processText.c_str());
-    dl->AddText(fontSegoeRegular13, 11.0f, ImVec2(fx + 10, fy + 24), IM_COL32(139, 148, 158, 255), fmtBuf, nullptr, 450.0f);
-    snprintf(fmtBuf, sizeof(fmtBuf), "\xD0\x9E\xD0\xBA\xD0\xBE\xD0\xBD\xD1\x87\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5: %s", p.endText.c_str());
-    dl->AddText(fontSegoeRegular13, 11.0f, ImVec2(fx + 10, fy + 40), IM_COL32(139, 148, 158, 255), fmtBuf, nullptr, 450.0f);
-    dl->PopClipRect();
+    // Format text lines: scrollable box for long texts
+    ImGui::SetCursorScreenPos(ImVec2(fx + 1, fy + 1));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0,0,0,0));
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, C_HEADER);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
+    ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
+    ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 6.0f);
+    ImGui::BeginChild("##FormatChild", ImVec2(468, 84), false, ImGuiWindowFlags_NoBackground);
+    
+    ImDrawList* cdl = ImGui::GetWindowDrawList();
+    float cx = fx + 10;
+    
+    auto drawFmtLine = [&](const char* label, const char* text) {
+        ImVec2 cp = ImGui::GetCursorScreenPos();
+        cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cx, cp.y + 2), IM_COL32(139, 148, 158, 255), label);
+        float lw = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, label).x;
+        float wrapW = 445.0f - lw; // leave space for scrollbar without shifting text
+        ImVec2 tSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, wrapW, text);
+        if (text[0] == '\0') tSz.y = 16.0f; // minimum height
+        cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cx + lw + 4.0f, cp.y + 2), C_WHITE, text, nullptr, wrapW);
+        ImGui::Dummy(ImVec2(10, tSz.y + 2.0f));
+    };
+    
+    ImGui::Dummy(ImVec2(10, 2));
+    drawFmtLine("\xD0\x9D\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xBE:", p.startText.c_str());
+    drawFmtLine("\xD0\x92 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x86\xD0\xB5\xD1\x81\xD1\x81\xD0\xB5:", p.processText.c_str());
+    drawFmtLine("\xD0\x9E\xD0\xBA\xD0\xBE\xD0\xBD\xD1\x87\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5:", p.endText.c_str());
+    ImGui::Dummy(ImVec2(10, 2));
+    
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(5);
 
     // Extract custom variables
     std::vector<std::string> vars;
@@ -5524,7 +5676,7 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
             std::string uMatch = match;
             std::transform(uMatch.begin(), uMatch.end(), uMatch.begin(), ::toupper);
             if (uMatch == "\xD0\x98\xD0\x9C\xD0\xAF" || uMatch == "\xD0\xA4\xD0\x90\xD0\x9C" || uMatch == "\xD0\xA2\xD0\x95\xD0\x93" || 
-                uMatch == "\xD0\x97\xD0\x92" || uMatch == "\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF" || uMatch == "ID") continue;
+                uMatch == "\xD0\x97\xD0\x92" || uMatch == "\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF") continue;
             bool isGlobal = false;
             for (const auto& gv : BinderManager::Get().Variables) {
                 if (gv.first == match) { isGlobal = true; break; }
@@ -5539,33 +5691,41 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
 
     // Variables section
     if (!vars.empty()) {
-        dl->AddText(fontSegoeBold12, 11.0f, ImVec2(px + 20, o.y + 211),
+        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(px + 20, o.y + 190),
             IM_COL32(139, 148, 158, 255),
             "\xD0\x97\xD0\x9D\xD0\x90\xD0\xA7\xD0\x95\xD0\x9D\xD0\x98\xD0\xAF \xD0\x9F\xD0\x95\xD0\xA0\xD0\x95\xD0\x9C\xD0\x95\xD0\x9D\xD0\x9D\xD0\xAB\xD0\xA5 (\xD0\x9C\xD0\x90\xD0\x9A\xD0\xA1. 4)");
+
+        float startY = (vars.size() <= 2) ? (o.y + 226) : (o.y + 211);
 
         for (size_t i = 0; i < vars.size() && i < 4; i++) {
             int col = (int)(i % 2);
             int row = (int)(i / 2);
             float labelX = px + 20 + col * 210;
             float inputX = px + 90 + col * 210;
-            float rowY = o.y + 230 + row * 30;
+            float rowY = startY + row * 30;
 
             char varLabel[128]; snprintf(varLabel, sizeof(varLabel), "*%s*", vars[i].c_str());
-            dl->AddText(fontSegoeBold12, 12.0f, ImVec2(labelX, rowY + 5), IM_COL32(243, 211, 153, 255), varLabel);
+            dl->AddText(fontSegoeBold14, 14.0f, ImVec2(labelX, rowY + 2), IM_COL32(243, 211, 153, 255), varLabel);
 
-            dl->AddRectFilled(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), IM_COL32(8, 10, 15, 255), 4.0f);
-            dl->AddRect(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), IM_COL32(48, 54, 61, 255), 4.0f, 0, 1.0f);
+            dl->AddRectFilled(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), C_INPUT, 4.0f);
+            dl->AddRect(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), C_BORDER, 4.0f, 0, 1.0f);
 
             char varBuf[256] = "";
-            if (activePatrol.variables.count(vars[i])) strcpy_s(varBuf, activePatrol.variables[vars[i]].c_str());
+            if (editVariables.count(vars[i])) strcpy_s(varBuf, editVariables[vars[i]].c_str());
+            else if (activePatrol.variables.count(vars[i])) {
+                strcpy_s(varBuf, activePatrol.variables[vars[i]].c_str());
+                editVariables[vars[i]] = varBuf;
+            }
             ImGui::SetCursorScreenPos(ImVec2(inputX + 2, rowY + 1));
             ImGui::PushItemWidth(116);
             ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
             ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+            ImGui::PushFont(fontSegoeBold14);
             if (ImGui::InputText((std::string("##v") + std::to_string(i)).c_str(), varBuf, 256)) {
-                activePatrol.variables[vars[i]] = varBuf;
+                editVariables[vars[i]] = varBuf;
             }
+            ImGui::PopFont();
             ImGui::PopStyleVar();
             ImGui::PopStyleColor(2);
             ImGui::PopItemWidth();
@@ -5573,22 +5733,52 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     }
 
     // Separator at y=270
-    dl->AddLine(ImVec2(px, o.y + 270), ImVec2(px + panW, o.y + 270), IM_COL32(31, 36, 46, 255), 1.0f);
+    dl->AddLine(ImVec2(px, o.y + 270), ImVec2(px + panW, o.y + 270), C_BORDER, 1.0f);
 
-    // Interval
-    dl->AddText(fontSegoeBold12, 12.0f, ImVec2(px + 20, o.y + 285),
+    // Total Time (Left)
+    dl->AddText(fontSegoeBold14, 13.0f, ImVec2(px + 20, o.y + 285),
         IM_COL32(139, 148, 158, 255),
-        "\xD0\x98\xD0\xBD\xD1\x82\xD0\xB5\xD1\x80\xD0\xB2\xD0\xB0\xD0\xBB \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xB0:");
+        "\xD0\x9E\xD0\x91\xD0\xA9\xD0\x95\xD0\x95 \xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF:");
 
+    static char editTotalTimeBuf[8] = "";
     static int editInterval = 10;
     static int lastSelIdx = -1;
     if (lastSelIdx != selectedPatrolIndex) {
         editInterval = p.defaultIntervalMin > 0 ? p.defaultIntervalMin : 10;
         lastSelIdx = selectedPatrolIndex;
+        editTotalTimeBuf[0] = '\0'; // Reset to empty when switching
     }
-    float intX = px + 140, intY = o.y + 280;
-    dl->AddRectFilled(ImVec2(intX, intY), ImVec2(intX + 40, intY + 22), IM_COL32(8, 10, 15, 255), 4.0f);
-    dl->AddRect(ImVec2(intX, intY), ImVec2(intX + 40, intY + 22), IM_COL32(48, 54, 61, 255), 4.0f, 0, 1.0f);
+
+    float totX = px + 120, totY = o.y + 280;
+    dl->AddRectFilled(ImVec2(totX, totY), ImVec2(totX + 40, totY + 22), C_INPUT, 4.0f);
+    dl->AddRect(ImVec2(totX, totY), ImVec2(totX + 40, totY + 22), C_BORDER, 4.0f, 0, 1.0f);
+
+    ImGui::SetCursorScreenPos(ImVec2(totX + 2, totY + 1));
+    ImGui::PushItemWidth(36);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+    ImGui::PushFont(fontSegoeBold14);
+    if (activePatrol.active) ImGui::BeginDisabled(true);
+    ImGui::InputText("##patrolTotalTime", editTotalTimeBuf, 8, ImGuiInputTextFlags_CharsDecimal);
+    if (activePatrol.active) ImGui::EndDisabled();
+    ImGui::PopFont();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(2);
+    ImGui::PopItemWidth();
+
+    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(totX + 45, o.y + 285),
+        IM_COL32(139, 148, 158, 255), "\xD0\xBC\xD0\xB8\xD0\xBD.");
+
+    // Interval (Right)
+    float intLabelX = px + 210;
+    dl->AddText(fontSegoeBold14, 13.0f, ImVec2(intLabelX, o.y + 285),
+        IM_COL32(139, 148, 158, 255),
+        "\xD0\x98\xD0\x9D\xD0\xA2\xD0\x95\xD0\xA0\xD0\x92\xD0\x90\xD0\x9B \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x90:");
+
+    float intX = intLabelX + 130, intY = o.y + 280;
+    dl->AddRectFilled(ImVec2(intX, intY), ImVec2(intX + 40, intY + 22), C_INPUT, 4.0f);
+    dl->AddRect(ImVec2(intX, intY), ImVec2(intX + 40, intY + 22), C_BORDER, 4.0f, 0, 1.0f);
 
     char intBuf[8]; snprintf(intBuf, sizeof(intBuf), "%d", editInterval);
     ImGui::SetCursorScreenPos(ImVec2(intX + 2, intY + 1));
@@ -5596,11 +5786,15 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+    ImGui::PushFont(fontSegoeBold14);
+    if (activePatrol.active) ImGui::BeginDisabled(true);
     if (ImGui::InputText("##patrolInterval", intBuf, 8, ImGuiInputTextFlags_CharsDecimal)) {
         editInterval = atoi(intBuf);
         if (editInterval < 1) editInterval = 1;
         if (editInterval > 60) editInterval = 60;
     }
+    if (activePatrol.active) ImGui::EndDisabled();
+    ImGui::PopFont();
     ImGui::PopStyleVar();
     ImGui::PopStyleColor(2);
     ImGui::PopItemWidth();
@@ -5614,16 +5808,16 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     ImGui::InvisibleButton("##autoSendCheck", ImVec2(14, 14));
     if (ImGui::IsItemClicked()) activePatrol.autoSend = !activePatrol.autoSend;
 
-    dl->AddRectFilled(ImVec2(cbX, cbY), ImVec2(cbX + 14, cbY + 14), IM_COL32(8, 10, 15, 255), 2.0f);
-    dl->AddRect(ImVec2(cbX, cbY), ImVec2(cbX + 14, cbY + 14), IM_COL32(48, 54, 61, 255), 2.0f, 0, 1.0f);
+    dl->AddRectFilled(ImVec2(cbX, cbY), ImVec2(cbX + 14, cbY + 14), C_INPUT, 2.0f);
+    dl->AddRect(ImVec2(cbX, cbY), ImVec2(cbX + 14, cbY + 14), C_BORDER, 2.0f, 0, 1.0f);
     if (activePatrol.autoSend) {
         dl->AddLine(ImVec2(cbX + 3, cbY + 7), ImVec2(cbX + 6, cbY + 11), C_GOLD, 2.0f);
         dl->AddLine(ImVec2(cbX + 6, cbY + 11), ImVec2(cbX + 11, cbY + 3), C_GOLD, 2.0f);
     }
 
-    dl->AddText(fontSegoeRegular13, 12.0f, ImVec2(cbX + 25, cbY + 1),
+    dl->AddText(fontSegoeBold14, 13.0f, ImVec2(cbX + 25, cbY),
         IM_COL32(139, 148, 158, 255),
-        "\xD0\x90\xD0\xB2\xD1\x82\xD0\xBE\xD0\xBC\xD0\xB0\xD1\x82\xD0\xB8\xD1\x87\xD0\xB5\xD1\x81\xD0\xBA\xD0\xB8 \xD0\xBE\xD1\x82\xD0\xBF\xD1\x80\xD0\xB0\xD0\xB2\xD0\xBB\xD1\x8F\xD1\x82\xD1\x8C \xD1\x82\xD0\xB5\xD0\xBA\xD1\x81\xD1\x82 \xD0\xB2 \xD1\x80\xD0\xB0\xD1\x86\xD0\xB8\xD1\x8E (\xD0\xB8\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB5 \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5)");
+        "\xD0\x90\xD0\xB2\xD1\x82\xD0\xBE\xD0\xBC\xD0\xB0\xD1\x82\xD0\xB8\xD1\x87\xD0\xB5\xD1\x81\xD0\xBA\xD0\xB8 \xD0\xB4\xD0\xB5\xD0\xBB\xD0\xB0\xD1\x82\xD1\x8C \xD1\x81\xD0\xBA\xD1\x80\xD0\xB8\xD0\xBD\xD1\x88\xD0\xBE\xD1\x82 (/c 60 + F8)");
 
     // Start/Stop button
     float btnY = o.y + 355;
@@ -5631,41 +5825,128 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
     bool startBtn = ImGui::InvisibleButton("##startPatrol", ImVec2(470, 40));
     bool startHover = ImGui::IsItemHovered();
 
+    bool needsUpdate = false;
+	if (activePatrol.active) {
+		if (activePatrol.data.name != p.name) {
+			needsUpdate = true;
+		} else {
+			for (const auto& v : vars) {
+				if (editVariables.count(v) && activePatrol.variables[v] != editVariables[v]) {
+					needsUpdate = true;
+					break;
+				}
+			}
+			if (activePatrol.intervalMin != editInterval) needsUpdate = true;
+			int editTot = editTotalTimeBuf[0] ? atoi(editTotalTimeBuf) : 0;
+			if (activePatrol.totalMin != editTot) needsUpdate = true;
+		}
+	}
+
     if (activePatrol.active) {
-        dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
-            startHover ? IM_COL32(231, 76, 60, 70) : IM_COL32(231, 76, 60, 38), 4.0f);
-        dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
-            IM_COL32(231, 76, 60, 255), 4.0f, 0, 1.5f);
-        const char* sTxt = "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\xAC";
-        ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, sTxt);
-        dl->AddText(fontSegoeBold14, 13.0f,
-            ImVec2(px + 20 + (470 - sSz.x) / 2, btnY + (40 - sSz.y) / 2),
-            IM_COL32(231, 76, 60, 255), sTxt);
-        if (startBtn) activePatrol.active = false;
+        if (needsUpdate) {
+            dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+                startHover ? IM_COL32(46, 204, 113, 70) : IM_COL32(46, 204, 113, 38), 4.0f);
+            dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+                IM_COL32(46, 204, 113, 255), 4.0f, 0, 1.5f);
+            const char* sTxt = "\xD0\x9E\xD0\x91\xD0\x9D\xD0\x9E\xD0\x92\xD0\x98\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94";
+            ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, 3.402823466e+38F, 0.0f, sTxt);
+            float totalW = 16.0f + 8.0f + sSz.x;
+            float startX = px + 20 + (470 - totalW) / 2;
+            
+            dl->AddCircle(ImVec2(startX + 8, btnY + 20), 5.0f, IM_COL32(46, 204, 113, 255), 12, 1.5f);
+            dl->AddTriangleFilled(ImVec2(startX + 10, btnY + 12), ImVec2(startX + 14, btnY + 15), ImVec2(startX + 10, btnY + 18), IM_COL32(46, 204, 113, 255));
+            
+            dl->AddText(fontSegoeBold14, 13.0f, ImVec2(startX + 24.0f, btnY + (40 - sSz.y) / 2), IM_COL32(46, 204, 113, 255), sTxt);
+            
+            if (startBtn) {
+                for (const auto& kv : editVariables) {
+                    activePatrol.variables[kv.first] = kv.second;
+                }
+            }
+        } else {
+            dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+                startHover ? IM_COL32(231, 76, 60, 70) : IM_COL32(231, 76, 60, 38), 4.0f);
+            dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
+                IM_COL32(231, 76, 60, 255), 4.0f, 0, 1.5f);
+							const char* sTxt = "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94";
+            ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, 3.402823466e+38F, 0.0f, sTxt);
+            float totalW = 12.0f + 8.0f + sSz.x;
+            float startX = px + 20 + (470 - totalW) / 2;
+            dl->AddRectFilled(ImVec2(startX, btnY + 14), ImVec2(startX + 12, btnY + 26), IM_COL32(231, 76, 60, 255));
+							dl->AddText(fontSegoeBold14, 13.0f, ImVec2(startX + 20.0f, btnY + (40 - sSz.y) / 2), IM_COL32(231, 76, 60, 255), "\xD0\x97\xD0\x90\xD0\x92\xD0\x95\xD0\xA0\xD0\xA8\xD0\x98\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94");
+            if (startBtn) activePatrol.active = false;
+        }
     } else {
         dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
             startHover ? IM_COL32(210, 166, 94, 70) : IM_COL32(210, 166, 94, 38), 4.0f);
         dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
             IM_COL32(210, 166, 94, 255), 4.0f, 0, 1.5f);
-        const char* sTxt = "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x9F\xD0\x90\xD0\xA2\xD0\xA0\xD0\xA3\xD0\x9B\xD0\xAC";
+							const char* sTxt = "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94";
         ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, sTxt);
-        dl->AddText(fontSegoeBold14, 13.0f,
-            ImVec2(px + 20 + (470 - sSz.x) / 2, btnY + (40 - sSz.y) / 2),
-            IM_COL32(210, 166, 94, 255), sTxt);
+							float totalW = 10.0f + 8.0f + sSz.x;
+							float startX = px + 20 + (470 - totalW) / 2;
+							ImVec2 p1(startX, btnY + 14);
+							ImVec2 p2(startX, btnY + 26);
+							ImVec2 p3(startX + 10, btnY + 20);
+							dl->AddTriangleFilled(p1, p2, p3, IM_COL32(210, 166, 94, 255));
+							dl->AddText(fontSegoeBold14, 13.0f, ImVec2(startX + 18.0f, btnY + (40 - sSz.y) / 2), IM_COL32(210, 166, 94, 255), "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94");
         if (startBtn) {
-            activePatrol.active = true;
-            activePatrol.data = p;
-            activePatrol.currentStage = 0;
+								activePatrol.active = true;
+								activePatrol.reportsSent = 0;
+								activePatrol.data = p;
+								activePatrol.variables.clear();
+								for (const auto& kv : editVariables) {
+									activePatrol.variables[kv.first] = kv.second;
+								}
+								activePatrol.currentStage = 0;
+            activePatrol.intervalMin = editInterval;
+            activePatrol.totalMin = editTotalTimeBuf[0] ? atoi(editTotalTimeBuf) : 0;
+            activePatrol.totalElapsedSec = 0.0f;
             activePatrol.timeRemainingSec = (float)editInterval * 60.0f;
             if (activePatrol.timeRemainingSec <= 0) activePatrol.timeRemainingSec = 600.0f;
+            activePatrol.lastTickTime = GetTickCount64();
+            
+            // Trigger first report immediately
+            // System notifications
+            RunOnMainThread([p, totalMin = activePatrol.totalMin]() {
+                extern void AddLocalSAMPMessage(const char*);
+                char msgBuf[512];
+                snprintf(msgBuf, sizeof(msgBuf), "{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x97\xD0\xB0\xD0\xBF\xD1\x83\xD1\x89\xD0\xB5\xD0\xBD \xD1\x81\xD1\x86\xD0\xB5\xD0\xBD\xD0\xB0\xD1\x80\xD0\xB8\xD0\xB9 \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2: \"%s\". \xD0\xA7\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xB7\xD0\xB0\xD0\xB2\xD0\xB5\xD1\x80\xD1\x88\xD0\xB8\xD1\x82\xD1\x8C \xD1\x80\xD0\xB0\xD0\xBD\xD1\x8C\xD1\x88\xD0\xB5, \xD0\xB7\xD0\xB0\xD0\xB9\xD0\xB4\xD0\xB8\xD1\x82\xD0\xB5 \xD0\xB2\xD0\xBE \xD0\xB2\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD1\x83 \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2.", p.name.c_str());
+                std::string cp1251_1 = UTF8ToCP1251(msgBuf);
+                AddLocalSAMPMessage(cp1251_1.c_str());
+                
+                time_t t = time(NULL);
+                struct tm tmBuf;
+                localtime_s(&tmBuf, &t);
+                char startTime[16];
+                snprintf(startTime, sizeof(startTime), "%02d:%02d", tmBuf.tm_hour, tmBuf.tm_min);
+                
+                if (totalMin > 0) {
+                    t += totalMin * 60;
+                    localtime_s(&tmBuf, &t);
+                    char endTime[16];
+                    snprintf(endTime, sizeof(endTime), "%02d:%02d", tmBuf.tm_hour, tmBuf.tm_min);
+                    snprintf(msgBuf, sizeof(msgBuf), "{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x92\xD1\x80\xD0\xB5\xD0\xBC\xD1\x8F \xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xB0 \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2: %s. \xD0\x92\xD1\x80\xD0\xB5\xD0\xBC\xD1\x8F \xD0\xBE\xD0\xBA\xD0\xBE\xD0\xBD\xD1\x87\xD0\xB0\xD0\xBD\xD0\xB8\xD1\x8F \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2: %s", startTime, endTime);
+                } else {
+                    snprintf(msgBuf, sizeof(msgBuf), "{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x92\xD1\x80\xD0\xB5\xD0\xBC\xD1\x8F \xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD0\xBB\xD0\xB0 \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2: %s. \xD0\x92\xD1\x80\xD0\xB5\xD0\xBC\xD1\x8F \xD0\xBE\xD0\xBA\xD0\xBE\xD0\xBD\xD1\x87\xD0\xB0\xD0\xBD\xD0\xB8\xD1\x8F \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2: \xD0\x91\xD0\xB5\xD1\x81\xD0\xBA\xD0\xBE\xD0\xBD\xD0\xB5\xD1\x87\xD0\xBD\xD0\xBE", startTime);
+                }
+                std::string cp1251_2 = UTF8ToCP1251(msgBuf);
+                AddLocalSAMPMessage(cp1251_2.c_str());
+            });
+
+            Toggle(); // Close overlay
+            ExecutePatrolReport();
         }
     }
 }
 
 
 
+
+
 void Gui::ExecutePatrolReport() {
     if (!activePatrol.active) return;
+	activePatrol.reportsSent++;
     
     std::string text;
     if (activePatrol.currentStage == 0) text = activePatrol.data.startText;
@@ -5697,7 +5978,7 @@ void Gui::ExecutePatrolReport() {
 
     // Replace time if any
     size_t tPos = 0;
-    std::string timeTag = "*\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF*"; // *ВРЕМЯ*
+    std::string timeTag = "*\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF*"; // *ÐÐ ÐÐÐ¯*
     std::string curTime = GetCurrentDateTime().substr(11, 5); // Assuming HH:MM
     while ((tPos = text.find(timeTag, tPos)) != std::string::npos) {
         text.replace(tPos, timeTag.length(), curTime);
@@ -5706,20 +5987,25 @@ void Gui::ExecutePatrolReport() {
     
     std::string cp1251 = UTF8ToCP1251(text.c_str());
 
-    if (activePatrol.autoSend) {
-        RunOnMainThread([cp1251]() {
-            SendSAMPMessage(cp1251.c_str());
-        });
-    } else {
-        RunOnMainThread([cp1251]() {
-            OpenChatWithText(cp1251.c_str(), 0);
-        });
-    }
+    RunOnMainThread([cp1251]() {
+        extern void SendSAMPMessage(const char*);
+        SendSAMPMessage(cp1251.c_str());
+        
+        if (Gui::activePatrol.autoSend) {
+            extern void StartAutoScreenshot();
+            StartAutoScreenshot();
+        }
+    });
 
     if (activePatrol.currentStage < 2) {
-        activePatrol.currentStage++;
-        activePatrol.timeRemainingSec = activePatrol.data.defaultIntervalMin * 60.0f;
-    } else {
-        activePatrol.active = false; // End patrol
+        float intervalSec = (float)activePatrol.intervalMin * 60.0f;
+		if (intervalSec > 0.0f) {
+			float elapsed = activePatrol.totalElapsedSec;
+			float nextReportSec = ceil(elapsed / intervalSec) * intervalSec;
+			if (nextReportSec <= elapsed) nextReportSec += intervalSec;
+			activePatrol.timeRemainingSec = nextReportSec - elapsed;
+		} else {
+			activePatrol.timeRemainingSec = 0.0f;
+		}
     }
 }
