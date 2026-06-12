@@ -185,7 +185,7 @@
                                 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Автор: " Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="11"/>
-                                    <TextBlock Text="{Binding Author}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="11"/>
+                                    <TextBlock Text="{Binding Author}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11"/>
                                 </StackPanel>
                             </StackPanel>
 

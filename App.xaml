@@ -284,29 +284,27 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="BorderOn" Property="Opacity" Value="1"/>
-                                <Setter TargetName="Dot" Property="Margin" Value="20,0,0,0"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BorderOn" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" />
+                                            <ThicknessAnimation Storyboard.TargetName="Dot" Storyboard.TargetProperty="Margin" To="20,0,0,0" Duration="0:0:0.15">
+                                                <ThicknessAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
+                                            </ThicknessAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BorderOn" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15" />
+                                            <ThicknessAnimation Storyboard.TargetName="Dot" Storyboard.TargetProperty="Margin" To="2,0,0,0" Duration="0:0:0.15">
+                                                <ThicknessAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
+                                            </ThicknessAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
-                            <EventTrigger RoutedEvent="CheckBox.Checked">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="BorderOn" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.15" />
-                                        <ThicknessAnimation Storyboard.TargetName="Dot" Storyboard.TargetProperty="Margin" From="2,0,0,0" To="20,0,0,0" Duration="0:0:0.15">
-                                            <ThicknessAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
-                                        </ThicknessAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="CheckBox.Unchecked">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="BorderOn" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.15" />
-                                        <ThicknessAnimation Storyboard.TargetName="Dot" Storyboard.TargetProperty="Margin" From="20,0,0,0" To="2,0,0,0" Duration="0:0:0.15">
-                                            <ThicknessAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></ThicknessAnimation.EasingFunction>
-                                        </ThicknessAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
