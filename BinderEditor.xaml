@@ -107,7 +107,7 @@
                                     
                                     <TextBox x:Name="txtStepVal" Text="{Binding value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                              TextChanged="StepVal_TextChanged" SelectionChanged="StepVal_SelectionChanged" Loaded="StepVal_Loaded" ScrollViewer.ScrollChanged="TxtStepVal_ScrollChanged" 
-                                             Background="Transparent" CaretBrush="White" SelectionBrush="#551f6feb" BorderThickness="0" 
+                                             Background="Transparent" CaretBrush="{DynamicResource TextBrush}" SelectionBrush="#551f6feb" BorderThickness="0" 
                                              FontSize="12" FontFamily="Segoe UI" VerticalAlignment="Center"
                                              TextWrapping="Wrap" MaxHeight="200">
                                         <TextBox.Style>
@@ -327,7 +327,7 @@
                                             </Style>
                                         </StackPanel.Style>
                                         <Border Width="70" Height="70" CornerRadius="35" Background="#15d2a65e" HorizontalAlignment="Center" Margin="0,0,0,15">
-                                            <Path Data="M7,2V13H10V22L17,10H13L17,2H7Z" Fill="#d2a65e" Stretch="Uniform" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
+                                            <Path Data="M7,2V13H10V22L17,10H13L17,2H7Z" Fill="{DynamicResource GoldBrush}" Stretch="Uniform" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.6"/>
                                         </Border>
                                         <TextBlock Text="ШАГИ НЕ ДОБАВЛЕНЫ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Opacity="0.6"/>
                                         <TextBlock Text="Нажмите «+ ЧАТ» или другую кнопку ниже,&#x0a;чтобы добавить первое действие." Foreground="#8b949e" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,8,0,0" Opacity="0.4" TextWrapping="Wrap"/>
@@ -409,7 +409,7 @@
                                 <StackPanel Margin="0,0,0,25">
                                     <TextBlock Text="НАЗВАНИЕ БИНДА" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,10"/>
                                     <Border Height="38" Background="{DynamicResource BgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="6">
-                                        <TextBox x:Name="txtBindName" Background="Transparent" Foreground="White" FontFamily="Segoe UI" FontSize="13" BorderThickness="0" Padding="12,0" VerticalContentAlignment="Center" CaretBrush="White"/>
+                                        <TextBox x:Name="txtBindName" Background="Transparent" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="13" BorderThickness="0" Padding="12,0" VerticalContentAlignment="Center" CaretBrush="{DynamicResource TextBrush}"/>
                                     </Border>
                                 </StackPanel>
 
@@ -417,7 +417,7 @@
                                 <StackPanel>
                                     <TextBlock Text="ТИП АКТИВАЦИИ" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource GoldBrush}" Margin="0,0,0,15"/>
                                     <StackPanel Margin="0,0,0,20">
-                                        <RadioButton x:Name="rbTypeKey" Content="Горячая клавиша" IsChecked="True" Foreground="White" FontFamily="Segoe UI" FontSize="13" Margin="0,0,0,12" Checked="BindType_Changed" Cursor="Hand">
+                                        <RadioButton x:Name="rbTypeKey" Content="Горячая клавиша" IsChecked="True" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="13" Margin="0,0,0,12" Checked="BindType_Changed" Cursor="Hand">
                                             <RadioButton.Template>
                                                 <ControlTemplate TargetType="RadioButton">
                                                     <StackPanel Orientation="Horizontal" Background="Transparent">
@@ -491,7 +491,7 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-                                                <TextBox x:Name="txtBindAutoTrigger" Background="Transparent" Foreground="White" BorderThickness="0" Padding="12,0" VerticalContentAlignment="Center" FontSize="13" FontFamily="Segoe UI" HorizontalContentAlignment="Left" CaretBrush="White"/>
+                                                <TextBox x:Name="txtBindAutoTrigger" Background="Transparent" Foreground="{DynamicResource TextBrush}" BorderThickness="0" Padding="12,0" VerticalContentAlignment="Center" FontSize="13" FontFamily="Segoe UI" HorizontalContentAlignment="Left" CaretBrush="{DynamicResource TextBrush}"/>
                                             </Grid>
                                         </Border>
                                     </Grid>
@@ -502,7 +502,7 @@
                             <!-- Hint text -->
                             <TextBlock Text="По умолчанию задержка устанавливается в оверлее, но если вы добавите её с помощью шагов слева (+ ЗАДЕРЖКА), будет считываться именно ваша задержка." Foreground="{DynamicResource GrayBrush}" FontSize="11" FontFamily="Segoe UI" TextWrapping="Wrap" Margin="0,0,0,15" Opacity="0.8" TextAlignment="Center"/>
                             
-                            <Button Content="СОХРАНИТЬ БИНД" Height="55" Background="{DynamicResource GreenBrush}" Foreground="White" BorderThickness="0" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Click="Bind_Save_Click" Cursor="Hand">
+                            <Button Content="СОХРАНИТЬ БИНД" Height="55" Background="{DynamicResource GreenBrush}" Foreground="{DynamicResource TextBrush}" BorderThickness="0" FontFamily="Segoe UI" FontSize="15" FontWeight="Bold" Click="Bind_Save_Click" Cursor="Hand">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="bg" Background="{TemplateBinding Background}" CornerRadius="10">

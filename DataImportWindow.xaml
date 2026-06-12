@@ -25,7 +25,7 @@
                     <Grid Margin="20,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="I" FontFamily="Consolas" Foreground="{DynamicResource GoldBrush}" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="Bold"/>
-                            <TextBlock Text="ИМПОРТ ДАННЫХ В СИСТЕМУ" Foreground="White" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                            <TextBlock Text="ИМПОРТ ДАННЫХ В СИСТЕМУ" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button Style="{StaticResource ModalCloseBtn}" Click="Close_Click"/>
                     </Grid>
@@ -47,7 +47,7 @@
                                             <TextBlock Text="P" Foreground="{DynamicResource GoldBrush}" FontFamily="Consolas" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                                            <TextBlock Text="ПРОФИЛЬ ЦЕЛИКОМ" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
+                                            <TextBlock Text="ПРОФИЛЬ ЦЕЛИКОМ" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
                                             <TextBlock Text="Файл (.duran). Загрузит бинды, законы и настройки." Foreground="{DynamicResource GrayBrush}" FontSize="10" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Grid>
@@ -73,7 +73,7 @@
                                             <TextBlock Text="L" Foreground="{DynamicResource GoldBrush}" FontFamily="Consolas" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                                            <TextBlock Text="ТОЛЬКО БАЗА ЗАКОНОВ" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
+                                            <TextBlock Text="ТОЛЬКО БАЗА ЗАКОНОВ" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
                                             <TextBlock Text="Файл (.json). Загрузит только разделы УК, КоАП и т.д." Foreground="{DynamicResource GrayBrush}" FontSize="10" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Grid>
@@ -99,7 +99,7 @@
                                             <TextBlock Text="B" Foreground="{DynamicResource GoldBrush}" FontFamily="Consolas" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                                            <TextBlock Text="ТОЛЬКО ИГРОВЫЕ БИНДЫ" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
+                                            <TextBlock Text="ТОЛЬКО ИГРОВЫЕ БИНДЫ" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
                                             <TextBlock Text="Файл (.json). Загрузит бинды и группы." Foreground="{DynamicResource GrayBrush}" FontSize="10" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Grid>
@@ -125,7 +125,7 @@
                                             <TextBlock Text="C" Foreground="{DynamicResource GoldBrush}" FontFamily="Consolas" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                                            <TextBlock Text="ТОЛЬКО БАЗА КАЛЬКУЛЯТОРА" Foreground="White" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
+                                            <TextBlock Text="ТОЛЬКО БАЗА КАЛЬКУЛЯТОРА" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI"/>
                                             <TextBlock Text="Файл (.json). Загрузит категории штрафов и розыска для калькулятора." Foreground="{DynamicResource GrayBrush}" FontSize="10" FontFamily="Segoe UI" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Grid>

@@ -272,7 +272,12 @@ void BinderManager::ReloadBinds() {
         
         std::string themeOverlay = jProfiles[lastProfile].value("OverlayTheme", "Default (Dark Blue)");
         if (themeOverlay.find("Black") != std::string::npos) Gui::currentTheme = 1;
-        else if (themeOverlay.find("Grey") != std::string::npos || themeOverlay.find("Sport") != std::string::npos) Gui::currentTheme = 2;
+        else if (themeOverlay.find("Red") != std::string::npos || themeOverlay.find("Sport") != std::string::npos) Gui::currentTheme = 2;
+        else if (themeOverlay.find("White") != std::string::npos) Gui::currentTheme = 3;
+        else if (themeOverlay == "Blue") Gui::currentTheme = 4;
+        else if (themeOverlay == "Light Blue") Gui::currentTheme = 5;
+        else if (themeOverlay == "Obsidian") Gui::currentTheme = 6;
+        else if (themeOverlay == "Onyx Black") Gui::currentTheme = 7;
         else Gui::currentTheme = 0;
         Gui::ApplyTheme();
         auto& profileObj = jProfiles[lastProfile];

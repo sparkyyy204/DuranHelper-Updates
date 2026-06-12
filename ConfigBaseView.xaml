@@ -41,19 +41,19 @@
 
             <!-- Server Filter -->
             <Border Grid.Column="0" Height="36" CornerRadius="6" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
-                <ComboBox x:Name="cmbServer" MaxDropDownHeight="210" Style="{DynamicResource DarkCombo}" Background="Transparent" BorderThickness="0" Foreground="White" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Margin="0,0"/>
+                <ComboBox x:Name="cmbServer" MaxDropDownHeight="210" Style="{DynamicResource DarkCombo}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Margin="0,0"/>
             </Border>
 
             <!-- Category Filter -->
             <Border Grid.Column="2" Height="36" CornerRadius="6" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
-                <ComboBox x:Name="cmbCategory" MaxDropDownHeight="210" Style="{DynamicResource DarkCombo}" Background="Transparent" BorderThickness="0" Foreground="White" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Margin="0,0"/>
+                <ComboBox x:Name="cmbCategory" MaxDropDownHeight="210" Style="{DynamicResource DarkCombo}" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Margin="0,0"/>
             </Border>
 
             <!-- Search -->
             <Border Grid.Column="4" Height="36" CornerRadius="6" Background="{DynamicResource BgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1.5">
                 <Grid>
                     <TextBlock Text="Поиск по названию или автору..." Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" VerticalAlignment="Center" Margin="35,0,0,0" IsHitTestVisible="False" x:Name="txtSearchHint"/>
-                    <TextBox x:Name="txtSearch" Background="Transparent" BorderThickness="0" Foreground="White" FontFamily="Segoe UI" FontSize="12" VerticalContentAlignment="Center" Margin="30,0,5,0" TextChanged="txtSearch_TextChanged"/>
+                    <TextBox x:Name="txtSearch" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="12" VerticalContentAlignment="Center" Margin="30,0,5,0" TextChanged="txtSearch_TextChanged"/>
                     <!-- Search Icon (magnifying glass) -->
                     <Canvas Width="20" Height="20" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False">
                         <Ellipse Canvas.Left="5" Canvas.Top="5" Width="10" Height="10" Stroke="{DynamicResource GrayBrush}" StrokeThickness="2" Fill="Transparent"/>
@@ -73,7 +73,7 @@
                 <TextBlock x:Name="txtErrorMsg" Text="Не удалось выполнить загрузку каталога." Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="13" HorizontalAlignment="Center" Margin="0,10,0,25" TextAlignment="Center" MaxWidth="250" TextWrapping="Wrap"/>
                 
                 <Button Content="ПОВТОРИТЬ ЗАГРУЗКУ" Width="200" Height="40" Click="Retry_Click" Cursor="Hand">
-                    <Button.Template><ControlTemplate TargetType="Button"><Border x:Name="bg" Background="#1f6feb" CornerRadius="6"><TextBlock Text="{TemplateBinding Content}" Foreground="White" FontFamily="Segoe UI" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bg" Property="Background" Value="#388bfd"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Button.Template>
+                    <Button.Template><ControlTemplate TargetType="Button"><Border x:Name="bg" Background="#1f6feb" CornerRadius="6"><TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="bg" Property="Background" Value="#388bfd"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Button.Template>
                 </Button>
             </StackPanel>
         </Border>
@@ -82,7 +82,7 @@
         <Border Grid.Row="2" x:Name="EmptyStateView" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" Padding="40" Margin="0,-40,0,0">
             <StackPanel>
                 <Grid Width="70" Height="70" HorizontalAlignment="Center" Margin="0,0,0,15">
-                    <Ellipse x:Name="EmptyStateIconBg" Fill="#d2a65e" Opacity="0.08"/>
+                    <Ellipse x:Name="EmptyStateIconBg" Fill="{DynamicResource GoldBrush}" Opacity="0.08"/>
                     
                     <!-- Search Icon (Category Empty) -->
                     <Path x:Name="EmptyStateIconSearch" Visibility="Visible" Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" Fill="{DynamicResource GoldBrush}" Width="24" Height="24" Stretch="Uniform" Opacity="0.6"/>
@@ -142,7 +142,7 @@
 
                                     <!-- Laws Icon (Gold) -->
                                     <Canvas x:Name="IconLaws" Visibility="Collapsed">
-                                        <Path Data="M 20 0 L 20 30 M 5 0 L 35 0 M 5 0 L 0 13 L 10 13 Z M 35 0 L 30 13 L 40 13 Z M 10 30 L 30 30" Stroke="#d2a65e" StrokeThickness="2" StrokeLineJoin="Round" Fill="Transparent"/>
+                                        <Path Data="M 20 0 L 20 30 M 5 0 L 35 0 M 5 0 L 0 13 L 10 13 Z M 35 0 L 30 13 L 40 13 Z M 10 30 L 30 30" Stroke="{DynamicResource GoldBrush}" StrokeThickness="2" StrokeLineJoin="Round" Fill="Transparent"/>
                                     </Canvas>
 
                                     <!-- Fines Icon (Green) -->
@@ -214,7 +214,7 @@
                         <DataTrigger Binding="{Binding Type}" Value="laws">
                             <Setter TargetName="IconProfile" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="IconLaws" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="IconBg" Property="Background" Value="#d2a65e"/>
+                            <Setter TargetName="IconBg" Property="Background" Value="{DynamicResource GoldBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Type}" Value="binds">
                             <Setter TargetName="IconProfile" Property="Visibility" Value="Collapsed"/>

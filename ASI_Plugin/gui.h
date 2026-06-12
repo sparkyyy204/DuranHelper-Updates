@@ -97,6 +97,7 @@ struct Notification {
     bool hasProgress;
     ImU32 color;
     bool isPayday;
+    ULONGLONG startTick;
 };
 
 extern float savedSensX, savedSensY;

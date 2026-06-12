@@ -239,8 +239,22 @@ void Gui::LoadSettings() {
             }
             if (j.contains("ThemeOverlay")) {
                 std::string t = j["ThemeOverlay"];
-                if (t.find("Black") != std::string::npos) currentTheme = 1;
-                else if (t.find("Grey") != std::string::npos || t.find("Sport") != std::string::npos) currentTheme = 2;
+                if (t == "Default (Dark Black)" || t == "Black" || t == "Monochrome Black") currentTheme = 1;
+                else if (t == "Gray Sport" || t.find("Red") != std::string::npos) currentTheme = 2;
+                else if (t == "Blue" || t.find("White") != std::string::npos) currentTheme = 3;
+                else if (t == "Deep Abyss") currentTheme = 4;
+                else if (t == "Obsidian") currentTheme = 5;
+                else if (t == "Onyx Black") currentTheme = 6;
+                else if (t == "Cyberpunk") currentTheme = 7;
+                else if (t == "Mocha") currentTheme = 8;
+                else if (t == "Crimson") currentTheme = 9;
+                else if (t == "Silver") currentTheme = 10;
+                else if (t == "Carbon") currentTheme = 11;
+                else if (t == "Soft Pink") currentTheme = 12;
+                else if (t == "Emerald") currentTheme = 13;
+                else if (t == "Total Black") currentTheme = 14;
+                else if (t == "Arctic Frost") currentTheme = 15;
+                else if (t == "Luxury Gold") currentTheme = 16;
                 else currentTheme = 0;
             }
             if (j.contains("BinderDelay")) {
@@ -262,6 +276,8 @@ void Gui::LoadSettings() {
             if (j.contains("RememberTab")) rememberTab = j["RememberTab"].get<bool>();
 
             if (j.contains("SearchCurrentSection")) searchCurrentSection = j["SearchCurrentSection"].get<bool>();
+            if (j.contains("ClearSearchOnClose")) clearSearchOnClose = j["ClearSearchOnClose"].get<bool>();
+            if (j.contains("CloseOnClickOutside")) closeOnClickOutside = j["CloseOnClickOutside"].get<bool>();
             if (j.contains("UseGridMenu")) useGridMenu = j["UseGridMenu"].get<bool>();
             if (j.contains("LastTab") && rememberTab) activeTab = j["LastTab"].get<int>();
             
@@ -300,8 +316,26 @@ void Gui::SaveSettings() {
     j["ScriptToggleKey"] = scriptToggleKeyStr;
     j["RadialToggleMode"] = radialActivationToggleMode;
     j["KeyToggle"] = toggleKeyStr;
-    if (currentTheme == 1) j["ThemeOverlay"] = "Black";
-    else if (currentTheme == 2) j["ThemeOverlay"] = "Grey";
+    j["BinderHint"] = binderHintKeyStr;
+    j["IssueFine"] = issueFineKeyStr;
+    j["CancelFine"] = cancelFineKeyStr;
+    j["StopBind"] = stopBindKeyStr;
+    if (currentTheme == 1) j["ThemeOverlay"] = "Default (Dark Black)";
+    else if (currentTheme == 2) j["ThemeOverlay"] = "Gray Sport";
+    else if (currentTheme == 3) j["ThemeOverlay"] = "Blue";
+    else if (currentTheme == 4) j["ThemeOverlay"] = "Deep Abyss";
+    else if (currentTheme == 5) j["ThemeOverlay"] = "Obsidian";
+    else if (currentTheme == 6) j["ThemeOverlay"] = "Onyx Black";
+    else if (currentTheme == 7) j["ThemeOverlay"] = "Cyberpunk";
+    else if (currentTheme == 8) j["ThemeOverlay"] = "Mocha";
+    else if (currentTheme == 9) j["ThemeOverlay"] = "Crimson";
+    else if (currentTheme == 10) j["ThemeOverlay"] = "Silver";
+    else if (currentTheme == 11) j["ThemeOverlay"] = "Carbon";
+    else if (currentTheme == 12) j["ThemeOverlay"] = "Soft Pink";
+    else if (currentTheme == 13) j["ThemeOverlay"] = "Emerald";
+    else if (currentTheme == 14) j["ThemeOverlay"] = "Total Black";
+    else if (currentTheme == 15) j["ThemeOverlay"] = "Arctic Frost";
+    else if (currentTheme == 16) j["ThemeOverlay"] = "Luxury Gold";
     else j["ThemeOverlay"] = "Default (Dark Blue)";
     j["BinderDelay"] = binderDelay;
     j["OverlayAlpha"] = settingsAlpha;
@@ -316,6 +350,8 @@ void Gui::SaveSettings() {
     j["RememberTab"] = rememberTab;
 
     j["SearchCurrentSection"] = searchCurrentSection;
+    j["ClearSearchOnClose"] = clearSearchOnClose;
+    j["CloseOnClickOutside"] = closeOnClickOutside;
     j["UseGridMenu"] = useGridMenu;
     j["LastTab"] = activeTab;
     
@@ -363,35 +399,73 @@ ImU32 C_HOVER       = IM_COL32(31,36,46,180);
 
 void Gui::ApplyTheme(float alphaMul) {
     if (currentTheme == 1) { // Black
-        C_BG = IM_COL32(8,8,8,240);
-        C_HEADER = IM_COL32(12,12,12,255);
-        C_BOX = IM_COL32(18,18,18,255);
-        C_INPUT = IM_COL32(5,5,5,255);
-        C_BORDER = IM_COL32(28,28,28,255);
-        C_LINE = IM_COL32(38,38,38,255);
-        C_GRID = IM_COL32(25,25,25,102);
-        C_DARK = IM_COL32(0,0,0,255);
-        C_HOVER = IM_COL32(28,28,28,180);
-    } else if (currentTheme == 2) { // Grey
-        C_BG = IM_COL32(24,24,24,240);
-        C_HEADER = IM_COL32(30,30,30,255);
-        C_BOX = IM_COL32(40,40,40,255);
-        C_INPUT = IM_COL32(15,15,15,255);
-        C_BORDER = IM_COL32(55,55,55,255);
-        C_LINE = IM_COL32(70,70,70,255);
-        C_GRID = IM_COL32(45,45,45,102);
-        C_DARK = IM_COL32(15,15,15,255);
-        C_HOVER = IM_COL32(50,50,50,180);
+        C_BG = IM_COL32(8,8,8,240); C_HEADER = IM_COL32(12,12,12,255); C_BOX = IM_COL32(18,18,18,255);
+        C_INPUT = IM_COL32(5,5,5,255); C_BORDER = IM_COL32(28,28,28,255); C_LINE = IM_COL32(38,38,38,255);
+        C_GRID = IM_COL32(25,25,25,102); C_DARK = IM_COL32(0,0,0,255); C_HOVER = IM_COL32(28,28,28,180);
+    } else if (currentTheme == 2) { // Red (Sport Red)
+        C_BG = IM_COL32(18,18,20,240); C_HEADER = IM_COL32(26,26,29,255); C_BOX = IM_COL32(26,26,29,255);
+        C_INPUT = IM_COL32(10,10,12,255); C_BORDER = IM_COL32(45,45,51,255); C_LINE = IM_COL32(45,45,51,255);
+        C_GRID = IM_COL32(35,35,40,102); C_DARK = IM_COL32(10,10,12,255); C_HOVER = IM_COL32(139,18,18,180);
+    } else if (currentTheme == 3) { // Blue
+        C_BG = IM_COL32(6,9,19,240); C_HEADER = IM_COL32(11,17,33,255); C_BOX = IM_COL32(11,17,33,255);
+        C_INPUT = IM_COL32(4,6,13,255); C_BORDER = IM_COL32(26,37,64,255); C_LINE = IM_COL32(26,37,64,255);
+        C_GRID = IM_COL32(17,27,51,102); C_DARK = IM_COL32(4,6,13,255); C_HOVER = IM_COL32(38,74,128,180);
+    } else if (currentTheme == 4) { // Deep Abyss
+        C_BG = IM_COL32(5,16,20,240); C_HEADER = IM_COL32(7,24,31,255); C_BOX = IM_COL32(7,24,31,255);
+        C_INPUT = IM_COL32(3,10,13,255); C_BORDER = IM_COL32(12,40,51,255); C_LINE = IM_COL32(12,40,51,255);
+        C_GRID = IM_COL32(10,30,38,102); C_DARK = IM_COL32(3,10,13,255); C_HOVER = IM_COL32(0,131,148,180);
+    } else if (currentTheme == 5) { // Obsidian
+        C_BG = IM_COL32(13,10,20,240); C_HEADER = IM_COL32(21,16,32,255); C_BOX = IM_COL32(21,16,32,255);
+        C_INPUT = IM_COL32(8,6,13,255); C_BORDER = IM_COL32(37,28,51,255); C_LINE = IM_COL32(37,28,51,255);
+        C_GRID = IM_COL32(31,24,48,102); C_DARK = IM_COL32(8,6,13,255); C_HOVER = IM_COL32(74,51,128,180);
+    } else if (currentTheme == 6) { // Onyx Black
+        C_BG = IM_COL32(8,8,8,240); C_HEADER = IM_COL32(17,17,17,255); C_BOX = IM_COL32(17,17,17,255);
+        C_INPUT = IM_COL32(5,5,5,255); C_BORDER = IM_COL32(42,42,42,255); C_LINE = IM_COL32(42,42,42,255);
+        C_GRID = IM_COL32(28,28,28,102); C_DARK = IM_COL32(5,5,5,255); C_HOVER = IM_COL32(30,140,68,180);
+    } else if (currentTheme == 7) { // Cyberpunk
+        C_BG = IM_COL32(9,5,20,240); C_HEADER = IM_COL32(14,7,28,255); C_BOX = IM_COL32(18,9,36,255);
+        C_INPUT = IM_COL32(6,3,13,255); C_BORDER = IM_COL32(42,23,74,255); C_LINE = IM_COL32(42,23,74,255);
+        C_GRID = IM_COL32(28,15,49,102); C_DARK = IM_COL32(6,3,13,255); C_HOVER = IM_COL32(191,0,95,180);
+    } else if (currentTheme == 8) { // Mocha
+        C_BG = IM_COL32(27,22,20,240); C_HEADER = IM_COL32(30,24,22,255); C_BOX = IM_COL32(36,29,26,255);
+        C_INPUT = IM_COL32(18,14,13,255); C_BORDER = IM_COL32(58,46,41,255); C_LINE = IM_COL32(58,46,41,255);
+        C_GRID = IM_COL32(38,30,27,102); C_DARK = IM_COL32(18,14,13,255); C_HOVER = IM_COL32(184,91,35,180);
+    } else if (currentTheme == 9) { // Crimson
+        C_BG = IM_COL32(18,5,7,240); C_HEADER = IM_COL32(26,10,13,255); C_BOX = IM_COL32(31,12,15,255);
+        C_INPUT = IM_COL32(10,3,4,255); C_BORDER = IM_COL32(51,20,26,255); C_LINE = IM_COL32(51,20,26,255);
+        C_GRID = IM_COL32(36,15,18,102); C_DARK = IM_COL32(10,3,4,255); C_HOVER = IM_COL32(179,30,50,180);
+    } else if (currentTheme == 10) { // Silver
+        C_BG = IM_COL32(15,16,18,240); C_HEADER = IM_COL32(23,24,27,255); C_BOX = IM_COL32(28,30,33,255);
+        C_INPUT = IM_COL32(10,11,13,255); C_BORDER = IM_COL32(48,51,56,255); C_LINE = IM_COL32(48,51,56,255);
+        C_GRID = IM_COL32(36,38,41,102); C_DARK = IM_COL32(10,11,13,255); C_HOVER = IM_COL32(87,97,107,180);
+    } else if (currentTheme == 11) { // Carbon Black
+        C_BG = IM_COL32(10,10,12,240); C_HEADER = IM_COL32(18,18,20,255); C_BOX = IM_COL32(18,18,20,255);
+        C_INPUT = IM_COL32(8,8,10,255); C_BORDER = IM_COL32(45,45,48,255); C_LINE = IM_COL32(45,45,48,255);
+        C_GRID = IM_COL32(35,35,40,102); C_DARK = IM_COL32(8,8,10,255); C_HOVER = IM_COL32(145,150,158,180);
+    } else if (currentTheme == 12) { // Soft Pink
+        C_BG = IM_COL32(20,16,18,240); C_HEADER = IM_COL32(28,21,24,255); C_BOX = IM_COL32(28,21,24,255);
+        C_INPUT = IM_COL32(14,10,12,255); C_BORDER = IM_COL32(42,30,36,255); C_LINE = IM_COL32(42,30,36,255);
+        C_GRID = IM_COL32(34,24,29,102); C_DARK = IM_COL32(14,10,12,255); C_HOVER = IM_COL32(242,162,183,180);
+    } else if (currentTheme == 13) { // Emerald
+        C_BG = IM_COL32(7,13,10,240); C_HEADER = IM_COL32(12,24,18,255); C_BOX = IM_COL32(12,24,18,255);
+        C_INPUT = IM_COL32(5,10,8,255); C_BORDER = IM_COL32(26,51,38,255); C_LINE = IM_COL32(26,51,38,255);
+        C_GRID = IM_COL32(17,34,26,102); C_DARK = IM_COL32(5,10,8,255); C_HOVER = IM_COL32(0,180,104,180);
+    } else if (currentTheme == 14) { // Total Black
+        C_BG = IM_COL32(0,0,0,240); C_HEADER = IM_COL32(3,3,3,255); C_BOX = IM_COL32(3,3,3,255);
+        C_INPUT = IM_COL32(0,0,0,255); C_BORDER = IM_COL32(15,15,15,255); C_LINE = IM_COL32(15,15,15,255);
+        C_GRID = IM_COL32(10,10,10,102); C_DARK = IM_COL32(0,0,0,255); C_HOVER = IM_COL32(50,50,50,180);
+    } else if (currentTheme == 15) { // Arctic Frost
+        C_BG = IM_COL32(9,13,18,240); C_HEADER = IM_COL32(14,20,28,255); C_BOX = IM_COL32(14,20,28,255);
+        C_INPUT = IM_COL32(6,9,13,255); C_BORDER = IM_COL32(31,44,61,255); C_LINE = IM_COL32(31,44,61,255);
+        C_GRID = IM_COL32(21,30,41,102); C_DARK = IM_COL32(6,9,13,255); C_HOVER = IM_COL32(77,153,204,180);
+    } else if (currentTheme == 16) { // Luxury Gold
+        C_BG = IM_COL32(15,10,5,240); C_HEADER = IM_COL32(26,18,10,255); C_BOX = IM_COL32(26,18,10,255);
+        C_INPUT = IM_COL32(10,6,3,255); C_BORDER = IM_COL32(61,43,23,255); C_LINE = IM_COL32(61,43,23,255);
+        C_GRID = IM_COL32(38,27,15,102); C_DARK = IM_COL32(10,6,3,255); C_HOVER = IM_COL32(204,153,51,180);
     } else { // Default (Dark Blue)
-        C_BG = IM_COL32(10,13,18,234);
-        C_HEADER = IM_COL32(17,21,29,204);
-        C_BOX = IM_COL32(22,27,34,255);
-        C_INPUT = IM_COL32(8,10,15,255);
-        C_BORDER = IM_COL32(31,36,46,255);
-        C_LINE = IM_COL32(48,54,61,255);
-        C_GRID = IM_COL32(22,27,34,102);
-        C_DARK = IM_COL32(8,10,15,255);
-        C_HOVER = IM_COL32(31,36,46,180);
+        C_BG = IM_COL32(10,13,18,234); C_HEADER = IM_COL32(17,21,29,204); C_BOX = IM_COL32(22,27,34,255);
+        C_INPUT = IM_COL32(8,10,15,255); C_BORDER = IM_COL32(31,36,46,255); C_LINE = IM_COL32(48,54,61,255);
+        C_GRID = IM_COL32(22,27,34,102); C_DARK = IM_COL32(8,10,15,255); C_HOVER = IM_COL32(31,36,46,180);
     }
     
     // Base colors that are theme-independent
@@ -406,6 +480,44 @@ void Gui::ApplyTheme(float alphaMul) {
     C_GREEN       = IM_COL32(21,115,60,255);
     C_GREEN_L     = IM_COL32(31,145,80,255);
     C_WHITE       = IM_COL32(255,255,255,255);
+
+    if (currentTheme == 2) { // Red (Sport Red) overrides
+        C_GOLD_L = IM_COL32(255,100,100,255); C_GOLD = IM_COL32(165,26,26,255); C_GOLD_DIM = IM_COL32(165,26,26,128); C_GOLD_BG = IM_COL32(165,26,26,38);
+    } else if (currentTheme == 3) { // Blue overrides
+        C_GOLD_L = IM_COL32(128,191,255,255); C_GOLD = IM_COL32(77,166,255,255); C_GOLD_DIM = IM_COL32(77,166,255,128); C_GOLD_BG = IM_COL32(77,166,255,38);
+    } else if (currentTheme == 4) { // Deep Abyss overrides
+        C_GOLD_L = IM_COL32(0,229,255,255); C_GOLD = IM_COL32(0,184,212,255); C_GOLD_DIM = IM_COL32(0,184,212,128); C_GOLD_BG = IM_COL32(0,184,212,38);
+    } else if (currentTheme == 5) { // Obsidian overrides
+        C_GOLD_L = IM_COL32(192,160,255,255); C_GOLD = IM_COL32(160,128,255,255); C_GOLD_DIM = IM_COL32(160,128,255,128); C_GOLD_BG = IM_COL32(160,128,255,38);
+    } else if (currentTheme == 6) { // Onyx Black overrides
+        C_GOLD_L = IM_COL32(30,140,68,255); C_GOLD = IM_COL32(26,112,56,255); C_GOLD_DIM = IM_COL32(26,112,56,128); C_GOLD_BG = IM_COL32(26,112,56,38);
+        C_GRAY = IM_COL32(160,170,181,255);
+    } else if (currentTheme == 7) { // Cyberpunk overrides
+        C_GOLD_L = IM_COL32(255,77,166,255); C_GOLD = IM_COL32(255,0,127,255); C_GOLD_DIM = IM_COL32(255,0,127,128); C_GOLD_BG = IM_COL32(255,0,127,38);
+    } else if (currentTheme == 8) { // Mocha overrides
+        C_GOLD_L = IM_COL32(240,154,103,255); C_GOLD = IM_COL32(224,122,62,255); C_GOLD_DIM = IM_COL32(224,122,62,128); C_GOLD_BG = IM_COL32(224,122,62,38);
+        C_WHITE = IM_COL32(240,230,210,255);
+    } else if (currentTheme == 9) { // Crimson overrides
+        C_GOLD_L = IM_COL32(235,203,103,255); C_GOLD = IM_COL32(212,175,55,255); C_GOLD_DIM = IM_COL32(212,175,55,128); C_GOLD_BG = IM_COL32(212,175,55,38);
+    } else if (currentTheme == 10) { // Silver overrides
+        C_GOLD_L = IM_COL32(255,200,115,255); C_GOLD = IM_COL32(255,179,71,255); C_GOLD_DIM = IM_COL32(255,179,71,128); C_GOLD_BG = IM_COL32(255,179,71,38);
+    } else if (currentTheme == 11) { // Carbon Black overrides
+        C_GOLD_L = IM_COL32(170,175,185,255); C_GOLD = IM_COL32(138,143,150,255); C_GOLD_DIM = IM_COL32(138,143,150,128); C_GOLD_BG = IM_COL32(138,143,150,38);
+    } else if (currentTheme == 12) { // Soft Pink overrides
+        C_GOLD_L = IM_COL32(242,162,183,255); C_GOLD = IM_COL32(216,123,147,255); C_GOLD_DIM = IM_COL32(216,123,147,128); C_GOLD_BG = IM_COL32(216,123,147,38);
+    } else if (currentTheme == 13) { // Emerald overrides
+        C_GOLD_L = IM_COL32(80,255,180,255); C_GOLD = IM_COL32(0,204,119,255); C_GOLD_DIM = IM_COL32(0,204,119,128); C_GOLD_BG = IM_COL32(0,204,119,38);
+    } else if (currentTheme == 14) { // Total Black overrides
+        C_GOLD_L = IM_COL32(120,120,120,255); C_GOLD = IM_COL32(102,102,102,255); C_GOLD_DIM = IM_COL32(102,102,102,128); C_GOLD_BG = IM_COL32(102,102,102,38);
+        C_WHITE = IM_COL32(208,208,208,255);
+        C_GRAY = IM_COL32(100,100,100,255);
+    } else if (currentTheme == 15) { // Arctic Frost overrides
+        C_GOLD_L = IM_COL32(153,214,255,255); C_GOLD = IM_COL32(102,194,255,255); C_GOLD_DIM = IM_COL32(102,194,255,128); C_GOLD_BG = IM_COL32(102,194,255,38);
+    } else if (currentTheme == 16) { // Luxury Gold overrides
+        C_GOLD_L = IM_COL32(230,199,99,255); C_GOLD = IM_COL32(212,175,55,255); C_GOLD_DIM = IM_COL32(212,175,55,128); C_GOLD_BG = IM_COL32(212,175,55,38);
+        C_WHITE = IM_COL32(255,245,215,255);
+
+    }
 
     auto applyAlpha = [alphaMul](ImU32& col) {
         int r = (col & 0xFF);
@@ -1170,8 +1282,10 @@ void Gui::DrawHudFrame(ImDrawList* dl, ImVec2 o) {
     float badgeX = startX + duranW + helperW + 12;
     float badgeH = 15.0f;
     float badgeY = o.y + 16.0f; // Aligned nicely with title
-    dl->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + verW, badgeY + badgeH), C_RED_BG, 4.0f);
-    dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY + 1.0f), C_RED, ver.c_str());
+    ImU32 badgeBgColor = (currentTheme == 0 || currentTheme == 1) ? C_RED_BG : C_GOLD;
+    ImU32 badgeTextColor = (currentTheme == 0 || currentTheme == 1) ? C_RED : IM_COL32(0,0,0,255);
+    dl->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + verW, badgeY + badgeH), badgeBgColor, 4.0f);
+    dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY + 1.0f), badgeTextColor, ver.c_str());
 
     // Close button - x=655 y=12 w=26 h=26
     float bx = o.x+655, by = o.y+12;
@@ -1282,7 +1396,7 @@ void Gui::DrawGridBackButton(ImDrawList* dl, ImVec2 o) {
 void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
 
     // ====== Background Patterns ======
-    ImU32 goldAcc = IM_COL32(243, 211, 153, 40); // Subtle gold, same as launcher Opacity 0.5 roughly
+    ImU32 goldAcc = (C_GOLD & 0x00FFFFFF) | ((ImU32)40 << 24); // Subtle accent color, Opacity ~40
     
     // Zigzag 1 (Top chaotic line)
     ImVec2 z1[5] = {ImVec2(o.x+37, o.y+189), ImVec2(o.x+150, o.y+119), ImVec2(o.x+262, o.y+154), ImVec2(o.x+412, o.y+84), ImVec2(o.x+562, o.y+133)};
@@ -1741,7 +1855,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                     if (ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(pMin, pMax, false)) {
                         ImVec2 wp = ImGui::GetWindowPos(); ImVec2 ws = ImGui::GetWindowSize();
                         cdl->PushClipRect(ImVec2(wp.x - 5.0f, wp.y), ImVec2(wp.x + ws.x, wp.y + ws.y), false);
-                        cdl->AddRectFilled(pMin, pMax, IM_COL32(210, 166, 94, 40), 6.0f);
+                        cdl->AddRectFilled(pMin, pMax, C_GOLD_BG, 6.0f);
                         cdl->PopClipRect();
                         ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                         if (ImGui::IsMouseReleased(0) && s_canQuote) {
@@ -2062,7 +2176,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                         }
 
                         if (isWordSelected) {
-                            cdl_notes->AddRectFilled(ImVec2(startX + curX, startY + curY), ImVec2(startX + curX + cmd.w, startY + curY + lineH), IM_COL32(210, 166, 94, 80)); // Semi-transparent gold
+                            cdl_notes->AddRectFilled(ImVec2(startX + curX, startY + curY), ImVec2(startX + curX + cmd.w, startY + curY + lineH), ((C_GOLD & 0x00FFFFFF) | ((ImU32)80 << 24))); // Semi-transparent gold
                             currentSelection += cmd.text;
                             lineHadSelection = true;
                         }
@@ -2174,7 +2288,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                         if (ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(pMin, pMax, false)) {
                             ImVec2 wp = ImGui::GetWindowPos(); ImVec2 ws = ImGui::GetWindowSize();
                             cdl_notes->PushClipRect(ImVec2(wp.x - 5.0f, wp.y), ImVec2(wp.x + ws.x, wp.y + ws.y), false);
-                            cdl_notes->AddRectFilled(pMin, pMax, IM_COL32(210, 166, 94, 40), 4.0f);
+                            cdl_notes->AddRectFilled(pMin, pMax, C_GOLD_BG, 4.0f);
                             cdl_notes->PopClipRect();
                             ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                             if (ImGui::IsMouseReleased(0) && s_canQuote) {
@@ -2203,7 +2317,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                         if (ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(pMin, pMax, false)) {
                             ImVec2 wp = ImGui::GetWindowPos(); ImVec2 ws = ImGui::GetWindowSize();
                             cdl_notes->PushClipRect(ImVec2(wp.x - 5.0f, wp.y), ImVec2(wp.x + ws.x, wp.y + ws.y), false);
-                            cdl_notes->AddRectFilled(pMin, pMax, IM_COL32(210, 166, 94, 40), 6.0f);
+                            cdl_notes->AddRectFilled(pMin, pMax, C_GOLD_BG, 6.0f);
                             cdl_notes->PopClipRect();
                             ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                             if (ImGui::IsMouseReleased(0) && s_canQuote) {
@@ -2272,7 +2386,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                         if (ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(pMin, pMax, false)) {
                             ImVec2 wp = ImGui::GetWindowPos(); ImVec2 ws = ImGui::GetWindowSize();
                             cdl->PushClipRect(ImVec2(wp.x - 5.0f, wp.y), ImVec2(wp.x + ws.x, wp.y + ws.y), false);
-                            cdl->AddRectFilled(pMin, pMax, IM_COL32(210, 166, 94, 40), 4.0f);
+                            cdl->AddRectFilled(pMin, pMax, C_GOLD_BG, 4.0f);
                             cdl->PopClipRect();
                             ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                             if (ImGui::IsMouseReleased(0) && s_canQuote) {
@@ -2302,7 +2416,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                         if (ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(pMin, pMax, false)) {
                             ImVec2 wp = ImGui::GetWindowPos(); ImVec2 ws = ImGui::GetWindowSize();
                             cdl->PushClipRect(ImVec2(wp.x - 5.0f, wp.y), ImVec2(wp.x + ws.x, wp.y + ws.y), false);
-                            cdl->AddRectFilled(pMin, pMax, IM_COL32(210, 166, 94, 40), 6.0f);
+                            cdl->AddRectFilled(pMin, pMax, C_GOLD_BG, 6.0f);
                             cdl->PopClipRect();
                             ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                             if (ImGui::IsMouseReleased(0) && s_canQuote) {
@@ -2425,20 +2539,25 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
         
         ImGui::PushStyleColor(ImGuiCol_WindowBg, (C_BOX & 0x00FFFFFF) | 0xFF000000);
         ImGui::PushStyleColor(ImGuiCol_Border, C_LINE);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, C_HEADER);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, C_GOLD);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // Strictly 0 to ensure flawless Y-offset math
+        ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 6.0f);
 
         // Using a Top-Level Window to cleanly isolate focus for closing when clicked outside
-        if (ImGui::Begin("##lawSectionsDropdown", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar)) {
+        if (ImGui::Begin("##lawSectionsDropdown", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
             ImDrawList* dcl = ImGui::GetWindowDrawList();
-            float itemW = drpW - 12.0f; 
+            float itemW = drpW - 20.0f; 
 
             ImGui::Dummy(ImVec2(0, 4)); // 4px top padding
 
             for (int i = 0; i < (int)lawSections.size(); i++) {
-                ImGui::SetCursorPosX(6.0f);
+                ImGui::SetCursorPosX(10.0f);
                 ImVec2 p = ImGui::GetCursorScreenPos(); // Exact physical position automatically adjusted for ScrollY
                 ImVec2 pMax = ImVec2(p.x + itemW, p.y + 32);
                 
@@ -2448,9 +2567,9 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                 
                 // Draw custom Duran style synced mathematically with the hit-box
                 if (sel || hover) {
-                    ImU32 bgCol = sel ? C_GOLD_BG : IM_COL32(210, 166, 94, 20); 
+                    ImU32 bgCol = sel ? ((C_GOLD & 0x00FFFFFF) | ((ImU32)40 << 24)) : ((C_GOLD & 0x00FFFFFF) | ((ImU32)15 << 24)); 
                     dcl->AddRectFilled(p, pMax, bgCol, 4.0f);
-                    if (sel) dcl->AddRectFilled(p, ImVec2(p.x + 4, p.y + 32), C_GOLD, 2.0f);
+                    if (sel) dcl->AddRect(p, pMax, C_GOLD, 4.0f, 0, 1.0f);
                 }
 
                 dcl->AddText(fontSegoeBold14, 13.0f, ImVec2(p.x + 9, p.y + 7), (sel || hover) ? C_GOLD : C_WHITE, lawSections[i].name.c_str());
@@ -2476,8 +2595,8 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
             
             ImGui::End();
         }
-        ImGui::PopStyleVar(4);
-        ImGui::PopStyleColor(2);
+        ImGui::PopStyleVar(5);
+        ImGui::PopStyleColor(6);
     }
 
     ImGui::SetCursorScreenPos(ImVec2(drpX, drpY));
@@ -3637,24 +3756,91 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     float ty1 = sy + 50;
     dl->AddText(fontSegoeBold14, 14.0f, ImVec2(sx+20, ty1+6), C_WHITE, "\xD0\xA2\xD0\xB5\xD0\xBC\xD0\xB0 \xD0\xBE\xD1\x84\xD0\xBE\xD1\x80\xD0\xBC\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xB8\xD1\x8F");
     dl->AddText(fontSegoeBold12, 12.0f, ImVec2(sx+20, ty1+24), IM_COL32(107,115,127,255), "\xD0\xA6\xD0\xB2\xD0\xB5\xD1\x82\xD0\xBE\xD0\xB2\xD0\xB0\xD1\x8F \xD0\xBF\xD0\xB0\xD0\xBB\xD0\xB8\xD1\x82\xD1\x80\xD0\xB0 \xD0\xBE\xD0\xB2\xD0\xB5\xD1\x80\xD0\xBB\xD0\xB5\xD1\x8F");
-    const char* tlbls[] = {"DEFAULT", "BLACK", "GREY"};
-    for (int t = 0; t < 3; t++) {
-        float bxx = sx + 20 + t*95;
-        bool tAct = (currentTheme == t);
-        ImGui::SetCursorScreenPos(ImVec2(bxx, ty1+40));
-        char tid[16]; sprintf_s(tid, "##thm%d", t);
-        bool tClicked = ImGui::InvisibleButton(tid, ImVec2(90, 28));
-        bool tHover = ImGui::IsItemHovered();
-        if (tAct) {
-            dl->AddRectFilled(ImVec2(bxx, ty1+40), ImVec2(bxx+90, ty1+68), C_GOLD_BG, 4.0f);
-            dl->AddRect(ImVec2(bxx, ty1+40), ImVec2(bxx+90, ty1+68), C_GOLD, 4.0f, 0, 1.5f);
-        } else {
-            dl->AddRectFilled(ImVec2(bxx, ty1+40), ImVec2(bxx+90, ty1+68), tHover ? IM_COL32(255,255,255,10) : C_BOX, 4.0f);
-            dl->AddRect(ImVec2(bxx, ty1+40), ImVec2(bxx+90, ty1+68), tHover ? C_GRAY : C_BORDER, 4.0f, 0, 1.0f);
+    const char* tlbls[] = {"Default (Dark Blue)", "Default (Dark Black)", "Gray Sport", "Blue", "Deep Abyss", "Obsidian", "Onyx Black", "Cyberpunk", "Mocha", "Crimson", "Silver", "Carbon", "Soft Pink", "Emerald", "Total Black", "Arctic Frost", "Luxury Gold"};
+    
+    static bool showThemeDropdown = false;
+    float drpX = sx + 20;
+    float drpY = ty1 + 40;
+    float drpW = 285;
+    float drpH = 30.0f;
+    std::string secName = currentTheme >= 0 && currentTheme < 17 ? tlbls[currentTheme] : tlbls[0];
+
+    dl->AddRectFilled(ImVec2(drpX, drpY), ImVec2(drpX + drpW, drpY + drpH), C_BOX, 6.0f);
+    dl->AddRect(ImVec2(drpX, drpY), ImVec2(drpX + drpW, drpY + drpH), C_GOLD, 6.0f, 0, 1.5f);
+    dl->AddText(fontSegoeBold14, 13.0f, ImVec2(drpX+15, drpY+7), C_WHITE, secName.c_str());
+    dl->AddLine(ImVec2(drpX+drpW-18, drpY+12), ImVec2(drpX+drpW-12, drpY+18), C_GOLD, 1.5f);
+    dl->AddLine(ImVec2(drpX+drpW-12, drpY+18), ImVec2(drpX+drpW-6, drpY+12), C_GOLD, 1.5f);
+
+    ImVec2 mp = ImGui::GetMousePos();
+    if (ImGui::IsMouseClicked(0)) {
+        if (mp.x >= drpX && mp.x <= drpX + drpW && mp.y >= drpY && mp.y <= drpY + drpH) {
+            showThemeDropdown = !showThemeDropdown;
+        } else if (showThemeDropdown) {
+            float ddY = drpY + 36;
+            int visibleItems = 6;
+            float ddH = visibleItems * 36.0f + 10.0f;
+            if (!(mp.x >= drpX && mp.x <= drpX + drpW && mp.y >= ddY && mp.y <= ddY + ddH)) {
+                showThemeDropdown = false;
+            }
         }
-        ImVec2 ts = fontSegoeBold12->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, tlbls[t]);
-        dl->AddText(fontSegoeBold12, 12.0f, ImVec2(bxx+(90-ts.x)/2, ty1+40+(28-ts.y)/2), tAct ? C_GOLD : (tHover ? C_WHITE : C_GRAY), tlbls[t]);
-        if (tClicked) { currentTheme = t; ApplyTheme(); SaveSettings(); }
+    }
+
+    if (showThemeDropdown) {
+        float ddY = drpY + 36;
+        int visibleItems = 6;
+        float ddH = visibleItems * 36.0f + 10.0f;
+
+        ImGui::SetNextWindowPos(ImVec2(drpX, ddY));
+        ImGui::SetNextWindowSize(ImVec2(drpW, ddH));
+        
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, (C_BOX & 0x00FFFFFF) | 0xFF000000);
+        ImGui::PushStyleColor(ImGuiCol_Border, C_LINE);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, C_HEADER);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrab, C_GOLD);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
+        ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 6.0f);
+
+        if (ImGui::Begin("##themeDropdown", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
+            ImDrawList* dcl = ImGui::GetWindowDrawList();
+            float itemW = drpW - 20.0f; 
+
+            ImGui::Dummy(ImVec2(0, 4));
+
+            for (int i = 0; i < 17; i++) {
+                ImGui::SetCursorPosX(10.0f);
+                ImVec2 p = ImGui::GetCursorScreenPos();
+                ImVec2 pMax = ImVec2(p.x + itemW, p.y + 32);
+                
+                bool hover = ImGui::IsMouseHoveringRect(p, pMax, true); 
+                bool sel = (currentTheme == i);
+                
+                if (sel || hover) {
+                    ImU32 bgCol = sel ? ((C_GOLD & 0x00FFFFFF) | ((ImU32)40 << 24)) : ((C_GOLD & 0x00FFFFFF) | ((ImU32)15 << 24)); 
+                    dcl->AddRectFilled(p, pMax, bgCol, 4.0f);
+                    if (sel) dcl->AddRect(p, pMax, C_GOLD, 4.0f, 0, 1.0f);
+                }
+
+                dcl->AddText(fontSegoeBold14, 13.0f, ImVec2(p.x + 9, p.y + 7), (sel || hover) ? C_GOLD : C_WHITE, tlbls[i]);
+
+                if (hover && ImGui::IsMouseClicked(0)) {
+                    if (currentTheme != i) {
+                        currentTheme = i;
+                        ApplyTheme();
+                        SaveSettings();
+                    }
+                    showThemeDropdown = false;
+                }
+                ImGui::Dummy(ImVec2(0, 32));
+            }
+        }
+        ImGui::End();
+        ImGui::PopStyleVar(5);
+        ImGui::PopStyleColor(6);
     }
     
     dl->AddLine(ImVec2(sx+20, ty1+85), ImVec2(sx+305, ty1+85), C_BORDER, 1.0f);
@@ -3962,8 +4148,10 @@ void Gui::RenderBinderHint() {
     float verW = fontSegoeBold12->CalcTextSizeA(verFontSize, FLT_MAX, 0.0f, ver.c_str()).x + 8.0f;
     float badgeH = 14.0f;
     float badgeY = p0.y + 16.0f;
-    dl->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + verW, badgeY + badgeH), C_RED_BG, 4.0f);
-    dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 4.0f, badgeY + 1.0f), C_RED, ver.c_str());
+    ImU32 badgeBgColor = (currentTheme == 0 || currentTheme == 1) ? C_RED_BG : C_GOLD;
+    ImU32 badgeTextColor = (currentTheme == 0 || currentTheme == 1) ? C_RED : IM_COL32(0,0,0,255);
+    dl->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + verW, badgeY + badgeH), badgeBgColor, 4.0f);
+    dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 4.0f, badgeY + 1.0f), badgeTextColor, ver.c_str());
 
     // 7. Subheader "РђРљРўРЈРђР›Р¬РќР«Р• Р‘РРќР”Р«"
     float cy = p0.y + headerH + 8.0f;
@@ -5103,22 +5291,24 @@ void Gui::RenderNotifications() {
             // Handle 10 min reminder
             if (now >= next10MinTrigger) {
                 double overdue = difftime(now, next10MinTrigger);
-                if (overdue > 120.0) {
-                    if (wasMinimized) {
-                        RunOnMainThread([]() {
-                            extern void AddLocalSAMPMessage(const char*);
-                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 (10 \xD0\xBC\xD0\xB8\xD0\xBD \xD0\xB4\xD0\xBE PayDay) \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x89\xD0\xB5\xD0\xBD\xD0\xBE. \xD0\x92\xD1\x8B \xD0\xBD\xD0\xB5 \xD1\x83\xD1\x81\xD0\xBF\xD0\xB5\xD0\xBB\xD0\xB8!").c_str());
-                        });
-                    }
-                } else {
+                if (overdue < 600.0) {
+                    int remaining = 10 - (int)(overdue / 60.0);
                     if (wasMinimized && overdue > 5.0) {
                         RunOnMainThread([]() {
                             extern void AddLocalSAMPMessage(const char*);
-                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 (10 \xD0\xBC\xD0\xB8\xD0\xBD) \xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
                         });
                     }
-                    std::string text = "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC 10 \xD0\x9C\xD0\x98\xD0\x9D\xD0\xA3\xD0\xA2\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!";
-                    AddNotification("HELPER", text, "", "", "", "", 6.0f, false, IM_COL32(46, 160, 67, 255));
+                    char textBuf[512];
+                    snprintf(textBuf, sizeof(textBuf), "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC %d \xD0\x9C\xD0\x98\xD0\x9D.\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!", remaining);
+                    AddNotification("HELPER", textBuf, "", "", "", "", 6.0f, false, IM_COL32(46, 160, 67, 255));
+                } else {
+                    if (wasMinimized) {
+                        RunOnMainThread([]() {
+                            extern void AddLocalSAMPMessage(const char*);
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0. PayDay \xD1\x83\xD0\xB6\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x88\xD0\xB5\xD0\xBB, \xD0\xB2\xD1\x8B \xD0\xBD\xD0\xB5 \xD1\x83\xD1\x81\xD0\xBF\xD0\xB5\xD0\xBB\xD0\xB8!").c_str());
+                        });
+                    }
                 }
                 next10MinTrigger += 3600;
                 while (next10MinTrigger <= now) next10MinTrigger += 3600;
@@ -5127,23 +5317,25 @@ void Gui::RenderNotifications() {
             // Handle 30 sec reminder
             if (now >= next30SecTrigger) {
                 double overdue = difftime(now, next30SecTrigger);
-                if (overdue > 30.0) {
+                if (overdue < 30.0) {
+                    int remaining = 30 - (int)overdue;
+                    if (wasMinimized && overdue > 5.0) {
+                        RunOnMainThread([]() {
+                            extern void AddLocalSAMPMessage(const char*);
+                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 \xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
+                        });
+                    }
+                    char textBuf[512];
+                    snprintf(textBuf, sizeof(textBuf), "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC %d \xD0\xA1\xD0\x95\xD0\x9A.\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!", remaining);
+                    AddNotification("HELPER", textBuf, "", "", "", "", 30.0f - (float)overdue, true, IM_COL32(46, 160, 67, 255));
+                    if (!activeNotifications.empty()) activeNotifications.back().isPayday = true;
+                } else {
                     if (wasMinimized) {
                         RunOnMainThread([]() {
                             extern void AddLocalSAMPMessage(const char*);
                             AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FF6B6B}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0. PayDay \xD1\x83\xD0\xB6\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD1\x88\xD0\xB5\xD0\xBB, \xD0\xB2\xD1\x8B \xD0\xBD\xD0\xB5 \xD1\x83\xD1\x81\xD0\xBF\xD0\xB5\xD0\xBB\xD0\xB8!").c_str());
                         });
                     }
-                } else {
-                    if (wasMinimized && overdue > 5.0) {
-                        RunOnMainThread([]() {
-                            extern void AddLocalSAMPMessage(const char*);
-                            AddLocalSAMPMessage(UTF8ToCP1251("{D2A65E}[DURAN HELPER] {FFFFFF}\xD0\x98\xD0\xB3\xD1\x80\xD0\xB0 \xD0\xB1\xD1\x8B\xD0\xBB\xD0\xB0 \xD1\x81\xD0\xB2\xD1\x91\xD1\x80\xD0\xBD\xD1\x83\xD1\x82\xD0\xB0, \xD0\xBD\xD0\xBE \xD0\xBD\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 (30 \xD1\x81\xD0\xB5\xD0\xBA) \xD0\xB4\xD0\xBE\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xBB\xD0\xB5\xD0\xBD\xD0\xBE.").c_str());
-                        });
-                    }
-                    std::string text = "\xD0\x94\xD0\x9E PAYDAY \xD0\x9E\xD0\xA1\xD0\xA2\xD0\x90\xD0\x9B\xD0\x9E\xD0\xA1\xD0\xAC 30 \xD0\xA1\xD0\x95\xD0\x9A\xD0\xA3\xD0\x9D\xD0\x94\n\xD0\x9D\xD0\xB5 \xD0\xB2\xD1\x81\xD1\x82\xD0\xB0\xD0\xB2\xD0\xB0\xD0\xB9\xD1\x82\xD0\xB5 \xD0\xBD\xD0\xB0 \xD0\xBF\xD0\xB0\xD1\x83\xD0\xB7\xD1\x83 \xD1\x87\xD1\x82\xD0\xBE\xD0\xB1\xD1\x8B \xD0\xBD\xD0\xB5 \xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C \xD0\xB7\xD0\xB0\xD1\x80\xD0\xBF\xD0\xBB\xD0\xB0\xD1\x82\xD1\x83!";
-                    AddNotification("HELPER", text, "", "", "", "", 30.0f - (float)overdue, true, IM_COL32(46, 160, 67, 255));
-                    if (!activeNotifications.empty()) activeNotifications.back().isPayday = true;
                 }
                 next30SecTrigger += 3600;
                 while (next30SecTrigger <= now) next30SecTrigger += 3600;
@@ -5156,6 +5348,7 @@ void Gui::RenderNotifications() {
     
     ImVec2 ds = ImGui::GetIO().DisplaySize;
     float dt = ImGui::GetIO().DeltaTime;
+    if (dt > 0.1f) dt = 0.1f; // PREVENT LARGE JUMPS ON RESUME SO NOTIFICATIONS SURVIVE
     
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ds);
@@ -5238,8 +5431,10 @@ void Gui::RenderNotifications() {
         float badgeH = 15.0f;
         float badgeX = startX + notifW - 15.0f - verW;
         float badgeY = startY + 10.0f;
-        dl->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + verW, badgeY + badgeH), C_RED_BG, 4.0f);
-        dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY + 1.0f), C_RED, ver.c_str());
+        ImU32 badgeBgColor = (currentTheme == 0 || currentTheme == 1) ? C_RED_BG : C_GOLD;
+        ImU32 badgeTextColor = (currentTheme == 0 || currentTheme == 1) ? C_RED : IM_COL32(0,0,0,255);
+        dl->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + verW, badgeY + badgeH), badgeBgColor, 4.0f);
+        dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY + 1.0f), badgeTextColor, ver.c_str());
 
         // Main Text (Centered)
         float textY = startY + HEADER_H + (hasKeys ? 12.0f : (it->hasProgress ? 8.0f : ((notifH - HEADER_H) * 0.5f - 8.0f)));
@@ -5391,8 +5586,10 @@ void Gui::RenderPatrolWidget() {
 	float badgeH = 15.0f;
 	float badgeX = pwX + w - 15.0f - verW;
 	float badgeY2 = pwY + 10.0f;
-	dl->AddRectFilled(ImVec2(badgeX, badgeY2), ImVec2(badgeX + verW, badgeY2 + badgeH), C_RED_BG, 4.0f);
-	dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY2 + 1.0f), C_RED, ver.c_str());
+	ImU32 badgeBgColor = (currentTheme == 0 || currentTheme == 1) ? C_RED_BG : C_GOLD;
+	ImU32 badgeTextColor = (currentTheme == 0 || currentTheme == 1) ? C_RED : IM_COL32(0,0,0,255);
+	dl->AddRectFilled(ImVec2(badgeX, badgeY2), ImVec2(badgeX + verW, badgeY2 + badgeH), badgeBgColor, 4.0f);
+	dl->AddText(fontSegoeBold12, verFontSize, ImVec2(badgeX + 5.0f, badgeY2 + 1.0f), badgeTextColor, ver.c_str());
 
 	// Timer countdown using real wall-clock time (works when game minimized)
 	ULONGLONG now = GetTickCount64();
@@ -5893,9 +6090,9 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
         }
     } else {
         dl->AddRectFilled(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
-            startHover ? IM_COL32(210, 166, 94, 70) : IM_COL32(210, 166, 94, 38), 4.0f);
+            startHover ? ((C_GOLD & 0x00FFFFFF) | ((ImU32)70 << 24)) : ((C_GOLD & 0x00FFFFFF) | ((ImU32)38 << 24)), 4.0f);
         dl->AddRect(ImVec2(px + 20, btnY), ImVec2(px + 490, btnY + 40),
-            IM_COL32(210, 166, 94, 255), 4.0f, 0, 1.5f);
+            C_GOLD, 4.0f, 0, 1.5f);
 							const char* sTxt = "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94";
         ImVec2 sSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, sTxt);
 							float totalW = 10.0f + 8.0f + sSz.x;
@@ -5903,8 +6100,8 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
 							ImVec2 p1(startX, btnY + 14);
 							ImVec2 p2(startX, btnY + 26);
 							ImVec2 p3(startX + 10, btnY + 20);
-							dl->AddTriangleFilled(p1, p2, p3, IM_COL32(210, 166, 94, 255));
-							dl->AddText(fontSegoeBold14, 13.0f, ImVec2(startX + 18.0f, btnY + (40 - sSz.y) / 2), IM_COL32(210, 166, 94, 255), "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94");
+							dl->AddTriangleFilled(p1, p2, p3, C_GOLD);
+							dl->AddText(fontSegoeBold14, 13.0f, ImVec2(startX + 18.0f, btnY + (40 - sSz.y) / 2), C_GOLD, "\xD0\x9D\xD0\x90\xD0\xA7\xD0\x90\xD0\xA2\xD0\xAC \xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94");
         if (startBtn) {
 								activePatrol.active = true;
 								activePatrol.reportsSent = 0;
