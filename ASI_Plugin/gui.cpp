@@ -3784,6 +3784,15 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
             }
         }
     }
+    
+    if (showThemeDropdown && ImGui::GetIO().MouseWheel != 0.0f) {
+        float ddY = drpY + 36;
+        int visibleItems = 6;
+        float ddH = visibleItems * 36.0f + 10.0f;
+        if (!(mp.x >= drpX && mp.x <= drpX + drpW && mp.y >= ddY && mp.y <= ddY + ddH)) {
+            showThemeDropdown = false; // Close when scrolling outside to prevent it flying out of the scrolling parent
+        }
+    }
 
     if (showThemeDropdown) {
         float ddY = drpY + 36;
