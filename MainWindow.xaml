@@ -764,7 +764,7 @@
                                                         <Border x:Name="dashProfileBadge" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,16,25,0" Width="95" Height="24" CornerRadius="12" Background="#1b1612" BorderBrush="{DynamicResource GoldBrush}" BorderThickness="1">
                                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                 <Ellipse x:Name="dashProfileDot" Width="8" Height="8" Fill="{DynamicResource GoldBrush}" Margin="0,0,5,0">
-                                                                    <Ellipse.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="12" Color="{DynamicResource GoldBrushColor}" ShadowDepth="0" Opacity="0.8"/></Ellipse.Effect>
+                                                                    <Ellipse.Effect><DropShadowEffect RenderingBias="Quality" BlurRadius="12" Color="{DynamicResource GoldBrushColor}" ShadowDepth="0" Opacity="0.8"/></Ellipse.Effect>
                                                                 </Ellipse>
                                                                 <TextBlock x:Name="dashProfileBadgeText" Text="АКТИВЕН" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
                                                             </StackPanel>
@@ -773,7 +773,7 @@
                                                         <!-- Avatar: Active -->
                                                         <Grid x:Name="dashAvatarActive" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="35,75,0,0" Width="70" Height="70" Visibility="Collapsed">
                                                             <Ellipse Fill="{DynamicResource DeepBgBrush}" Stroke="{DynamicResource GoldBrush}" StrokeThickness="3">
-                                                                <Ellipse.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="16" Color="{DynamicResource GoldBrushColor}" ShadowDepth="0" Opacity="0.8"/></Ellipse.Effect>
+                                                                <Ellipse.Effect><DropShadowEffect RenderingBias="Quality" BlurRadius="16" Color="{DynamicResource GoldBrushColor}" ShadowDepth="0" Opacity="0.8"/></Ellipse.Effect>
                                                             </Ellipse>
                                                             <TextBlock Text="👤" Foreground="{DynamicResource GrayBrush}" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0"/>
                                                         </Grid>
@@ -944,9 +944,7 @@
                                                         <TextBlock x:Name="lblStatSectionsLabel" Text="РАЗДЕЛОВ ЗАКОНОВ" Foreground="#1f6feb" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
                                                     </StackPanel>
                                                     <StackPanel Canvas.Left="590" Canvas.Top="75" Width="200">
-                                                        <TextBlock x:Name="lblStatLaws" Text="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="48" FontWeight="Black" HorizontalAlignment="Center">
-                                                            <TextBlock.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="12" Color="{DynamicResource GoldBrushColor}" ShadowDepth="0" Opacity="0.8"/></TextBlock.Effect>
-                                                        </TextBlock>
+                                                        <TextBlock x:Name="lblStatLaws" Text="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="48" FontWeight="Black" HorizontalAlignment="Center"/>
                                                         <TextBlock x:Name="lblStatLawsLabel" Text="СТАТЕЙ В БАЗЕ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
                                                     </StackPanel>
                                                     <Line X1="277" Y1="70" X2="277" Y2="150" Stroke="{DynamicResource LineBrush}" StrokeThickness="1"/>

@@ -1228,12 +1228,10 @@ namespace FSB_helper_C__
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = red });
                         else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
                         {
-                            if (vars != null && vars.ContainsKey(part))
+                            if (isReport || (vars != null && vars.ContainsKey(part)))
                                 tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
-                            else if (isReport)
-                                tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
                             else
-                                tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground });
+                                tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
                         }
                         else
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground }); // inherit explicitly
@@ -1278,7 +1276,7 @@ namespace FSB_helper_C__
                         tb.Inlines.Add(new Run(part) { Foreground = red });
                     else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
                     {
-                        if (vars != null && vars.ContainsKey(part))
+                        if (isReport || (vars != null && vars.ContainsKey(part)))
                             tb.Inlines.Add(new Run(part) { Foreground = gold });
                         else
                             tb.Inlines.Add(new Run(part) { Foreground = darkBlue });
@@ -1604,6 +1602,21 @@ namespace FSB_helper_C__
                 if (splashBarBrush != null) splashBarBrush.Color = goldColor;
                 if (barGlow != null) barGlow.Color = goldColor;
 
+                if (t == "Default (Dark Blue)" || t == "Default (Dark Black)" || (t.Contains("Black") && !CustomThemes.ContainsKey(t))) {
+                    if (dashProfileBadge != null) dashProfileBadge.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#1b1612");
+                    if (dashGameBadgeGreen != null) dashGameBadgeGreen.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#121b16");
+                    if (dashGameBadgeRed != null) dashGameBadgeRed.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#1c0f12");
+                } else {
+                    if (dashProfileBadge != null) dashProfileBadge.Background = new SolidColorBrush(Color.FromArgb(40, goldColor.R, goldColor.G, goldColor.B));
+                    if (dashGameBadgeGreen != null) {
+                        var greenColor = ((SolidColorBrush)Application.Current.Resources["GreenBrush"]).Color;
+                        dashGameBadgeGreen.Background = new SolidColorBrush(Color.FromArgb(40, greenColor.R, greenColor.G, greenColor.B));
+                    }
+                    if (dashGameBadgeRed != null) {
+                        var redColor = ((SolidColorBrush)Application.Current.Resources["RedBrush"]).Color;
+                        dashGameBadgeRed.Background = new SolidColorBrush(Color.FromArgb(40, redColor.R, redColor.G, redColor.B));
+                    }
+                }
             } catch {}
             
             // Re-apply dashboard state colors so locally-set Foregrounds update
@@ -1713,8 +1726,8 @@ namespace FSB_helper_C__
                     else btnCancelFineKey.Content = "Down";
                     if (s != null && s.ContainsKey("StopBind") && !string.IsNullOrWhiteSpace(s["StopBind"])) {
                         btnStopBindKey.Content = s["StopBind"];
-                        btnStopBindKey.Foreground = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
-                        btnStopBindKey.BorderBrush = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
+                        btnStopBindKey.SetResourceReference(Control.ForegroundProperty, "GoldBrush");
+                        btnStopBindKey.SetResourceReference(Control.BorderBrushProperty, "GoldBrush");
                     } else {
                         btnStopBindKey.Content = "Нет";
                     }
@@ -1734,10 +1747,14 @@ namespace FSB_helper_C__
 
                     }
                     if (s != null && s.ContainsKey("DisableOverlay")) {
+                        chkSysOverlay.ApplyTemplate();
                         chkSysOverlay.IsChecked = s["DisableOverlay"] != "True";
+                        chkDisableOverlay.ApplyTemplate();
                         chkDisableOverlay.IsChecked = s["DisableOverlay"] == "True";
+                        
                     }
                     if (s != null && s.ContainsKey("DisableBinder")) {
+                        chkSysBinder.ApplyTemplate();
                         chkSysBinder.IsChecked = s["DisableBinder"] != "True";
                     }
                     if (lawsDisabledOverlay != null) lawsDisabledOverlay.Visibility = chkSysOverlay.IsChecked == true ? Visibility.Collapsed : Visibility.Visible;
@@ -1763,15 +1780,18 @@ namespace FSB_helper_C__
                     }
                     if (s != null && s.ContainsKey("OverlayActivationType")) {
                         if (s["OverlayActivationType"] == "Advanced") {
+                            chkAdvancedOverlay.ApplyTemplate();
                             chkAdvancedOverlay.IsChecked = true;
                             pnlDefaultOverlayActivators.Visibility = Visibility.Collapsed;
                             pnlAdvancedOverlayActivators.Visibility = Visibility.Visible;
                         } else {
+                            chkAdvancedOverlay.ApplyTemplate();
                             chkAdvancedOverlay.IsChecked = false;
                             pnlDefaultOverlayActivators.Visibility = Visibility.Visible;
                             pnlAdvancedOverlayActivators.Visibility = Visibility.Collapsed;
                         }
                     } else {
+                        chkAdvancedOverlay.ApplyTemplate();
                         chkAdvancedOverlay.IsChecked = false;
                         pnlDefaultOverlayActivators.Visibility = Visibility.Visible;
                         pnlAdvancedOverlayActivators.Visibility = Visibility.Collapsed;
@@ -2162,6 +2182,10 @@ namespace FSB_helper_C__
                     btnRadialKey.Content = bi.DisplayKey;
                 else
                     btnRadialKey.Content = "M3";
+                
+                if (chkSysRadial != null) {
+                    chkSysRadial.IsChecked = MasterData[CurrentProfile].RadialMenu?.Enabled ?? true;
+                }
                 
                 
                 // Calculate and set stats
@@ -4171,8 +4195,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 else if (_captureTarget == "ToggleScript") btnKeyToggleScript.Content = keyName;
                 else if (_captureTarget == "StopBind") {
                     btnStopBindKey.Content = keyName;
-                    btnStopBindKey.Foreground = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
-                    btnStopBindKey.BorderBrush = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
+                    btnStopBindKey.SetResourceReference(Control.ForegroundProperty, "GoldBrush");
+                    btnStopBindKey.SetResourceReference(Control.BorderBrushProperty, "GoldBrush");
                 }
                 else if (_captureTarget == "Radial") {
                     keyName = string.IsNullOrEmpty(_capturedKey) ? "НЕТ" : _capturedKey;
@@ -6059,18 +6083,18 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
             lblDashTitle.Text = "ЦЕНТРАЛЬНАЯ ПАНЕЛЬ";
             lblDashSubtitle.Text = "> ВАШИ ИЗМЕНЕНИЯ СИНХРОНИЗИРУЮТСЯ В ЛАЙВ-РЕЖИМЕ";
-            lblDashSubtitle.Foreground = green;
+            lblDashSubtitle.SetResourceReference(TextBlock.ForegroundProperty, "GreenBrush");
 
             canvasShieldBg.BeginAnimation(OpacityProperty, new DoubleAnimation(canvasShieldBg.Opacity, 1.0, TimeSpan.FromSeconds(0.3)));
 
             dashProfileCard.Opacity = 1;
             dashProfileGlow.Opacity = 0;
-            dashProfileBorder.BorderBrush = line;
+            dashProfileBorder.SetResourceReference(Control.BorderBrushProperty, "LineBrush");
             dashProfileBadge.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1b1612"));
-            dashProfileBadge.BorderBrush = gold;
+            dashProfileBadge.SetResourceReference(Control.BorderBrushProperty, "GoldBrush");
             dashProfileBadgeText.Text = "АКТИВЕН";
-            dashProfileBadgeText.Foreground = gold;
-            dashProfileDot.Fill = gold;
+            dashProfileBadgeText.SetResourceReference(TextBlock.ForegroundProperty, "GoldBrush");
+            dashProfileDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "GoldBrush");
             dashProfileSubText.Text = "Синхронизация профиля с игрой установлена.";
 
             dashAvatarActive.Visibility = Visibility.Visible;
@@ -6122,18 +6146,18 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
             lblDashTitle.Text = "ЦЕНТРАЛЬНАЯ ПАНЕЛЬ";
             lblDashSubtitle.Text = "> СОЗДАЙТЕ ПРОФИЛЬ ДЛЯ НАЧАЛА РАБОТЫ";
-            lblDashSubtitle.Foreground = gold;
+            lblDashSubtitle.SetResourceReference(TextBlock.ForegroundProperty, "GoldBrush");
 
             canvasShieldBg.BeginAnimation(OpacityProperty, new DoubleAnimation(canvasShieldBg.Opacity, 0.15, TimeSpan.FromSeconds(0.3)));
 
             dashProfileCard.Opacity = 1;
             dashProfileGlow.Opacity = 1;
-            dashProfileBorder.BorderBrush = gold;
+            dashProfileBorder.SetResourceReference(Control.BorderBrushProperty, "GoldBrush");
             dashProfileBadge.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1b1612"));
-            dashProfileBadge.BorderBrush = gold;
+            dashProfileBadge.SetResourceReference(Control.BorderBrushProperty, "GoldBrush");
             dashProfileBadgeText.Text = "ТРЕБУЕТСЯ";
-            dashProfileBadgeText.Foreground = gold;
-            dashProfileDot.Fill = gold;
+            dashProfileBadgeText.SetResourceReference(TextBlock.ForegroundProperty, "GoldBrush");
+            dashProfileDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "GoldBrush");
             dashProfileSubText.Text = "Создайте профиль чтобы начать работу.";
 
             dashAvatarActive.Visibility = Visibility.Collapsed;
@@ -6178,18 +6202,18 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
             lblDashTitle.Text = "ПРОБЛЕМА СВЯЗИ";
             lblDashSubtitle.Text = "> СВЯЗЬ С ИГРОВЫМ КЛИЕНТОМ ПОТЕРЯНА";
-            lblDashSubtitle.Foreground = red;
+            lblDashSubtitle.SetResourceReference(TextBlock.ForegroundProperty, "RedBrush");
 
             canvasShieldBg.BeginAnimation(OpacityProperty, new DoubleAnimation(canvasShieldBg.Opacity, 0.15, TimeSpan.FromSeconds(0.3)));
 
             dashProfileCard.Opacity = 0.4;
             dashProfileGlow.Opacity = 0;
-            dashProfileBorder.BorderBrush = line;
+            dashProfileBorder.SetResourceReference(Control.BorderBrushProperty, "LineBrush");
             dashProfileBadge.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1c0f12"));
-            dashProfileBadge.BorderBrush = red;
+            dashProfileBadge.SetResourceReference(Control.BorderBrushProperty, "RedBrush");
             dashProfileBadgeText.Text = "НЕАКТИВЕН";
-            dashProfileBadgeText.Foreground = red;
-            dashProfileDot.Fill = red;
+            dashProfileBadgeText.SetResourceReference(TextBlock.ForegroundProperty, "RedBrush");
+            dashProfileDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "RedBrush");
             dashProfileSubText.Text = "Синхронизация профиля с игрой установлена.";
 
             dashAvatarActive.Visibility = Visibility.Collapsed;

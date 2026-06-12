@@ -1959,7 +1959,7 @@ static void MainThread() {
             hookGetAsyncKeyState.before += [](const auto& hook, int& vKey) -> std::optional<SHORT> {
                 bool wantTextInput = false;
                 if (ImGui::GetCurrentContext() != nullptr) wantTextInput = ImGui::GetIO().WantTextInput;
-                if (Gui::show && (Gui::blockKeyboardInput || wantTextInput) && (vKey == 'T' || vKey == 't' || vKey == VK_F6 || vKey == VK_F8 || vKey == VK_ESCAPE)) {
+                if (Gui::show && (Gui::blockKeyboardInput || wantTextInput) && (vKey == 'T' || vKey == 't' || vKey == VK_F6 || vKey == VK_ESCAPE)) {
                     return 0; // Return unpressed for specific keys
                 }
                 return std::nullopt;
@@ -1976,7 +1976,6 @@ static void MainThread() {
                 if (Gui::show && (Gui::blockKeyboardInput || wantTextInput) && ret && lpKeyState) {
                     lpKeyState['T'] = 0;
                     lpKeyState['t'] = 0;
-                    lpKeyState[VK_F8] = 0;
                     lpKeyState[VK_ESCAPE] = 0;
                 }
             };
@@ -2064,14 +2063,14 @@ static void MainThread() {
                         if (GetRawInputData((HRAWINPUT)msg->lParam, RID_INPUT, &ri, &dwSize, sizeof(RAWINPUTHEADER)) != (UINT)-1) {
                             if (ri.header.dwType == RIM_TYPEKEYBOARD) {
                                 USHORT vKey = ri.data.keyboard.VKey;
-                                if (vKey == 'X' || vKey == VK_BACK) return std::nullopt;
+                                if (vKey == 'X' || vKey == VK_BACK || vKey == VK_F8) return std::nullopt;
                                 if (!wantText && (vKey == 'W' || vKey == 'A' || vKey == 'S' || vKey == 'D' || vKey == 'F' || vKey == VK_RETURN)) {
                                     return std::nullopt;
                                 }
                             }
                         }
                     } else if (msg->message == WM_KEYDOWN || msg->message == WM_KEYUP) {
-                        if (msg->wParam == 'X' || msg->wParam == VK_BACK) return std::nullopt;
+                        if (msg->wParam == 'X' || msg->wParam == VK_BACK || msg->wParam == VK_F8) return std::nullopt;
                         if (!wantText && (msg->wParam == 'W' || msg->wParam == 'A' || msg->wParam == 'S' || msg->wParam == 'D' || msg->wParam == 'F' || msg->wParam == VK_RETURN)) {
                             return std::nullopt;
                         }
