@@ -944,9 +944,7 @@
                                                         <TextBlock x:Name="lblStatSectionsLabel" Text="РАЗДЕЛОВ ЗАКОНОВ" Foreground="#1f6feb" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
                                                     </StackPanel>
                                                     <StackPanel Canvas.Left="590" Canvas.Top="75" Width="200">
-                                                        <TextBlock x:Name="lblStatLaws" Text="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="48" FontWeight="Black" HorizontalAlignment="Center">
-                                                            <TextBlock.Effect><DropShadowEffect RenderingBias="Performance" BlurRadius="12" Color="{DynamicResource GoldBrushColor}" ShadowDepth="0" Opacity="0.8"/></TextBlock.Effect>
-                                                        </TextBlock>
+                                                        <TextBlock x:Name="lblStatLaws" Text="0" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="48" FontWeight="Black" HorizontalAlignment="Center"/>
                                                         <TextBlock x:Name="lblStatLawsLabel" Text="СТАТЕЙ В БАЗЕ" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,-5,0,0"/>
                                                     </StackPanel>
                                                     <Line X1="277" Y1="70" X2="277" Y2="150" Stroke="{DynamicResource LineBrush}" StrokeThickness="1"/>

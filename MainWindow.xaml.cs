@@ -1228,12 +1228,10 @@ namespace FSB_helper_C__
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = red });
                         else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
                         {
-                            if (vars != null && vars.ContainsKey(part))
+                            if (isReport || (vars != null && vars.ContainsKey(part)))
                                 tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
-                            else if (isReport)
-                                tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
                             else
-                                tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground });
+                                tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
                         }
                         else
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground }); // inherit explicitly
@@ -1278,7 +1276,7 @@ namespace FSB_helper_C__
                         tb.Inlines.Add(new Run(part) { Foreground = red });
                     else if (part.StartsWith("*") && part.EndsWith("*") && part.Length > 2)
                     {
-                        if (vars != null && vars.ContainsKey(part))
+                        if (isReport || (vars != null && vars.ContainsKey(part)))
                             tb.Inlines.Add(new Run(part) { Foreground = gold });
                         else
                             tb.Inlines.Add(new Run(part) { Foreground = darkBlue });
@@ -1604,6 +1602,21 @@ namespace FSB_helper_C__
                 if (splashBarBrush != null) splashBarBrush.Color = goldColor;
                 if (barGlow != null) barGlow.Color = goldColor;
 
+                if (t == "Default (Dark Blue)" || t == "Default (Dark Black)" || (t.Contains("Black") && !CustomThemes.ContainsKey(t))) {
+                    if (dashProfileBadge != null) dashProfileBadge.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#1b1612");
+                    if (dashGameBadgeGreen != null) dashGameBadgeGreen.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#121b16");
+                    if (dashGameBadgeRed != null) dashGameBadgeRed.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#1c0f12");
+                } else {
+                    if (dashProfileBadge != null) dashProfileBadge.Background = new SolidColorBrush(Color.FromArgb(40, goldColor.R, goldColor.G, goldColor.B));
+                    if (dashGameBadgeGreen != null) {
+                        var greenColor = ((SolidColorBrush)Application.Current.Resources["GreenBrush"]).Color;
+                        dashGameBadgeGreen.Background = new SolidColorBrush(Color.FromArgb(40, greenColor.R, greenColor.G, greenColor.B));
+                    }
+                    if (dashGameBadgeRed != null) {
+                        var redColor = ((SolidColorBrush)Application.Current.Resources["RedBrush"]).Color;
+                        dashGameBadgeRed.Background = new SolidColorBrush(Color.FromArgb(40, redColor.R, redColor.G, redColor.B));
+                    }
+                }
             } catch {}
             
             // Re-apply dashboard state colors so locally-set Foregrounds update
