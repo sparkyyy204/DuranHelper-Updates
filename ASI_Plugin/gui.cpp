@@ -1271,7 +1271,7 @@ void Gui::DrawHudFrame(ImDrawList* dl, ImVec2 o) {
 
     float startX = o.x + 20.0f;
     if (true) {
-        float totalW = duranW + helperW + 12.0f + verW;
+        float totalW = duranW + helperW;
         startX = o.x + (W - totalW) / 2.0f;
     }
 
@@ -5749,7 +5749,8 @@ void Gui::RenderPatrolWidget() {
 	}
 	char actionBuf[128];
 	snprintf(actionBuf, sizeof(actionBuf), "\xD0\xA1\xD0\x9B\xD0\x95\xD0\x94. \xD0\x94\xD0\x95\xD0\x99\xD0\xA1\xD0\xA2\xD0\x92\xD0\x98\xD0\x95: %s", actionTxt);
-	dl->AddText(fontSegoeBold14, 11.0f, ImVec2(vbx + 8, vty), IM_COL32(243, 211, 153, 255), actionBuf);
+	ImU32 valCol = (currentTheme == 0 || currentTheme == 1) ? IM_COL32(243, 211, 153, 255) : C_GOLD;
+	dl->AddText(fontSegoeBold14, 11.0f, ImVec2(vbx + 8, vty), valCol, actionBuf);
 
 }
 
@@ -5870,10 +5871,60 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
         cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cx, cp.y + 2), IM_COL32(139, 148, 158, 255), label);
         float lw = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, label).x;
         float wrapW = 445.0f - lw; // leave space for scrollbar without shifting text
-        ImVec2 tSz = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, wrapW, text);
-        if (text[0] == '\0') tSz.y = 16.0f; // minimum height
-        cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(cx + lw + 4.0f, cp.y + 2), C_WHITE, text, nullptr, wrapW);
-        ImGui::Dummy(ImVec2(10, tSz.y + 2.0f));
+        
+        ImU32 valCol = (currentTheme == 0 || currentTheme == 1) ? IM_COL32(243, 211, 153, 255) : C_GOLD;
+        float startX = cx + lw + 4.0f;
+        float curX = 0.0f;
+        float curY = 0.0f;
+        float lineHeight = 16.0f;
+        
+        std::string s(text);
+        std::regex re("(\\*[^\\*]+\\*)");
+        std::sregex_token_iterator it(s.begin(), s.end(), re, {-1, 0});
+        std::sregex_token_iterator end;
+
+        for (; it != end; ++it) {
+            std::string tok = *it;
+            if (tok.empty()) continue;
+            
+            bool isVar = (tok.length() >= 2 && tok.front() == '*' && tok.back() == '*');
+            ImU32 col = isVar ? valCol : C_WHITE;
+            
+            size_t pos = 0;
+            while (pos < tok.length()) {
+                size_t nextBreak = tok.find_first_of(" \n", pos);
+                bool hasNewline = (nextBreak != std::string::npos && tok[nextBreak] == '\n');
+                if (nextBreak == std::string::npos) nextBreak = tok.length();
+                else nextBreak++; 
+                
+                std::string word = tok.substr(pos, nextBreak - pos);
+                pos = nextBreak;
+                
+                std::string wordNoSpace = word;
+                while (!wordNoSpace.empty() && (wordNoSpace.back() == ' ' || wordNoSpace.back() == '\n')) wordNoSpace.pop_back();
+                
+                float wNoSpace = fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, wordNoSpace.c_str()).x;
+                
+                if (curX + wNoSpace > wrapW && curX > 0.0f) {
+                    curX = 0.0f;
+                    curY += lineHeight;
+                }
+                
+                std::string renderWord = word;
+                if (!renderWord.empty() && renderWord.back() == '\n') renderWord.pop_back();
+                
+                cdl->AddText(fontSegoeBold14, 13.0f, ImVec2(startX + curX, cp.y + 2 + curY), col, renderWord.c_str());
+                curX += fontSegoeBold14->CalcTextSizeA(13.0f, FLT_MAX, 0.0f, renderWord.c_str()).x;
+                
+                if (hasNewline) {
+                    curX = 0.0f;
+                    curY += lineHeight;
+                }
+            }
+        }
+        
+        float totalHeight = s.empty() ? 16.0f : (curY + lineHeight);
+        ImGui::Dummy(ImVec2(10, totalHeight + 2.0f));
     };
     
     ImGui::Dummy(ImVec2(10, 2));
@@ -5896,13 +5947,8 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
             std::string match = (*i)[1].str();
             std::string uMatch = match;
             std::transform(uMatch.begin(), uMatch.end(), uMatch.begin(), ::toupper);
-            if (uMatch == "\xD0\x98\xD0\x9C\xD0\xAF" || uMatch == "\xD0\xA4\xD0\x90\xD0\x9C" || uMatch == "\xD0\xA2\xD0\x95\xD0\x93" || 
-                uMatch == "\xD0\x97\xD0\x92" || uMatch == "\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF") continue;
-            bool isGlobal = false;
-            for (const auto& gv : BinderManager::Get().Variables) {
-                if (gv.first == match) { isGlobal = true; break; }
-            }
-            if (isGlobal) continue;
+            if (uMatch == "\xD0\x92\xD0\xA0\xD0\x95\xD0\x9C\xD0\xAF") continue;
+            // We no longer skip global variables. Patrol variables are completely independent.
             bool exists = false;
             for (auto& v : vars) if (v == match) exists = true;
             if (!exists) vars.push_back(match);
@@ -5926,7 +5972,11 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
             float rowY = startY + row * 30;
 
             char varLabel[128]; snprintf(varLabel, sizeof(varLabel), "*%s*", vars[i].c_str());
-            dl->AddText(fontSegoeBold14, 14.0f, ImVec2(labelX, rowY + 2), IM_COL32(243, 211, 153, 255), varLabel);
+            float lw = fontSegoeBold14->CalcTextSizeA(14.0f, FLT_MAX, 0.0f, varLabel).x;
+            float labelCX = labelX + (60.0f - lw) / 2.0f; // Center label in its 60px area
+            
+            ImU32 valCol = (currentTheme == 0 || currentTheme == 1) ? IM_COL32(243, 211, 153, 255) : C_GOLD;
+            dl->AddText(fontSegoeBold14, 14.0f, ImVec2(labelCX, rowY + 2), valCol, varLabel);
 
             dl->AddRectFilled(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), C_INPUT, 4.0f);
             dl->AddRect(ImVec2(inputX, rowY), ImVec2(inputX + 120, rowY + 22), C_BORDER, 4.0f, 0, 1.0f);
@@ -5941,7 +5991,9 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
             ImGui::PushItemWidth(116);
             ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
             ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+            
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+            
             ImGui::PushFont(fontSegoeBold14);
             if (ImGui::InputText((std::string("##v") + std::to_string(i)).c_str(), varBuf, 256)) {
                 editVariables[vars[i]] = varBuf;
@@ -5951,6 +6003,30 @@ void Gui::RenderPatrolsTab(ImDrawList* dl, ImVec2 o) {
             ImGui::PopStyleColor(2);
             ImGui::PopItemWidth();
         }
+    } else {
+        // Empty state for variables
+        float emptyY = o.y + 220;
+        float emptyX = px + panW / 2.0f;
+        
+        // Draw { } icon
+        dl->PathLineTo(ImVec2(emptyX - 15, emptyY - 20));
+        dl->PathLineTo(ImVec2(emptyX - 25, emptyY - 10));
+        dl->PathLineTo(ImVec2(emptyX - 25, emptyY + 10));
+        dl->PathLineTo(ImVec2(emptyX - 15, emptyY + 20));
+        dl->PathStroke(C_BORDER, 0, 3.0f);
+
+        dl->PathLineTo(ImVec2(emptyX + 15, emptyY - 20));
+        dl->PathLineTo(ImVec2(emptyX + 25, emptyY - 10));
+        dl->PathLineTo(ImVec2(emptyX + 25, emptyY + 10));
+        dl->PathLineTo(ImVec2(emptyX + 15, emptyY + 20));
+        dl->PathStroke(C_BORDER, 0, 3.0f);
+
+        // Slash
+        dl->AddLine(ImVec2(emptyX - 10, emptyY + 15), ImVec2(emptyX + 10, emptyY - 15), C_BORDER, 3.0f);
+        
+        const char* emtVar = "\xD0\x9F\xD0\xB5\xD1\x80\xD0\xB5\xD0\xBC\xD0\xB5\xD0\xBD\xD0\xBD\xD1\x8B\xD0\xB5 \xD0\xB2 \xD0\xB2\xD1\x8B\xD0\xB1\xD1\x80\xD0\xB0\xD0\xBD\xD0\xBD\xD0\xBE\xD0\xBC \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xB5 \xD0\xBE\xD1\x82\xD1\x81\xD1\x83\xD1\x82\xD1\x81\xD1\x82\xD0\xB2\xD1\x83\xD1\x8E\xD1\x82";
+        ImVec2 tSz = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, emtVar);
+        dl->AddText(fontSegoeBold14, 12.0f, ImVec2(emptyX - tSz.x / 2, emptyY + 30), IM_COL32(92, 99, 112, 180), emtVar);
     }
 
     // Separator at y=270
@@ -6174,18 +6250,7 @@ void Gui::ExecutePatrolReport() {
     else if (activePatrol.currentStage == 1) text = activePatrol.data.processText;
     else text = activePatrol.data.endText;
 
-    // Apply global variables from BinderManager
-    for (const auto& var : BinderManager::Get().Variables) {
-        if (var.first.empty()) continue;
-        size_t pos = 0;
-        std::string upperKey = var.first;
-        std::transform(upperKey.begin(), upperKey.end(), upperKey.begin(), ::toupper);
-        
-        while ((pos = text.find(var.first, pos)) != std::string::npos || (pos = text.find(upperKey, pos)) != std::string::npos) {
-            text.replace(pos, var.first.length(), var.second);
-            pos += var.second.length();
-        }
-    }
+    // Global variables are NO LONGER applied here to ensure patrols are 100% independent.
 
     // Apply local variables
     for (const auto& kv : activePatrol.variables) {
