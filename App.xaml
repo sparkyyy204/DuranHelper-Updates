@@ -9,7 +9,7 @@
         <SolidColorBrush x:Key="BoxBrush" Color="#161b22"/>
         <SolidColorBrush x:Key="InputBrush" Color="#0a0d12"/>
         
-        <SolidColorBrush x:Key="GoldBrush" Color="#d2a65e"/>
+        <SolidColorBrush x:Key="GoldBrush" Color="{DynamicResource GoldBrushColor}"/>
         <SolidColorBrush x:Key="RedBrush" Color="#ff7b72"/>
         <SolidColorBrush x:Key="GreenBrush" Color="#2ea043"/>
         <SolidColorBrush x:Key="YellowBrush" Color="#feca2f"/>

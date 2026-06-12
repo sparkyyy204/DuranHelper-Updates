@@ -23,6 +23,7 @@ namespace FSB_helper_C__
 {
     public partial class MainWindow : Window
     {
+
         public static readonly DependencyProperty ExpansionProgressProperty = 
             DependencyProperty.Register("ExpansionProgress", typeof(double), typeof(MainWindow), 
             new PropertyMetadata(0.0, OnExpansionProgressChanged));
@@ -137,6 +138,9 @@ namespace FSB_helper_C__
             _isUpgrade = FSB_helper_C__.Services.SystemMigrationService.MigrateLegacyFilesToDocuments();
 
             InitializeComponent();
+
+            // Populate all 17 custom themes
+            ThemesData.Pop(CustomThemes);
 
             // Dynamic high-DPI scaling based on screen height to prevent miniature UI on 1080p, 1440p and higher displays
             try
@@ -317,8 +321,8 @@ namespace FSB_helper_C__
             // --- INTERNAL PROCESSES (Heavy UI logic) ---
             if (string.IsNullOrEmpty(_lastAppliedLauncherTheme)) {
                 _lastAppliedLauncherTheme = "Default (Dark Blue)";
-                if (rbThemeBlack?.IsChecked == true) _lastAppliedLauncherTheme = "Black (AMOLED)";
-                else if (rbThemeGrey?.IsChecked == true) _lastAppliedLauncherTheme = "Grey (Sport red)";
+                
+                
             }
             // Initialize clip with matching 12px cut corners
             const double C_init = 12;
@@ -1570,7 +1574,7 @@ namespace FSB_helper_C__
             if(t.Contains("Black")) { 
                 setCol("BgBrush","#000000"); setCol("SideBrush","#121212"); setCol("SidebarBrush","#0a0a0a"); setCol("BoxBrush","#121212"); setCol("InputBrush","#000000"); setCol("DeepBgBrush","#000000");
                 setCol("TextBrush", "White"); setCol("LineBrush", "#1f1f1f");
-                setCol("GoldBrush", "#b8904f"); setCol("GrayBrush", "#8b949e"); setCol("GreenBrush", "#2ea043"); setCol("RedBrush", "#ff7b72");
+                setCol("GoldBrush", "#b8904f"); setCol("GoldBrushTransparent", "#20b8904f"); setCol("GrayBrush", "#8b949e"); setCol("GreenBrush", "#2ea043"); setCol("RedBrush", "#ff7b72");
                 setCol("MenuHoverBrush", "#151515"); setCol("SectionBtnBrush", "#151515"); setCol("HoverBrush", "#1a3d6e"); setCol("BtnHoverBrush", "#0f0f0f");
                 setCol("OverlayBrush", "#30000000");
                 setCol("GoldBrushTransparent", "#15b8904f");
@@ -1579,7 +1583,7 @@ namespace FSB_helper_C__
             else if (t.Contains("Grey") || t.Contains("Sport red")) { 
                 setCol("BgBrush","#121214"); setCol("SideBrush","#1a1a1d"); setCol("SidebarBrush","#0f0f11"); setCol("BoxBrush","#1a1a1d"); setCol("InputBrush","#0a0a0c"); setCol("DeepBgBrush","#0a0a0c");
                 setCol("TextBrush", "White"); setCol("LineBrush", "#2d2d33");
-                setCol("GoldBrush", "#a51a1a"); setCol("GrayBrush", "#7e8590"); setCol("GreenBrush", "#a51a1a"); setCol("RedBrush", "#ff4d4d");
+                setCol("GoldBrush", "#a51a1a"); setCol("GoldBrushTransparent", "#20a51a1a"); setCol("GrayBrush", "#7e8590"); setCol("GreenBrush", "#a51a1a"); setCol("RedBrush", "#ff4d4d");
                 setCol("MenuHoverBrush", "#232328"); setCol("SectionBtnBrush", "#232328"); setCol("HoverBrush", "#8b1212"); setCol("BtnHoverBrush", "#1f2228");
                 setCol("OverlayBrush", "#30000000");
                 setCol("GoldBrushTransparent", "#15a51a1a");
@@ -1588,7 +1592,7 @@ namespace FSB_helper_C__
             else { 
                 setCol("BgBrush","#0d1117"); setCol("SideBrush","#161b22"); setCol("SidebarBrush","#11151d"); setCol("BoxBrush","#161b22"); setCol("InputBrush","#0a0d12"); setCol("DeepBgBrush","#0a0d12");
                 setCol("TextBrush", "White"); setCol("LineBrush", "#30363d");
-                setCol("GoldBrush", "#d2a65e"); setCol("GrayBrush", "#8b949e"); setCol("GreenBrush", "#2ea043"); setCol("RedBrush", "#ff7b72");
+                setCol("GoldBrush", "#d2a65e"); setCol("GoldBrushTransparent", "#20d2a65e"); setCol("GrayBrush", "#8b949e"); setCol("GreenBrush", "#2ea043"); setCol("RedBrush", "#ff7b72");
                 setCol("MenuHoverBrush", "#21262d"); setCol("SectionBtnBrush", "#21262d"); setCol("HoverBrush", "#1f6feb"); setCol("BtnHoverBrush", "#1f2937");
                 setCol("OverlayBrush", "#30000000");
                 setCol("ImportExportBgBrush", "#051024");
@@ -1656,10 +1660,13 @@ namespace FSB_helper_C__
                     if (s != null && s.ContainsKey("AcceptedConfigWarning")) {
                         AcceptedConfigWarning = s["AcceptedConfigWarning"] == "True";
                     }
+
+                    if (CustomThemes == null) CustomThemes = new Dictionary<string, Dictionary<string, string>>();
+                    ThemesData.Pop(CustomThemes);
                     cbThemeOverlay.Items.Clear();
-                    cbThemeOverlay.Items.Add("Default (Dark Blue)");
-                    cbThemeOverlay.Items.Add("Black (AMOLED)");
-                    cbThemeOverlay.Items.Add("Grey (Sport red)");
+                    // removed
+                    // removed
+                    // removed
                     if (CustomThemes != null) {
                         foreach(var k in CustomThemes.Keys) cbThemeOverlay.Items.Add(k);
                     }
@@ -1667,16 +1674,26 @@ namespace FSB_helper_C__
                     _ignoreEvents = true;
                     if (s != null && s.ContainsKey("ThemeLauncher")) { 
                         string content = s["ThemeLauncher"];
-                        if (content == "Default (Dark Blue)") { rbThemeDefault.IsChecked = true; ApplyTheme(content); }
-                        else if (content == "Black (AMOLED)") { rbThemeBlack.IsChecked = true; ApplyTheme(content); }
-                        else if (content == "Grey (Sport red)") { rbThemeGrey.IsChecked = true; ApplyTheme(content); }
+                        
+                        
+                                    if (cbLauncherTheme != null) {
+                cbLauncherTheme.SelectionChanged -= LauncherTheme_SelectionChanged;
+                foreach (ComboBoxItem item in cbLauncherTheme.Items) {
+                    if (item.Content.ToString() == content) {
+                        cbLauncherTheme.SelectedItem = item;
+                        ApplyTheme(content);
+                        break;
+                    }
+                }
+                cbLauncherTheme.SelectionChanged += LauncherTheme_SelectionChanged;
+            }
                     }
                     if (s != null && s.ContainsKey("ThemeOverlay")) { 
                         foreach(string i in cbThemeOverlay.Items) { 
                             if (i == s["ThemeOverlay"]) { cbThemeOverlay.SelectedItem = i; break; } 
                         } 
                     }
-                    if (rbThemeDefault.IsChecked != true && rbThemeBlack.IsChecked != true && rbThemeGrey.IsChecked != true) { rbThemeDefault.IsChecked = true; ApplyTheme("Default (Dark Blue)"); }
+                    
                     if (cbThemeOverlay.SelectedItem == null) cbThemeOverlay.SelectedIndex = 0;
                     
                     if (s != null && s.ContainsKey("KeyToggle")) {
@@ -1772,12 +1789,12 @@ namespace FSB_helper_C__
                 }
             } else {
                 cbThemeOverlay.Items.Clear();
-                cbThemeOverlay.Items.Add("Default (Dark Blue)");
-                cbThemeOverlay.Items.Add("Black (AMOLED)");
-                cbThemeOverlay.Items.Add("Grey (Sport red)");
+                // removed
+                // removed
+                // removed
                 
                 _ignoreEvents = true;
-                rbThemeDefault.IsChecked = true;
+                
                 cbThemeOverlay.SelectedIndex = 0;
                 ApplyTheme("Default (Dark Blue)");
                 Application.Current.Resources["OverlayOpacity"] = 0.85;
@@ -1818,9 +1835,9 @@ namespace FSB_helper_C__
                 Dispatcher.BeginInvoke(new Action(() => ViewCloud.RefreshState()), System.Windows.Threading.DispatcherPriority.Background);
             }
 
-            string tLauncher = "Default (Dark Blue)";
-            if (rbThemeBlack.IsChecked == true) tLauncher = "Black (AMOLED)";
-            else if (rbThemeGrey.IsChecked == true) tLauncher = "Grey (Sport red)";
+            string tLauncher = (cbLauncherTheme.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Default (Dark Blue)";
+            
+            
             string tOverlay = cbThemeOverlay.SelectedItem?.ToString() ?? "Default (Dark Blue)";
 
             string overlayType = chkAdvancedOverlay.IsChecked == true ? "Advanced" : "Default";
@@ -4555,9 +4572,9 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
 
         private void Theme_Changed(object sender, SelectionChangedEventArgs e) { 
             if(!_isLoaded) return;
-            string tLauncher = "Default (Dark Blue)";
-            if (rbThemeBlack.IsChecked == true) tLauncher = "Black (AMOLED)";
-            else if (rbThemeGrey.IsChecked == true) tLauncher = "Grey (Sport red)";
+            string tLauncher = (cbLauncherTheme.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Default (Dark Blue)";
+            
+            
             if(!string.IsNullOrEmpty(tLauncher)) ApplyTheme(tLauncher);
             
             string tOverlay = cbThemeOverlay.SelectedItem?.ToString();
@@ -5214,8 +5231,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         private void ThemeRadioButton_Checked(object sender, RoutedEventArgs e) {
             if (!_isLoaded) return;
             string themeName = "Default (Dark Blue)";
-            if (rbThemeBlack.IsChecked == true) themeName = "Black (AMOLED)";
-            else if (rbThemeGrey.IsChecked == true) themeName = "Grey (Sport red)";
+            
+            
             ApplyTheme(themeName);
             SaveData();
         }
@@ -5362,7 +5379,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             OpenDialog(WinImportConflict);
         }
 
-        private void ThemeLauncher_Changed(object sender, SelectionChangedEventArgs e) {
+        private void LauncherTheme_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (!_isLoaded) return;
             if (sender is ComboBox combo && combo.SelectedItem is ComboBoxItem item) {
                 string themeName = item.Content?.ToString() ?? "Default (Dark Blue)";
                 if (_isLoaded) {
@@ -5944,9 +5962,9 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         private void UpdateDashboardState() {
             // Keep dashboard colors in sync with currently selected launcher theme,
             // but do not re-apply the same theme repeatedly (can stutter splash expansion).
-            string activeLauncherTheme = "Default (Dark Blue)";
-            if (rbThemeBlack?.IsChecked == true) activeLauncherTheme = "Black (AMOLED)";
-            else if (rbThemeGrey?.IsChecked == true) activeLauncherTheme = "Grey (Sport red)";
+            string activeLauncherTheme = (cbLauncherTheme.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Default (Dark Blue)";
+            
+            
             if (!string.Equals(_lastAppliedLauncherTheme, activeLauncherTheme, StringComparison.Ordinal))
             {
                 _lastAppliedLauncherTheme = activeLauncherTheme;
@@ -6388,12 +6406,12 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             bgPath.RenderTransform = new TransformGroup {
                 Children = { new TranslateTransform(-_svgCx, -_svgCy), new ScaleTransform(_svgScale, _svgScale), new TranslateTransform(_canvasCx, _canvasCy) }
             };
-            if (glow) bgPath.Effect = new DropShadowEffect { Color = Color.FromRgb(210,166,94), BlurRadius = 8, ShadowDepth = 0, Opacity = 0.4 };
+            if (glow) bgPath.Effect = new DropShadowEffect { Color = ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color, BlurRadius = 8, ShadowDepth = 0, Opacity = 0.4 };
             canvasRadial.Children.Add(bgPath);
 
             // 2. Grid Path (pattern only, step size 30)
             bool isGold = (fill is SolidColorBrush scb) && 
-                          (scb.Color == Color.FromArgb(66, 210, 166, 94) || scb.Color == Color.FromArgb(51, 210, 166, 94));
+                          (scb.Color == Color.FromArgb(66, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B) || scb.Color == Color.FromArgb(51, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));
 
             var gridBrush = new DrawingBrush {
                 TileMode = TileMode.Tile,
@@ -6401,7 +6419,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 ViewportUnits = BrushMappingMode.Absolute
             };
             var gridDrawing = new DrawingGroup();
-            var gridPen = new Pen(new SolidColorBrush(isGold ? Color.FromArgb(45, 210, 166, 94) : Color.FromArgb(14, 255, 255, 255)), 0.85);
+            var gridPen = new Pen(new SolidColorBrush(isGold ? Color.FromArgb(45, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B) : Color.FromArgb(14, 255, 255, 255)), 0.85);
             gridDrawing.Children.Add(new GeometryDrawing(null, gridPen, new LineGeometry(new Point(0, 0), new Point(0, 30))));
             gridDrawing.Children.Add(new GeometryDrawing(null, gridPen, new LineGeometry(new Point(0, 0), new Point(30, 0))));
             gridBrush.Drawing = gridDrawing;
@@ -6534,9 +6552,9 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             canvasRadial.Children.Clear();
             bool isGrouped = (cfg.Mode == "Grouped");
 
-            var goldFill    = new SolidColorBrush(Color.FromArgb(66, 210, 166, 94));   // rgba(210,166,94,0.26)
-            var goldStroke  = new SolidColorBrush(Color.FromArgb(230, 210, 166, 94));  // rgba(210,166,94,0.9)
-            var goldLine    = new SolidColorBrush(Color.FromArgb(245, 210, 166, 94));  // rgba(210,166,94,0.96)
+            var goldFill    = new SolidColorBrush(Color.FromArgb(66, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));   // rgba(210,166,94,0.26)
+            var goldStroke  = new SolidColorBrush(Color.FromArgb(230, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));  // rgba(210,166,94,0.9)
+            var goldLine    = new SolidColorBrush(Color.FromArgb(245, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));  // rgba(210,166,94,0.96)
 
             // Derive sector colors from current theme
             var bgColor = ((SolidColorBrush)Application.Current.Resources["BgBrush"]).Color;
@@ -6546,10 +6564,10 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             var darkStroke     = new SolidColorBrush(Color.FromArgb(209, lineColor.R, lineColor.G, lineColor.B));
             var bindDarkFill   = new SolidColorBrush(Color.FromArgb(234, bgColor.R, bgColor.G, bgColor.B));
             var bindDarkStroke = new SolidColorBrush(Color.FromArgb(178, lineColor.R, lineColor.G, lineColor.B));
-            var bindGoldFill   = new SolidColorBrush(Color.FromArgb(51, 210, 166, 94));  // rgba(210,166,94,0.2)
-            var bindGoldStroke = new SolidColorBrush(Color.FromArgb(217, 210, 166, 94)); // rgba(210,166,94,0.85)
+            var bindGoldFill   = new SolidColorBrush(Color.FromArgb(51, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));  // rgba(210,166,94,0.2)
+            var bindGoldStroke = new SolidColorBrush(Color.FromArgb(217, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)); // rgba(210,166,94,0.85)
             var whiteTxt    = new SolidColorBrush(Color.FromArgb(217, 255, 255, 255));
-            var goldTxt     = new SolidColorBrush(Color.FromRgb(210, 166, 94));
+            var goldTxt     = new SolidColorBrush(((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color);
 
             if (isGrouped) {
                 // === INNER RING: 4 groups, each 90°, starting at 315° ===
@@ -6602,7 +6620,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                         arrow1.Points.Add(new Point(-5, 3.5));
                         arrow1.Points.Add(new Point(0, -3.5));
                         arrow1.Points.Add(new Point(5, 3.5));
-                        arrow1.Fill = new SolidColorBrush(Color.FromArgb(153, 210, 166, 94));
+                        arrow1.Fill = new SolidColorBrush(Color.FromArgb(153, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));
                         arrow1.IsHitTestVisible = false;
                         arrow1.RenderTransform = groupTr;
                         canvasRadial.Children.Add(arrow1);
@@ -6611,7 +6629,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                         arrow2.Points.Add(new Point(-5, 8.5));
                         arrow2.Points.Add(new Point(0, 1.5));
                         arrow2.Points.Add(new Point(5, 8.5));
-                        arrow2.Fill = new SolidColorBrush(Color.FromArgb(77, 210, 166, 94));
+                        arrow2.Fill = new SolidColorBrush(Color.FromArgb(77, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));
                         arrow2.IsHitTestVisible = false;
                         arrow2.RenderTransform = groupTr;
                         canvasRadial.Children.Add(arrow2);
@@ -6655,8 +6673,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                     if (sel) {
                         var (ix1, iy1) = SvgPolar(a1, 162); var (ox1, oy1) = SvgPolar(a1, 255);
                         var (ix2, iy2) = SvgPolar(a2, 162); var (ox2, oy2) = SvgPolar(a2, 255);
-                        AddSvgLine(ix1, iy1, ox1, oy1, new SolidColorBrush(Color.FromArgb(230, 210, 166, 94)), 2.5);
-                        AddSvgLine(ix2, iy2, ox2, oy2, new SolidColorBrush(Color.FromArgb(230, 210, 166, 94)), 2.5);
+                        AddSvgLine(ix1, iy1, ox1, oy1, new SolidColorBrush(Color.FromArgb(230, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 2.5);
+                        AddSvgLine(ix2, iy2, ox2, oy2, new SolidColorBrush(Color.FromArgb(230, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 2.5);
                     }
 
                     // Bind name text
@@ -6670,7 +6688,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                     // Bind icon symbol (below name)
                     if (i < activeSectors.Count) {
                         if (!string.IsNullOrEmpty(activeSectors[i].Icon) && activeSectors[i].Icon != "none") {
-                            var iconBrush = new SolidColorBrush(Color.FromArgb(178, 210, 166, 94));
+                            var iconBrush = new SolidColorBrush(Color.FromArgb(178, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));
                             if (activeSectors[i].BindId == "open_fines") {
                                 iconBrush = new SolidColorBrush(Color.FromRgb(46, 160, 67));
                             } else if (activeSectors[i].BindId == "open_wanted") {
@@ -6678,7 +6696,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                             }
                             AddVectorIcon(canvasRadial, SvgX(btx), SvgY(bty + 16), SvgR(11), activeSectors[i].Icon, iconBrush, 1.0);
                         } else {
-                            AddEllipse(btx, bty + 12, 3, new SolidColorBrush(Color.FromArgb(178, 210, 166, 94)), null, 0);
+                            AddEllipse(btx, bty + 12, 3, new SolidColorBrush(Color.FromArgb(178, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), null, 0);
                         }
                     }
                 }
@@ -6764,7 +6782,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                         if (disp.Length > 12) disp = disp.Substring(0, 10) + "..";
                         AddSvgText(tx, ty - 10, disp, 11, new SolidColorBrush(Color.FromArgb(178, 255, 255, 255)));
                         if (hasIcon) {
-                            var iconBrush = new SolidColorBrush(Color.FromArgb(178, 210, 166, 94));
+                            var iconBrush = new SolidColorBrush(Color.FromArgb(178, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));
                             if (cfg.Sectors[i].BindId == "open_fines") {
                                 iconBrush = new SolidColorBrush(Color.FromRgb(46, 160, 67));
                             } else if (cfg.Sectors[i].BindId == "open_wanted") {
@@ -6772,14 +6790,14 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                             }
                             AddVectorIcon(canvasRadial, SvgX(tx), SvgY(ty + 14), SvgR(9.5), iconKey, iconBrush, 1.0);
                         } else {
-                            AddEllipse(tx, ty + 12, 3, new SolidColorBrush(Color.FromArgb(178, 210, 166, 94)), null, 0);
+                            AddEllipse(tx, ty + 12, 3, new SolidColorBrush(Color.FromArgb(178, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), null, 0);
                         }
                     } else {
                         if (hasIcon) {
-                            var iconBrush = new SolidColorBrush(Color.FromArgb(178, 210, 166, 94));
+                            var iconBrush = new SolidColorBrush(Color.FromArgb(178, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B));
                             AddVectorIcon(canvasRadial, SvgX(tx), SvgY(ty), SvgR(9.5), iconKey, iconBrush, 1.0);
                         } else {
-                            AddEllipse(tx, ty, 3, new SolidColorBrush(Color.FromArgb(178, 210, 166, 94)), null, 0);
+                            AddEllipse(tx, ty, 3, new SolidColorBrush(Color.FromArgb(178, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), null, 0);
                         }
                     }
                 }
@@ -6797,9 +6815,9 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             // === DECORATIVE RINGS ===
             double outR = isGrouped ? 150 : 190;
             AddEllipse(250, 250, outR,   Brushes.Transparent, new SolidColorBrush(Color.FromArgb(214, lineColor.R, lineColor.G, lineColor.B)), 2);
-            AddEllipse(250, 250, outR+1.5, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(74, 210, 166, 94)), 2.2);
+            AddEllipse(250, 250, outR+1.5, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(74, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 2.2);
             if (!isGrouped) {
-                AddEllipse(250, 250, outR+4, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(23, 210, 166, 94)), 3);
+                AddEllipse(250, 250, outR+4, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(23, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 3);
             }
             // === CENTER HUB ===
             var deepBg = ((SolidColorBrush)Application.Current.Resources["DeepBgBrush"]).Color;
@@ -6807,13 +6825,13 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             AddEllipse(250, 250, 42, new SolidColorBrush(Color.FromArgb(248, bgColor.R, bgColor.G, bgColor.B)), null, 0);
 
             // Faint outer gold ring (radius 41, thickness 3, opacity 28/255)
-            AddEllipse(250, 250, 41, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(28, 210, 166, 94)), 3.0);
+            AddEllipse(250, 250, 41, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(28, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 3.0);
 
             // Golden outer border (radius 42, thickness 2.5, C_LINE equivalent)
             AddEllipse(250, 250, 42, Brushes.Transparent, new SolidColorBrush(Color.FromArgb(230, lineColor.R, lineColor.G, lineColor.B)), 2.5);
 
             // Inner dark circle (radius 36, C_DARK background with gold border thickness 1.2)
-            AddEllipse(250, 250, 36, new SolidColorBrush(deepBg), new SolidColorBrush(Color.FromArgb(255, 210, 166, 94)), 1.2);
+            AddEllipse(250, 250, 36, new SolidColorBrush(deepBg), new SolidColorBrush(Color.FromArgb(255, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 1.2);
             
             // Solid inner circular grid (radius 25, C_GRID equivalent, opacity 30/255)
             var techGridGeom = new EllipseGeometry(new Point(SvgX(250), SvgY(250)), SvgR(25), SvgR(25));
@@ -6833,7 +6851,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 double y1 = 250 + 28 * Math.Sin(a);
                 double x2 = 250 + 33 * Math.Cos(a);
                 double y2 = 250 + 33 * Math.Sin(a);
-                AddSvgLine(x1, y1, x2, y2, new SolidColorBrush(Color.FromArgb(102, 210, 166, 94)), 1.0);
+                AddSvgLine(x1, y1, x2, y2, new SolidColorBrush(Color.FromArgb(102, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.R, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.G, ((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color.B)), 1.0);
             }
 
             // Letter "D" shadow (1px offset)
@@ -6887,7 +6905,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             double r = SvgR(13);
             var circle = new System.Windows.Shapes.Ellipse {
                 Width = r * 2, Height = r * 2,
-                Fill = new SolidColorBrush(Color.FromRgb(210, 166, 94)),
+                Fill = new SolidColorBrush(((SolidColorBrush)Application.Current.Resources["GoldBrush"]).Color),
                 Stroke = new SolidColorBrush(Color.FromRgb(255, 220, 140)),
                 StrokeThickness = 1.5, Cursor = Cursors.Hand
             };
@@ -7230,6 +7248,17 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         protected override void OnRender(DrawingContext drawingContext) { drawingContext.DrawRectangle(_brush, null, new Rect(0, 0, this.AdornedElement.RenderSize.Width, this.AdornedElement.RenderSize.Height)); }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -24,6 +24,7 @@ bool g_WndProcHooked = false;
 #include <fstream>
 
 bool g_Initialized = false;
+extern ImU32 C_GOLD;
 volatile bool g_DeviceResetting = false;  // true while D3D9 device is being reset (Alt-Tab)
 volatile int g_SkipFrames = 0;            // skip N frames of ImGui rendering after focus change
 std::atomic<bool> g_CancelQuote(false);
@@ -441,7 +442,7 @@ void StartFineSequence(const std::string& targetId, const std::string& articleMs
                 AddLocalSAMPMessage(m.c_str());
                 if (Gui::notifyFineIssue) {
                     std::string nMsg = "\xD0\x9F\xD0\xA0\xD0\x9E\xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4?";
-                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
+                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, C_GOLD);
                 }
             });
 
@@ -598,7 +599,7 @@ void StartWantedSequence(const std::string& targetId, const std::string& article
                 AddLocalSAMPMessage(qReq.c_str());
                 if (Gui::notifyFineIssue) {
                     std::string nMsg = "\xD0\x9F\xD0\xA0\xD0\x9E\xD0\xA6\xD0\x98\xD0\xA2\xD0\x98\xD0\xA0\xD0\x9E\xD0\x92\xD0\x90\xD0\xA2\xD0\xAC \xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A?";
-                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, IM_COL32(210, 166, 94, 255));
+                    Gui::AddNotification("HELPER", nMsg, k_c, "\xD0\xBD\xD0\xB0\xD1\x87\xD0\xB0\xD1\x82\xD1\x8C", k_x, "\xD0\xBF\xD1\x80\xD0\xBE\xD0\xBF\xD1\x83\xD1\x81\xD1\x82\xD0\xB8\xD1\x82\xD1\x8C", 30.0f, true, C_GOLD);
                 }
             });
             
@@ -988,9 +989,6 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
     if (uMsg == WM_ACTIVATEAPP && wParam == FALSE) {
         if (Gui::show) Gui::Toggle();
-        Gui::ClearNotifications();
-        g_FineSequenceCancel.store(true);
-        g_WantedSequenceCancel.store(true);
         if (Gui::radialMenuOpen || Gui::radialIdInputOpen) {
             Gui::radialMenuOpen = false;
             Gui::radialIdInputOpen = false;
@@ -1000,9 +998,6 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     }
     if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE) {
         if (Gui::show) Gui::Toggle();
-        Gui::ClearNotifications();
-        g_FineSequenceCancel.store(true);
-        g_WantedSequenceCancel.store(true);
         if (Gui::radialMenuOpen || Gui::radialIdInputOpen) {
             Gui::radialMenuOpen = false;
             Gui::radialIdInputOpen = false;
@@ -1796,27 +1791,47 @@ static IDirect3DDevice9* GetGameDevice() {
 }
 
 static void MainThread() {
-    // ===== RADMIR IP VERIFICATION =====
-    const char* official_ips[] = {
-        "185.169.134.139", "185.169.134.140", "80.66.71.76", "80.66.71.77",
-        "185.169.134.35", "185.169.134.36", "80.66.71.74", "80.66.71.75",
-        "185.169.134.123", "185.169.134.124", "80.66.71.80", "80.66.71.81",
-        "80.66.71.78", "80.66.71.79", "80.66.71.82", "80.66.71.83",
-        "80.66.71.84", "80.66.71.61", "80.66.71.71", "80.66.71.91", "80.66.71.92",
-        "127.0.0.1", "localhost" // Allow local testing
+    const std::vector<std::vector<uint8_t>> enc_nodes = {
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x69, 0x63, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6E, 0x6A, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x6D, 0x6C, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x6D, 0x6D, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x69, 0x6F, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x69, 0x6C, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x6D, 0x6E, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x6D, 0x6F, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6C, 0x6D, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6C, 0x62, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6C, 0x63, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6D, 0x6A, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6D, 0x6B, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6D, 0x68, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6D, 0x69, 0x00 },
+        { 0x6B, 0x62, 0x6F, 0x74, 0x6B, 0x6C, 0x63, 0x74, 0x6B, 0x69, 0x6E, 0x74, 0x6B, 0x6D, 0x6E, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x62, 0x68, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x62, 0x6E, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x62, 0x6F, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x62, 0x6C, 0x00 },
+        { 0x62, 0x6A, 0x74, 0x6C, 0x6C, 0x74, 0x6D, 0x6B, 0x74, 0x62, 0x6D, 0x00 },
+        { 0x6B, 0x68, 0x6D, 0x74, 0x6A, 0x74, 0x6A, 0x74, 0x6B, 0x00 },
+        { 0x36, 0x35, 0x39, 0x3B, 0x36, 0x32, 0x35, 0x29, 0x2E, 0x00 }
     };
-    bool ip_valid = false;
+    bool config_ok = false;
     char* cmdLine = GetCommandLineA();
     if (cmdLine) {
-        for (const char* ip : official_ips) {
-            if (strstr(cmdLine, ip)) {
-                ip_valid = true;
+        for (const auto& enc : enc_nodes) {
+            std::string dec;
+            for (size_t i = 0; i < enc.size() - 1; i++) {
+                dec += (char)(enc[i] ^ 0x5A);
+            }
+            if (strstr(cmdLine, dec.c_str())) {
+                config_ok = true;
                 break;
             }
         }
     }
     
-    if (!ip_valid) {
+    if (!config_ok) {
         Gui::versionStr = "1.0.1";
         Gui::scriptEnabled = false;
         Gui::binderEnabled = false;

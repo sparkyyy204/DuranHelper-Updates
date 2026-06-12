@@ -25,7 +25,7 @@
                     <Grid Margin="20,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="H" FontFamily="Consolas" Foreground="#2ea043" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="Bold"/>
-                            <TextBlock Text="ИМПОРТ ИЗ AUTOHOTKEY" Foreground="White" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                            <TextBlock Text="ИМПОРТ ИЗ AUTOHOTKEY" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="Black" FontFamily="Segoe UI" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button Style="{StaticResource ModalCloseBtn}" Click="CloseButton_Click"/>
                     </Grid>
@@ -55,7 +55,7 @@
                                     <DataTemplate>
                                         <Border Background="{DynamicResource SideBrush}" CornerRadius="6" Margin="4,4,4,4" Padding="12,10">
                                             <StackPanel>
-                                                <TextBlock Text="{Binding name}" Foreground="White" FontSize="12" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                                <TextBlock Text="{Binding name}" Foreground="{DynamicResource TextBrush}" FontSize="12" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,0,0,4"/>
                                                 <TextBlock Text="{Binding description}" Foreground="#2ea043" FontSize="10" FontFamily="Segoe UI" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
                                         </Border>
