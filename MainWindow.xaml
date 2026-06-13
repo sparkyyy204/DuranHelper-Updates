@@ -4085,8 +4085,7 @@
                                                          <TextBlock Text="КАК РАБОТАЮТ ПЕРЕМЕННЫЕ" Foreground="{DynamicResource TextBrush}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
                                                      </StackPanel>
                                                      <TextBlock Text="В докладах можно использовать переменные. Просто оберните слово в звездочки, например: *пост* или *ТЕГ*." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,10"/>
-                                                     <TextBlock Text="• ЗОЛОТЫЕ переменные: Если вы обернули слово в звездочки, и такая переменная УЖЕ СУЩЕСТВУЕТ во вкладке «Бинды», она подсветится золотым цветом. Её значение автоматически подтянется из настроек переменных." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16" Margin="0,0,0,8"/>
-                                                     <TextBlock Text="• СИНИЕ переменные: Если переменной нет во вкладке «Бинды», она подсветится синим. Её не нужно нигде заранее создавать! Значение синей переменной вы сможете менять прямо на ходу, в окне доклада в самом игровом оверлее." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                     <TextBlock Text="Все такие слова автоматически станут переменными и подсветятся золотым цветом. Их не нужно нигде заранее создавать! Значение каждой переменной вы сможете быстро менять прямо на ходу — в окне доклада в самом игровом оверлее." Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                                 </StackPanel>
                                             </Border>
 
@@ -4102,13 +4101,13 @@
                                                              <Run Text="/r " Foreground="{DynamicResource TextBrush}"/>
                                                              <Run Text="*ТЕГ*" Foreground="{DynamicResource GoldBrush}"/>
                                                              <Run Text=" Докладывает: Дуран | Заступил на пост: " Foreground="{DynamicResource TextBrush}"/>
-                                                             <Run Text="*пост*" Foreground="#58a6ff"/>
+                                                             <Run Text="*пост*" Foreground="{DynamicResource GoldBrush}"/>
                                                              <Run Text=" | Сост." Foreground="{DynamicResource TextBrush}"/>
-                                                             <Run Text="*Стаб*" Foreground="#58a6ff"/>
+                                                             <Run Text="*Стаб*" Foreground="{DynamicResource GoldBrush}"/>
                                                              <Run Text="." Foreground="{DynamicResource TextBrush}"/>
                                                          </TextBlock>
                                                      </Border>
-                                                     <TextBlock Text="В этом примере переменная *ТЕГ* уже существует в Биндерах — она будет браться оттуда и её не придётся каждый раз вводить. А *пост* и *Стаб* — синие переменные. Прямо во время игры вы сможете быстро вписать название поста и статус, не открывая лаунчер!" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
+                                                     <TextBlock Text="В этом примере *ТЕГ*, *пост* и *Стаб* — это ваши переменные. Прямо во время игры вы сможете быстро вписать свой тег, название поста и статус в окне доклада, не сворачивая игру и не открывая лаунчер!" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" LineHeight="16"/>
                                                 </StackPanel>
                                             </Border>
                                         </StackPanel>
