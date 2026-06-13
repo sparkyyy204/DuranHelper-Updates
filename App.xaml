@@ -31,6 +31,7 @@
         
         <Color x:Key="GreenColor">#2ea043</Color>
         <Color x:Key="GoldColor">#d2a65e</Color>
+        <Color x:Key="GoldBrushColor">#d2a65e</Color>
         <Color x:Key="RedColor">#ff7b72</Color>
         <Style TargetType="Button" x:Key="BaseBtn"><Setter Property="FocusVisualStyle" Value="{x:Null}"/></Style>
         <Style TargetType="RadioButton"><Setter Property="FocusVisualStyle" Value="{x:Null}"/></Style>
