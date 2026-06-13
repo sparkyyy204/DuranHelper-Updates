@@ -1218,7 +1218,6 @@ namespace FSB_helper_C__
                     var parts = System.Text.RegularExpressions.Regex.Split(txt.Text ?? "", @"(\*[^\*]+\*)");
                     var gold = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
                     var red = (SolidColorBrush)Application.Current.Resources["RedBrush"];
-                    var darkBlue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498db"));
                     var vars = MasterData[CurrentProfile].Variables;
 
                     foreach (var part in parts)
@@ -1231,7 +1230,7 @@ namespace FSB_helper_C__
                             if (isReport || (vars != null && vars.ContainsKey(part)))
                                 tbSyntax.Inlines.Add(new Run(part) { Foreground = gold });
                             else
-                                tbSyntax.Inlines.Add(new Run(part) { Foreground = darkBlue });
+                                tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground });
                         }
                         else
                             tbSyntax.Inlines.Add(new Run(part) { Foreground = tbSyntax.Foreground }); // inherit explicitly
@@ -1260,7 +1259,6 @@ namespace FSB_helper_C__
                 var parts = System.Text.RegularExpressions.Regex.Split(text, @"(\*[^\*]+\*)");
                 var gold = (SolidColorBrush)Application.Current.Resources["GoldBrush"];
                 var red = (SolidColorBrush)Application.Current.Resources["RedBrush"];
-                var darkBlue = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498db"));
                 
                 string curProf = win.CurrentProfile;
                 Dictionary<string, string> vars = null;
@@ -1279,7 +1277,7 @@ namespace FSB_helper_C__
                         if (isReport || (vars != null && vars.ContainsKey(part)))
                             tb.Inlines.Add(new Run(part) { Foreground = gold });
                         else
-                            tb.Inlines.Add(new Run(part) { Foreground = darkBlue });
+                            tb.Inlines.Add(new Run(part));
                     }
                     else
                     {
