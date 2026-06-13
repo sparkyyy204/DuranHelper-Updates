@@ -1699,6 +1699,17 @@ namespace FSB_helper_C__
                 cbLauncherTheme.SelectionChanged += LauncherTheme_SelectionChanged;
             }
                     }
+                    if (cbLauncherTheme != null && cbLauncherTheme.SelectedItem == null) {
+                        cbLauncherTheme.SelectionChanged -= LauncherTheme_SelectionChanged;
+                        foreach (ComboBoxItem item in cbLauncherTheme.Items) {
+                            if (item.Content.ToString() == "Default (Dark Blue)") {
+                                cbLauncherTheme.SelectedItem = item;
+                                ApplyTheme("Default (Dark Blue)");
+                                break;
+                            }
+                        }
+                        cbLauncherTheme.SelectionChanged += LauncherTheme_SelectionChanged;
+                    }
                     if (s != null && s.ContainsKey("ThemeOverlay")) { 
                         foreach(string i in cbThemeOverlay.Items) { 
                             if (i == s["ThemeOverlay"]) { cbThemeOverlay.SelectedItem = i; break; } 
@@ -2570,13 +2581,15 @@ namespace FSB_helper_C__
             if (lblStatSections != null) lblStatSections.Text = pf.Laws.Count.ToString();
             if (lblStatLaws != null) lblStatLaws.Text = CountRealArticles(pf.Laws).ToString();
 
-            if (cbSections.Items.Count > 0) { 
+            if (cbSections.Items.Count > 0) {
+                if (lblSectionsPlaceholder != null) lblSectionsPlaceholder.Visibility = Visibility.Collapsed; 
                 if (!string.IsNullOrEmpty(_lastLawSection) && cbSections.Items.Contains(_lastLawSection)) cbSections.SelectedItem = _lastLawSection;
                 else cbSections.SelectedIndex = 0; 
                 Section_Changed(null, null); 
                 lblNoLaws.Visibility = Visibility.Collapsed; 
             } 
             else { 
+                if (lblSectionsPlaceholder != null && btnToggleTabPatrols.IsChecked != true) lblSectionsPlaceholder.Visibility = Visibility.Visible; 
                 if (pnlLaws2Col != null) pnlLaws2Col.Visibility = Visibility.Collapsed; 
                 if (pnlLawsText != null) pnlLawsText.Visibility = Visibility.Collapsed;
                 if (pnlFineCalcList != null) pnlFineCalcList.Visibility = Visibility.Collapsed;
@@ -2591,7 +2604,9 @@ namespace FSB_helper_C__
             if (btnToggleTabPatrols.IsChecked == true) {
                 if (gridLawsTopBar != null) gridLawsTopBar.Visibility = Visibility.Visible;
                 if (lblCurrentSection != null) lblCurrentSection.Visibility = Visibility.Collapsed;
+                if (gridSections != null) gridSections.Visibility = Visibility.Collapsed;
                 if (cbSections != null) cbSections.Visibility = Visibility.Collapsed;
+                if (lblSectionsPlaceholder != null) lblSectionsPlaceholder.Visibility = Visibility.Collapsed; 
                 if (btnPatrolsInfo != null) btnPatrolsInfo.Visibility = Visibility.Visible;
                 
                 if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ ДОКЛАД"; }
@@ -2608,6 +2623,7 @@ namespace FSB_helper_C__
             } else {
                 if (gridLawsTopBar != null) gridLawsTopBar.Visibility = Visibility.Visible;
                 if (lblCurrentSection != null) lblCurrentSection.Visibility = Visibility.Visible;
+                if (gridSections != null) gridSections.Visibility = Visibility.Visible;
                 if (cbSections != null) cbSections.Visibility = Visibility.Visible;
                 if (btnPatrolsInfo != null) btnPatrolsInfo.Visibility = Visibility.Collapsed;
                 if (btnSectionAdd != null) { btnSectionAdd.Visibility = Visibility.Visible; btnSectionAdd.Content = "+ СОЗДАТЬ РАЗДЕЛ"; }
@@ -2618,6 +2634,14 @@ namespace FSB_helper_C__
             }
         }
         
+        private void cbSections_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (cbSections != null && cbSections.Items.Count == 0)
+            {
+                e.Handled = true;
+            }
+        }
+
         private void Section_Changed(object sender, SelectionChangedEventArgs e) 
         { 
             if (pnlEmptyLawsHint != null) pnlEmptyLawsHint.Visibility = Visibility.Collapsed;
@@ -5358,7 +5382,8 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 
                 if (_importTargetContext == "Laws") {
                     UpdateLawsList();
-                    if (cbSections.Items.Count > 0) { cbSections.SelectedIndex = 0; Section_Changed(null, null); }
+                    if (cbSections.Items.Count > 0) {
+                if (lblSectionsPlaceholder != null) lblSectionsPlaceholder.Visibility = Visibility.Collapsed; cbSections.SelectedIndex = 0; Section_Changed(null, null); }
                     if (_hadImportConflicts) OpenInfo("ВНИМАНИЕ", "Законы импортированы.\nНесколько разделов были переименованы из-за конфликтов.");
                     else OpenInfo("УСПЕШНО", "Законы импортированы!", true);
                     AddLog($"Законы импортированы", "#3388ff");
