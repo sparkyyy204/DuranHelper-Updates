@@ -34,3 +34,28 @@ Name: "{group}\Удалить DURAN HELPER"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\DURANHELPER.exe"; Description: "Запустить DURAN HELPER"; Flags: nowait postinstall skipifsilent
+Filename: "https://sparkyyy204.github.io/DuranHelper-Updates/"; Description: "Открыть инструкцию по настройке (рекомендуется)"; Flags: postinstall shellexec skipifsilent
+
+[Code]
+var
+  InstructionLabel: TNewStaticText;
+
+procedure InstructionLinkClick(Sender: TObject);
+var
+  ErrorCode: Integer;
+begin
+  ShellExecAsOriginalUser('open', 'https://sparkyyy204.github.io/DuranHelper-Updates/', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+end;
+
+procedure InitializeWizard();
+begin
+  InstructionLabel := TNewStaticText.Create(WizardForm);
+  InstructionLabel.Parent := WizardForm;
+  InstructionLabel.Left := ScaleX(20);
+  InstructionLabel.Top := WizardForm.ClientHeight - ScaleY(32);
+  InstructionLabel.Caption := 'Инструкция по настройке';
+  InstructionLabel.Font.Color := clBlue;
+  InstructionLabel.Font.Style := [fsUnderline];
+  InstructionLabel.Cursor := crHand;
+  InstructionLabel.OnClick := @InstructionLinkClick;
+end;
