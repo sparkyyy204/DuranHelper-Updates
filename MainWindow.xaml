@@ -1160,14 +1160,17 @@
                                                 <Grid>
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="25,0,0,0">
                                                     <TextBlock x:Name="lblCurrentSection" Text="ТЕКУЩИЙ РАЗДЕЛ:" Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                                                    <ComboBox x:Name="cbSections" Width="280" Height="40" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Style="{StaticResource DarkCombo}" SelectionChanged="Section_Changed" ItemTemplate="{StaticResource SectionComboItemTemplate}">
-                                                        <ComboBox.ItemsPanel>
-                                                            <ItemsPanelTemplate>
-                                                                <VirtualizingStackPanel />
-                                                            </ItemsPanelTemplate>
-                                                        </ComboBox.ItemsPanel>
-                                                        <ComboBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></ComboBox.Resources>
-                                                    </ComboBox>
+                                                    <Grid x:Name="gridSections" Width="280" Height="40">
+                            <ComboBox x:Name="cbSections" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource DeepBgBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Foreground="{DynamicResource TextBrush}" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Style="{StaticResource DarkCombo}" SelectionChanged="Section_Changed" PreviewMouseLeftButtonDown="cbSections_PreviewMouseLeftButtonDown" ItemTemplate="{StaticResource SectionComboItemTemplate}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                                <ComboBox.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></ComboBox.Resources>
+                            </ComboBox>
+                            <TextBlock x:Name="lblSectionsPlaceholder" IsHitTestVisible="False" Text="Разделы не созданы" Foreground="{DynamicResource GrayBrush}" Opacity="0.8" Panel.ZIndex="99" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="15,0,0,0" Visibility="Collapsed"/>
+                        </Grid>
                                                     <Button x:Name="btnPatrolsInfo" Visibility="Collapsed" Content="ИНСТРУКЦИЯ" Padding="6,2" Background="Transparent" Foreground="{DynamicResource GrayBrush}" BorderBrush="{DynamicResource GrayBrush}" BorderThickness="1" FontFamily="Segoe UI" FontSize="9" FontWeight="Bold" Cursor="Hand" Click="PatrolsInfo_Click">
                                                         <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="4"/></Style></Button.Resources>
                                                     </Button>
