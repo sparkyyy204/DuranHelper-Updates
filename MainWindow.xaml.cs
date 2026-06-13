@@ -5707,6 +5707,7 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 wizCard2.Opacity = 0.5; wizGlow2.BeginAnimation(DropShadowEffect.OpacityProperty, new DoubleAnimation(wizGlow2.Opacity, 0, TimeSpan.FromSeconds(0.4))); wizGlow2.BeginAnimation(DropShadowEffect.BlurRadiusProperty, new DoubleAnimation(wizGlow2.BlurRadius, 0, TimeSpan.FromSeconds(0.4)));
                 wizCard2.BorderBrush = line; wizTitle2.Text = "ШАГ 2: СОЕДИНЕНИЕ С ИГРОЙ"; wizTitle2.Foreground = gray; wizLine2.Stroke = line;
                 btnWizAction2.Content = "ОЖИДАНИЕ"; btnWizAction2.Foreground = new SolidColorBrush(disabledColor); btnWizAction2.BorderBrush = line; btnWizAction2.IsHitTestVisible = false;
+                btnWizPastePath.Foreground = new SolidColorBrush(disabledColor); btnWizPastePath.BorderBrush = line; btnWizPastePath.IsHitTestVisible = false; btnWizPastePath.Cursor = Cursors.Arrow;
                 wizCard3.Opacity = 0.5; wizGlow3.BeginAnimation(DropShadowEffect.OpacityProperty, new DoubleAnimation(wizGlow3.Opacity, 0, TimeSpan.FromSeconds(0.4))); wizGlow3.BeginAnimation(DropShadowEffect.BlurRadiusProperty, new DoubleAnimation(wizGlow3.BlurRadius, 0, TimeSpan.FromSeconds(0.4)));
                 wizCard3.Background = new SolidColorBrush(boxBrushColor);
                 wizTitle3.Foreground = gray;
@@ -5761,6 +5762,10 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 btnWizAction2.Content = "УКАЗАТЬ ПАПКУ";
                 btnWizAction2.Foreground = blue;
                 btnWizAction2.BorderBrush = blue;
+                btnWizPastePath.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#c9d1d9"));
+                btnWizPastePath.BorderBrush = line;
+                btnWizPastePath.IsHitTestVisible = true;
+                btnWizPastePath.Cursor = Cursors.Hand;
 
                 // Reset Step 3
                 wizCard3.Opacity = 0.5;
@@ -5806,6 +5811,10 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 btnWizAction2.Foreground = green;
                 btnWizAction2.BorderBrush = green;
                 btnWizAction2.IsHitTestVisible = false;
+                btnWizPastePath.Foreground = new SolidColorBrush(disabledColor);
+                btnWizPastePath.BorderBrush = line;
+                btnWizPastePath.IsHitTestVisible = false;
+                btnWizPastePath.Cursor = Cursors.Arrow;
                 
                 // Dim Step 2
                 wizCard2.BeginAnimation(OpacityProperty, new DoubleAnimation(wizCard2.Opacity, 0.5, TimeSpan.FromSeconds(0.4)));
@@ -5861,6 +5870,24 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
             }
         }
 
+        private void Wizard_PastePath_Click(object sender, RoutedEventArgs e) {
+            if (_wizardStep != 2) return;
+            string folder = System.Windows.Clipboard.GetText()?.Trim();
+            if (string.IsNullOrEmpty(folder) || !System.IO.Directory.Exists(folder)) {
+                OpenInfo("ОШИБКА", "В буфере обмена нет корректного пути к существующей папке.");
+                return;
+            }
+            bool isGameFolder = System.IO.File.Exists(System.IO.Path.Combine(folder, "gta_sa.exe"))
+                || System.IO.File.Exists(System.IO.Path.Combine(folder, "gta-sa.exe"))
+                || System.IO.File.Exists(System.IO.Path.Combine(folder, "radmir.exe"));
+            if (!isGameFolder) {
+                OpenInfo("ОШИБКА", "Скопированный путь не является корневой папкой игры.\n\nВ ней не найден файл gta_sa.exe.\n\nУзнать корневую папку с игрой вы сможете в RADMIR Launcher в настройках лаунчера.\nПараметр \"Путь к папке\".");
+                return;
+            }
+            lblWizardFolder.Text = folder;
+            _wizardStep = 3;
+            UpdateWizardUI();
+        }
         private async void Wizard_Install_Click(object sender, RoutedEventArgs e) {
             if (_wizardStep != 3) return;
 

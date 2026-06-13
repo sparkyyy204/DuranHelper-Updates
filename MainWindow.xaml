@@ -4190,9 +4190,14 @@
                                         
                                         <TextBlock x:Name="lblWizSub2" Text="Ожидание завершения первого шага..." Foreground="#5c6370" FontSize="12" FontFamily="Segoe UI" HorizontalAlignment="Center" Margin="0,175,0,0"/>
 
-                                        <Button x:Name="btnWizAction2" Content="ОЖИДАНИЕ" Click="Wizard_Browse_Click" Width="200" Height="40" Margin="0,215,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Style="{StaticResource FlatBtn}" Background="{DynamicResource DeepBgBrush}" Foreground="#5c6370" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" FontWeight="Bold" Cursor="Arrow">
-                                            <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
-                                        </Button>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,215,0,0">
+                                            <Button x:Name="btnWizAction2" Content="ОЖИДАНИЕ" Click="Wizard_Browse_Click" Width="140" Height="40" Style="{StaticResource FlatBtn}" Background="{DynamicResource DeepBgBrush}" Foreground="#5c6370" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" FontWeight="Bold" Cursor="Arrow">
+                                                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                            </Button>
+                                            <Button x:Name="btnWizPastePath" Content="ВСТАВИТЬ ПУТЬ" Click="Wizard_PastePath_Click" Width="140" Height="40" Margin="10,0,0,0" Style="{StaticResource FlatBtn}" Background="{DynamicResource DeepBgBrush}" Foreground="#5c6370" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" FontWeight="Bold" Cursor="Arrow" IsHitTestVisible="False">
+                                                <Button.Resources><Style TargetType="Border"><Setter Property="CornerRadius" Value="6"/></Style></Button.Resources>
+                                            </Button>
+                                        </StackPanel>
                                         <Button x:Name="btnWizBack2" Visibility="Collapsed" Click="Wizard_Back_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,15,15,0" Cursor="Hand">
                                             <Button.Template>
                                                 <ControlTemplate TargetType="Button">
