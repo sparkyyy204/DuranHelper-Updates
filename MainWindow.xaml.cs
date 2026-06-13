@@ -2179,6 +2179,19 @@ namespace FSB_helper_C__
 
 
             
+            // Sync cbLauncherTheme with currently applied theme
+            if (cbLauncherTheme != null && cbLauncherTheme.SelectedItem == null) {
+                string appliedTheme = _lastAppliedLauncherTheme ?? "Default (Dark Blue)";
+                cbLauncherTheme.SelectionChanged -= LauncherTheme_SelectionChanged;
+                foreach (ComboBoxItem item in cbLauncherTheme.Items) {
+                    if (item.Content.ToString() == appliedTheme) {
+                        cbLauncherTheme.SelectedItem = item;
+                        break;
+                    }
+                }
+                cbLauncherTheme.SelectionChanged += LauncherTheme_SelectionChanged;
+            }
+
             if (hasProfile) { 
                 InitDefaults(); 
                 txtOverlayName.Text = MasterData[CurrentProfile].OverlayText ?? ""; 
