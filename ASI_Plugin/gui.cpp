@@ -2525,10 +2525,24 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
     float drpY = o.y + 65;
     float drpW = 210;
     std::string secName = lawSections.empty() ? "---" : lawSections[selectedLawSection].name;
+    
+    // UTF-8 truncation for button text (>30 chars)
+    int utf8_count = 0; size_t byte_idx = 0;
+    while (byte_idx < secName.length() && utf8_count < 30) {
+        unsigned char c = secName[byte_idx];
+        if ((c & 0x80) == 0) byte_idx += 1;
+        else if ((c & 0xE0) == 0xC0) byte_idx += 2;
+        else if ((c & 0xF0) == 0xE0) byte_idx += 3;
+        else if ((c & 0xF8) == 0xF0) byte_idx += 4;
+        else byte_idx += 1;
+        utf8_count++;
+    }
+    if (byte_idx < secName.length()) secName = secName.substr(0, byte_idx) + "...";
+
     float drpH = 30.0f;
     dl->AddRectFilled(ImVec2(drpX, drpY), ImVec2(drpX + drpW, drpY + drpH), C_BOX, 6.0f);
     dl->AddRect(ImVec2(drpX, drpY), ImVec2(drpX + drpW, drpY + drpH), C_GOLD, 6.0f, 0, 1.5f);
-    dl->AddText(fontSegoeBold14, 13.0f, ImVec2(drpX+15, drpY+7), C_WHITE, secName.c_str());
+    dl->AddText(fontSegoeBold14, 13.0f, ImVec2(drpX+8, drpY+8), C_WHITE, secName.c_str());
     dl->AddLine(ImVec2(drpX+drpW-18, drpY+12), ImVec2(drpX+drpW-12, drpY+18), C_GOLD, 1.5f);
     dl->AddLine(ImVec2(drpX+drpW-12, drpY+18), ImVec2(drpX+drpW-6, drpY+12), C_GOLD, 1.5f);
 
@@ -2536,7 +2550,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
         float ddY = drpY + 36;
         int visibleItems = (int)lawSections.size();
         if (visibleItems > 6) visibleItems = 6;
-        float ddH = visibleItems * 36.0f + 10.0f;
+        float ddH = visibleItems * 36.0f + 8.0f; // 6px top + 6px bottom padding - 4px no-gap
 
         ImGui::SetNextWindowPos(ImVec2(drpX, ddY));
         ImGui::SetNextWindowSize(ImVec2(drpW, ddH));
@@ -2548,7 +2562,7 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered, C_GOLD);
         ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive, C_GOLD);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 6.0f)); // 6px padding to detach scrollbar from corners
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0)); // Strictly 0 to ensure flawless Y-offset math
         ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 6.0f);
@@ -2556,12 +2570,10 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
         // Using a Top-Level Window to cleanly isolate focus for closing when clicked outside
         if (ImGui::Begin("##lawSectionsDropdown", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings)) {
             ImDrawList* dcl = ImGui::GetWindowDrawList();
-            float itemW = drpW - 20.0f; 
-
-            ImGui::Dummy(ImVec2(0, 4)); // 4px top padding
+            float itemW = drpW - 14.0f; // Original width
 
             for (int i = 0; i < (int)lawSections.size(); i++) {
-                ImGui::SetCursorPosX(10.0f);
+                ImGui::SetCursorPosX(3.0f); // Shifted further left
                 ImVec2 p = ImGui::GetCursorScreenPos(); // Exact physical position automatically adjusted for ScrollY
                 ImVec2 pMax = ImVec2(p.x + itemW, p.y + 32);
                 
@@ -2576,7 +2588,20 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                     if (sel) dcl->AddRect(p, pMax, C_GOLD, 4.0f, 0, 1.0f);
                 }
 
-                dcl->AddText(fontSegoeBold14, 13.0f, ImVec2(p.x + 9, p.y + 7), (sel || hover) ? C_GOLD : C_WHITE, lawSections[i].name.c_str());
+                std::string listName = lawSections[i].name;
+                int u_cnt = 0; size_t b_idx = 0;
+                while (b_idx < listName.length() && u_cnt < 30) {
+                    unsigned char c = listName[b_idx];
+                    if ((c & 0x80) == 0) b_idx += 1;
+                    else if ((c & 0xE0) == 0xC0) b_idx += 2;
+                    else if ((c & 0xF0) == 0xE0) b_idx += 3;
+                    else if ((c & 0xF8) == 0xF0) b_idx += 4;
+                    else b_idx += 1;
+                    u_cnt++;
+                }
+                if (b_idx < listName.length()) listName = listName.substr(0, b_idx) + "...";
+
+                dcl->AddText(fontSegoeBold14, 13.0f, ImVec2(p.x + 6, p.y + 9), (sel || hover) ? C_GOLD : C_WHITE, listName.c_str());
 
                 // Direct click resolution
                 if (hover && ImGui::IsMouseClicked(0)) {
@@ -2589,7 +2614,9 @@ void Gui::RenderLawsTab(ImDrawList* dl, ImVec2 o) {
                 
                 // Advance cursor physically for the next loop iteration
                 ImGui::Dummy(ImVec2(itemW, 32)); // Box height
-                ImGui::Dummy(ImVec2(0, 4));      // Gap beneath box
+                if (i < (int)lawSections.size() - 1) {
+                    ImGui::Dummy(ImVec2(0, 4));      // Gap beneath box
+                }
             }
             
             // Allow close on clicking out
@@ -4380,12 +4407,14 @@ void Gui::Render() {
             
             if (showLawDropdown && !lawSections.empty()) {
                 float ddY = dby + 36;
-                float ddH = (float)lawSections.size() * 36.0f + 10.0f;
+                int visibleItems = (int)lawSections.size();
+                if (visibleItems > 6) visibleItems = 6;
+                float ddH = visibleItems * 36.0f + 8.0f;
                 bool clickedItem = false;
                 // Check item clicks
                 for (int i = 0; i < (int)lawSections.size(); i++) {
-                    float iy = ddY + 8 + i * 36;
-                    if (mp.x >= dbx+6 && mp.x <= dbx+204 && mp.y >= iy && mp.y <= iy+32) {
+                    float iy = ddY + 6 + i * 36;
+                    if (mp.x >= dbx+3 && mp.x <= dbx+199 && mp.y >= iy && mp.y <= iy+32) {
                         if (selectedLawSection != i) {
                             selectedLawSection = i;
                             resetLawsScroll = true;
