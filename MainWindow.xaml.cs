@@ -3262,9 +3262,9 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
                 lblStatSections.Text = sectionsCount.ToString();
                 lblStatLaws.Text = lawsCount.ToString();
                 SaveData();
-            }, watermark: "Введите имя раздела", maxLength: 20, showSectionType: true);
+            }, watermark: "Введите имя раздела", maxLength: 30, showSectionType: true);
         }
-        private void Section_Rename_Click(object sender, RoutedEventArgs e) { if (sender is Button btn && btn.Tag != null) { var old = btn.Tag.ToString(); _dialogHost.ShowInput("НОВОЕ ИМЯ РАЗДЕЛА", (v) => { string newName = v.Trim(); string baseName = newName; if (!string.Equals(old, newName, StringComparison.OrdinalIgnoreCase)) { int count = 1; while (MasterData[CurrentProfile].Laws.Keys.Any(k => string.Equals(k, newName, StringComparison.OrdinalIgnoreCase))) { newName = $"{baseName} #{count}"; count++; } } var d = MasterData[CurrentProfile].Laws[old]; MasterData[CurrentProfile].Laws.Remove(old); MasterData[CurrentProfile].Laws[newName] = d; _lastLawSection = newName; UpdateLawsList(); SaveData(); }, maxLength: 20); } }
+        private void Section_Rename_Click(object sender, RoutedEventArgs e) { if (sender is Button btn && btn.Tag != null) { var old = btn.Tag.ToString(); _dialogHost.ShowInput("НОВОЕ ИМЯ РАЗДЕЛА", (v) => { string newName = v.Trim(); string baseName = newName; if (!string.Equals(old, newName, StringComparison.OrdinalIgnoreCase)) { int count = 1; while (MasterData[CurrentProfile].Laws.Keys.Any(k => string.Equals(k, newName, StringComparison.OrdinalIgnoreCase))) { newName = $"{baseName} #{count}"; count++; } } var d = MasterData[CurrentProfile].Laws[old]; MasterData[CurrentProfile].Laws.Remove(old); MasterData[CurrentProfile].Laws[newName] = d; _lastLawSection = newName; UpdateLawsList(); SaveData(); }, maxLength: 30); } }
 
         private void Section_Delete_Click(object sender, RoutedEventArgs e) { 
             if (btnToggleTabPatrols.IsChecked == true) {
