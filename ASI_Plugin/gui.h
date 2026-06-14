@@ -218,6 +218,7 @@ public:
     static bool showTabFines;
     static bool showTabLaws;
     static bool showTabWanted;
+    static bool showTabPatrols;
 
     static int binderHintKey;
     static std::string binderHintKeyStr;

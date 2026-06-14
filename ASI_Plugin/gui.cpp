@@ -104,6 +104,7 @@ bool Gui::showTabBinder = true;
 bool Gui::showTabFines = true;
 bool Gui::showTabLaws = true;
 bool Gui::showTabWanted = true;
+bool Gui::showTabPatrols = true;
 
 int Gui::binderHintKey = VK_F4;
 std::string Gui::binderHintKeyStr = "F4";
@@ -273,6 +274,7 @@ void Gui::LoadSettings() {
             if (j.contains("ShowTabFines")) showTabFines = j["ShowTabFines"].get<bool>();
             if (j.contains("ShowTabLaws")) showTabLaws = j["ShowTabLaws"].get<bool>();
             if (j.contains("ShowTabWanted")) showTabWanted = j["ShowTabWanted"].get<bool>();
+            if (j.contains("ShowTabPatrols")) showTabPatrols = j["ShowTabPatrols"].get<bool>();
             if (j.contains("RememberTab")) rememberTab = j["RememberTab"].get<bool>();
 
             if (j.contains("SearchCurrentSection")) searchCurrentSection = j["SearchCurrentSection"].get<bool>();
@@ -347,6 +349,7 @@ void Gui::SaveSettings() {
     j["ShowTabFines"] = showTabFines;
     j["ShowTabLaws"] = showTabLaws;
     j["ShowTabWanted"] = showTabWanted;
+    j["ShowTabPatrols"] = showTabPatrols;
     j["RememberTab"] = rememberTab;
 
     j["SearchCurrentSection"] = searchCurrentSection;
@@ -1312,6 +1315,7 @@ void Gui::DrawTabs(ImDrawList* dl, ImVec2 o) {
     if (showTabFines) tabs.push_back({1, "\xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4\xD0\xAB"});
     if (showTabWanted) tabs.push_back({4, "\xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A"});
     if (showTabBinder) tabs.push_back({2, "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\x95\xD0\xA0"});
+    if (showTabPatrols) tabs.push_back({5, "\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\xAB"});
 
     float tx = o.x + 260;
     float ty = o.y + 12;
@@ -1514,7 +1518,7 @@ void Gui::DrawGridMenu(ImDrawList* dl, ImVec2 o) {
     if (showTabFines) btns.push_back({1, "\xD0\xA8\xD0\xA2\xD0\xA0\xD0\x90\xD0\xA4\xD0\xAB", 0, 0, drawFinesIcon});
     if (showTabWanted) btns.push_back({4, "\xD0\xA0\xD0\x9E\xD0\x97\xD0\xAB\xD0\xA1\xD0\x9A", 0, 0, drawWantedIcon});
     if (showTabBinder) btns.push_back({2, "\xD0\x91\xD0\x98\xD0\x9D\xD0\x94\xD0\x95\xD0\xA0", 0, 0, drawBinderIcon});
-    btns.push_back({5, "\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\xAB", 0, 0, drawPatrolsIcon});
+    if (showTabPatrols) btns.push_back({5, "\xD0\x94\xD0\x9E\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\xAB", 0, 0, drawPatrolsIcon});
     btns.push_back({-2, "\xD0\x9D\xD0\x90\xD0\xA1\xD0\xA2\xD0\xA0\xD0\x9E\xD0\x99\xD0\x9A\xD0\x98", 0, 0, drawSettingsIcon});
 
     int count = (int)btns.size();
@@ -3888,8 +3892,8 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
 
     // Block 2: TABS VISIBILITY
     float tabY = sy + 220;
-    dl->AddRectFilled(ImVec2(sx, tabY), ImVec2(sx+325, tabY+315), C_HEADER, 8.0f);
-    dl->AddRect(ImVec2(sx, tabY), ImVec2(sx+325, tabY+315), C_BORDER, 8.0f, 0, 1.5f);
+    dl->AddRectFilled(ImVec2(sx, tabY), ImVec2(sx+325, tabY+370), C_HEADER, 8.0f);
+    dl->AddRect(ImVec2(sx, tabY), ImVec2(sx+325, tabY+370), C_BORDER, 8.0f, 0, 1.5f);
     dl->AddText(fontSegoeBold14, 14.0f, ImVec2(sx+20, tabY+11), C_GOLD, "\xD0\x92\xD0\x9A\xD0\x9B\xD0\x90\xD0\x94\xD0\x9A\xD0\x98 \xD0\x9E\xD0\x92\xD0\x95\xD0\xA0\xD0\x9B\xD0\x95\xD0\xAF");
     dl->AddLine(ImVec2(sx+20, tabY+35), ImVec2(sx+305, tabY+35), C_BORDER, 1.5f);
     
@@ -3901,7 +3905,9 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     dl->AddLine(ImVec2(sx+20, tabY+205), ImVec2(sx+305, tabY+205), C_BORDER, 1.0f);
     drawToggle(tabY+210, sx, "\xD0\x92\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD0\xB0 \xD0\xA0\xD0\xBE\xD0\xB7\xD1\x8B\xD1\x81\xD0\xBA", "\xD0\x9E\xD1\x82\xD0\xBE\xD0\xB1\xD1\x80\xD0\xB0\xD0\xB6\xD0\xB0\xD1\x82\xD1\x8C \xD0\xBC\xD0\xB5\xD0\xBD\xD1\x8E \xD1\x80\xD0\xBE\xD0\xB7\xD1\x8B\xD1\x81\xD0\xBA\xD0\xB0", showTabWanted, "##tab4");
     dl->AddLine(ImVec2(sx+20, tabY+260), ImVec2(sx+305, tabY+260), C_BORDER, 1.0f);
-    drawToggle(tabY+265, sx, "\xD0\x97\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD1\x82\xD1\x8C \xD0\xB2\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD1\x83", "\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD1\x8B\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD0\xBF\xD0\xBE\xD1\x81\xD0\xBB\xD0\xB5\xD0\xB4\xD0\xBD\xD1\x8E\xD1\x8E \xD0\xB0\xD0\xBA\xD1\x82\xD0\xB8\xD0\xB2\xD0\xBD\xD1\x83\xD1\x8E \xD0\xB2\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD1\x83", rememberTab, "##remTabBtn");
+    drawToggle(tabY+265, sx, "\xD0\x92\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD0\xB0 \xD0\x94\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD1\x8B", "\xD0\x9E\xD1\x82\xD0\xBE\xD0\xB1\xD1\x80\xD0\xB0\xD0\xB6\xD0\xB0\xD1\x82\xD1\x8C \xD0\xBC\xD0\xB5\xD0\xBD\xD1\x8E \xD0\xB4\xD0\xBE\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBE\xD0\xB2", showTabPatrols, "##tab5");
+    dl->AddLine(ImVec2(sx+20, tabY+315), ImVec2(sx+305, tabY+315), C_BORDER, 1.0f);
+    drawToggle(tabY+320, sx, "\xD0\x97\xD0\xB0\xD0\xBF\xD0\xBE\xD0\xBC\xD0\xB8\xD0\xBD\xD0\xB0\xD1\x82\xD1\x8C \xD0\xB2\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD1\x83", "\xD0\x9E\xD1\x82\xD0\xBA\xD1\x80\xD1\x8B\xD0\xB2\xD0\xB0\xD1\x82\xD1\x8C \xD0\xBF\xD0\xBE\xD1\x81\xD0\xBB\xD0\xB5\xD0\xB4\xD0\xBD\xD1\x8E\xD1\x8E \xD0\xB0\xD0\xBA\xD1\x82\xD0\xB8\xD0\xB2\xD0\xBD\xD1\x83\xD1\x8E \xD0\xB2\xD0\xBA\xD0\xBB\xD0\xB0\xD0\xB4\xD0\xBA\xD1\x83", rememberTab, "##remTabBtn");
 
     // ----- RIGHT COLUMN -----
     float prx = o.x + 355;
@@ -3992,7 +3998,7 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     drawToggle(qy+320, prx, "\xD0\xA6\xD0\xB8\xD1\x82\xD0\xB8\xD1\x80\xD0\xBE\xD0\xB2\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5 \xD1\x80\xD0\xBE\xD0\xB7\xD1\x8B\xD1\x81\xD0\xBA\xD0\xB0", "\xD0\xA0\xD0\xB5\xD0\xB6\xD0\xB8\xD0\xBC \xD1\x86\xD0\xB8\xD1\x82\xD0\xB8\xD1\x80\xD0\xBE\xD0\xB2\xD0\xB0\xD0\xBD\xD0\xB8\xD1\x8F \xD1\x80\xD0\xBE\xD0\xB7\xD1\x8B\xD1\x81\xD0\xBA\xD0\xB0.", quoteWanted, "##tglQ5");
 
     // Block 5: VK Group Banner (LEFT COLUMN, filling the rest of the space)
-    float vkY = tabY + 325; 
+    float vkY = tabY + 380; 
     float vkH = (qy + 370) - vkY; // Matches the exact end of right column!
     dl->AddRectFilled(ImVec2(sx, vkY), ImVec2(sx+324, vkY+vkH), C_HEADER, 8.0f);
     // Draw blue accent on the left
