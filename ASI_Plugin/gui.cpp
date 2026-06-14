@@ -3655,8 +3655,14 @@ void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
             }
         }
 
-        // Name - SVG: x=70 y=27 font-size=12
-        cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(cx2+10+kbW+10, cy2+14), hover ? C_GOLD : C_WHITE, b.name.c_str());
+        // Name - smart two-line wrapping to prevent overlap with play button
+        float nameX = cx2 + 10 + kbW + 10;
+        float maxNameW = cardW - kbW - 55; // 10(pad) + kbW + 10(gap) + name + 35(play area) = cardW
+        ImVec2 fullNameSize = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, b.name.c_str());
+        bool nameWraps = (fullNameSize.x > maxNameW);
+        float nameY = nameWraps ? (cy2 + 7) : (cy2 + 14);
+        ImVec4 nameClip(nameX, cy2, cx2 + cardW - 35, cy2 + cardH);
+        cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(nameX, nameY), hover ? C_GOLD : C_WHITE, b.name.c_str(), NULL, maxNameW, &nameClip);
         
         if (!bsq.empty()) {
             std::string txtLower = ToLowerUTF8(b.name);
@@ -3667,9 +3673,12 @@ void Gui::RenderBinderTab(ImDrawList* dl, ImVec2 o) {
                 float xOff = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, prefix.c_str()).x;
                 std::string matchStr = b.name.substr(matchPos, bsq.length());
                 float mWidth = fontSegoeBold14->CalcTextSizeA(12.0f, FLT_MAX, 0.0f, matchStr.c_str()).x;
-                float mx = cx2+10+kbW+10 + xOff;
-                cdlb->AddRectFilled(ImVec2(mx, cy2+13), ImVec2(mx + mWidth, cy2+14+15), C_GOLD_BG, 2.0f);
-                cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(mx, cy2+14), C_GOLD, matchStr.c_str());
+                float mx = nameX + xOff;
+                // Only highlight matches that fit within the first line
+                if (mx + mWidth <= nameX + maxNameW + 2) {
+                    cdlb->AddRectFilled(ImVec2(mx, nameY - 1), ImVec2(mx + mWidth, nameY + 15), C_GOLD_BG, 2.0f);
+                    cdlb->AddText(fontSegoeBold14, 12.0f, ImVec2(mx, nameY), C_GOLD, matchStr.c_str());
+                }
                 matchPos = txtLower.find(bsq, mEnd);
             }
         }
@@ -3772,14 +3781,16 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
     dl->AddLine(ImVec2(drpX+drpW-12, drpY+18), ImVec2(drpX+drpW-6, drpY+12), C_GOLD, 1.5f);
 
     ImVec2 mp = ImGui::GetMousePos();
+    bool hoverThemeBtn = ImGui::IsMouseHoveringRect(ImVec2(drpX, drpY), ImVec2(drpX + drpW, drpY + drpH), true);
     if (ImGui::IsMouseClicked(0)) {
-        if (mp.x >= drpX && mp.x <= drpX + drpW && mp.y >= drpY && mp.y <= drpY + drpH) {
+        if (hoverThemeBtn) {
             showThemeDropdown = !showThemeDropdown;
         } else if (showThemeDropdown) {
             float ddY = drpY + 36;
             int visibleItems = 6;
             float ddH = visibleItems * 36.0f + 10.0f;
-            if (!(mp.x >= drpX && mp.x <= drpX + drpW && mp.y >= ddY && mp.y <= ddY + ddH)) {
+            bool hoverThemeList = ImGui::IsMouseHoveringRect(ImVec2(drpX, ddY), ImVec2(drpX + drpW, ddY + ddH), true);
+            if (!hoverThemeList) {
                 showThemeDropdown = false;
             }
         }
@@ -3789,7 +3800,8 @@ void Gui::RenderSettingsTab(ImDrawList* parent_dl, ImVec2 origin) {
         float ddY = drpY + 36;
         int visibleItems = 6;
         float ddH = visibleItems * 36.0f + 10.0f;
-        if (!(mp.x >= drpX && mp.x <= drpX + drpW && mp.y >= ddY && mp.y <= ddY + ddH)) {
+        bool hoverThemeList = ImGui::IsMouseHoveringRect(ImVec2(drpX, ddY), ImVec2(drpX + drpW, ddY + ddH), true);
+        if (!hoverThemeList) {
             showThemeDropdown = false; // Close when scrolling outside to prevent it flying out of the scrolling parent
         }
     }
