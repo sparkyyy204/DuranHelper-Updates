@@ -25,7 +25,7 @@
             <!-- Актуальность базы Badge -->
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal" Margin="0,5,10,0">
                 <TextBlock Text="Актуальность базы: " Foreground="{DynamicResource GrayBrush}" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Opacity="0.7"/>
-                <TextBlock Text="10.06.2026" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="15.06.2026" Foreground="{DynamicResource GoldBrush}" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold"/>
             </StackPanel>
         </Grid>
 
