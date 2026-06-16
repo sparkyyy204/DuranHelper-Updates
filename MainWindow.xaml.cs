@@ -124,9 +124,10 @@ namespace FSB_helper_C__
         internal struct Win32Point { public Int32 X; public Int32 Y; }
 
         private bool _isUpgrade = false;
-
-
-
+        private bool _isThemeOverlayChanged = false;
+        private Dictionary<string, object> _currentSettings = new Dictionary<string, object>();
+        private Dictionary<string, string> _loadedSharedSettings = new Dictionary<string, string>();
+        
         public MainWindow()
         {
             if (!IsAdministrator())
@@ -1710,9 +1711,9 @@ namespace FSB_helper_C__
                         }
                         cbLauncherTheme.SelectionChanged += LauncherTheme_SelectionChanged;
                     }
-                    if (s != null && s.ContainsKey("ThemeOverlay")) { 
+                    if (s != null && s.ContainsKey("OverlayThemeName")) { 
                         foreach(string i in cbThemeOverlay.Items) { 
-                            if (i == s["ThemeOverlay"]) { cbThemeOverlay.SelectedItem = i; break; } 
+                            if (i == s["OverlayThemeName"]) { cbThemeOverlay.SelectedItem = i; break; } 
                         } 
                     }
                     
@@ -1809,8 +1810,14 @@ namespace FSB_helper_C__
                     _ignoreEvents = false;
 
                     if (MasterData.Count > 0) {
-                        if (s.ContainsKey("LastProfile") && MasterData.ContainsKey(s["LastProfile"])) CurrentProfile = s["LastProfile"];
+                        if (s != null && s.ContainsKey("LastProfile") && MasterData.ContainsKey(s["LastProfile"])) CurrentProfile = s["LastProfile"];
                         else CurrentProfile = MasterData.Keys.First();
+                    }
+                    if (s != null) {
+                        foreach(var kvp in s) {
+                            _loadedSharedSettings[kvp.Key] = kvp.Value;
+                            _currentSettings[kvp.Key] = kvp.Value;
+                        }
                     }
                 } catch { 
                     ApplyTheme("Default (Dark Blue)");
@@ -1836,7 +1843,7 @@ namespace FSB_helper_C__
                 initialSettings["KeyPrev"] = "КЛАВИША: НЕТ";
                 initialSettings["KeyNext"] = "КЛАВИША: НЕТ";
                 initialSettings["ThemeLauncher"] = "Default (Dark Blue)";
-                initialSettings["ThemeOverlay"] = "Default (Dark Blue)";
+                initialSettings["OverlayThemeName"] = "Default (Dark Blue)";
                 initialSettings["OverlayOpacity"] = "0.85";
                 initialSettings["OverlayActivationType"] = "Default";
                 initialSettings["Notifications"] = "True";
@@ -1844,6 +1851,7 @@ namespace FSB_helper_C__
                 initialSettings["BinderEngine"] = "0";
                 initialSettings["GamePath"] = "";
                 File.WriteAllText("Settings.json", JsonConvert.SerializeObject(initialSettings, Formatting.Indented));
+                foreach(var kvp in initialSettings) _loadedSharedSettings[kvp.Key] = kvp.Value;
             }
         }
 
@@ -1865,8 +1873,6 @@ namespace FSB_helper_C__
             }
 
             string tLauncher = (cbLauncherTheme.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Default (Dark Blue)";
-            
-            
             string tOverlay = cbThemeOverlay.SelectedItem?.ToString() ?? "Default (Dark Blue)";
 
             string overlayType = chkAdvancedOverlay.IsChecked == true ? "Advanced" : "Default";
@@ -1874,7 +1880,6 @@ namespace FSB_helper_C__
             var settings = new Dictionary<string, string> { 
                 { "LastProfile", CurrentProfile ?? "" }, 
                 { "ThemeLauncher", tLauncher }, 
-                { "ThemeOverlay", tOverlay }, 
                 { "KeyToggle", btnKeyToggle?.Content?.ToString() ?? "КЛАВИША: НЕТ" }, 
                 { "KeyPrev", btnKeyPrev?.Content?.ToString() ?? "КЛАВИША: НЕТ" }, 
                 { "KeyNext", btnKeyNext?.Content?.ToString() ?? "КЛАВИША: НЕТ" }, 
@@ -1895,6 +1900,58 @@ namespace FSB_helper_C__
                 { "GamePath", txtGamePath?.Text ?? "" },
                 { "Version", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3) }
             };
+
+            // Read fresh settings from file FIRST so we can preserve ASI-written values
+            Dictionary<string, object> freshFromFile = null;
+            if (File.Exists("Settings.json")) {
+                try {
+                    var freshJson = File.ReadAllText("Settings.json");
+                    freshFromFile = JsonConvert.DeserializeObject<Dictionary<string, object>>(freshJson);
+                    if (freshFromFile != null) {
+                        foreach (var kvp in freshFromFile) _currentSettings[kvp.Key] = kvp.Value;
+                    }
+                } catch { }
+            }
+            if (freshFromFile != null && freshFromFile.ContainsKey("OverlayThemeName") && !string.IsNullOrEmpty(CurrentProfile) && MasterData.ContainsKey(CurrentProfile)) {
+                string freshOverlayTheme = freshFromFile["OverlayThemeName"]?.ToString();
+                if (!string.IsNullOrEmpty(freshOverlayTheme) && MasterData[CurrentProfile].OverlayTheme != freshOverlayTheme) {
+                    MasterData[CurrentProfile].OverlayTheme = freshOverlayTheme;
+                    if (Dispatcher.CheckAccess()) {
+                        _ignoreEvents = true;
+                        cbThemeOverlay.SelectedItem = freshOverlayTheme;
+                        _ignoreEvents = false;
+                    } else {
+                        Dispatcher.Invoke(() => {
+                            _ignoreEvents = true;
+                            cbThemeOverlay.SelectedItem = freshOverlayTheme;
+                            _ignoreEvents = false;
+                        });
+                    }
+                }
+            }
+            if (_currentSettings == null) _currentSettings = new Dictionary<string, object>();
+
+            if (_isThemeOverlayChanged) {
+                // User explicitly changed theme in launcher UI — use UI value
+                settings["OverlayThemeName"] = tOverlay;
+                _isThemeOverlayChanged = false;
+            } else {
+                // Preserve OverlayThemeName from the FRESH file (what ASI wrote) so it doesn't get lost
+                if (freshFromFile != null && freshFromFile.ContainsKey("OverlayThemeName")) {
+                    settings["OverlayThemeName"] = freshFromFile["OverlayThemeName"]?.ToString() ?? "Default (Dark Blue)";
+                } else if (_currentSettings.ContainsKey("OverlayThemeName")) {
+                    settings["OverlayThemeName"] = _currentSettings["OverlayThemeName"]?.ToString() ?? "Default (Dark Blue)";
+                } else {
+                    settings["OverlayThemeName"] = tOverlay;
+                }
+            }
+            
+            foreach (var kvp in settings) {
+                if (!_loadedSharedSettings.ContainsKey(kvp.Key) || _loadedSharedSettings[kvp.Key] != kvp.Value) {
+                    _currentSettings[kvp.Key] = kvp.Value;
+                    _loadedSharedSettings[kvp.Key] = kvp.Value;
+                }
+            }
             
             var lawsExport = new Dictionary<string, object>();
             object finesExport = null;
@@ -1947,7 +2004,16 @@ namespace FSB_helper_C__
             
             Task.Run(() => {
                 try { File.WriteAllText("Profiles.json", JsonConvert.SerializeObject(MasterData, Formatting.Indented)); } catch { }
-                try { File.WriteAllText("Settings.json", JsonConvert.SerializeObject(settings)); } catch { }
+                // === DEBUG LOG: track what OverlayThemeName is being written ===
+                try {
+                    string debugTheme = _currentSettings.ContainsKey("OverlayThemeName") ? _currentSettings["OverlayThemeName"]?.ToString() : "KEY_MISSING";
+                    string freshTheme = freshFromFile != null && freshFromFile.ContainsKey("OverlayThemeName") ? freshFromFile["OverlayThemeName"]?.ToString() : "NULL_OR_MISSING";
+                    // Need to use the local boolean variable or class variable if we consumed it. Wait, SaveData consumes _isThemeOverlayChanged.
+                    // Actually we can just say "usedUI" because we already cleared _isThemeOverlayChanged earlier in SaveData.
+                    string debugLine = $"[{DateTime.Now:HH:mm:ss.fff}] SaveData writing: \"{debugTheme}\" | tOverlay(UI)=\"{tOverlay}\" | freshFromFile=\"{freshTheme}\"\n";
+                    File.AppendAllText("_debug_theme_log.txt", debugLine);
+                } catch { }
+                try { File.WriteAllText("Settings.json", JsonConvert.SerializeObject(_currentSettings, Formatting.Indented)); } catch { }
                 
                 if (hasProfile) {
                     try { File.WriteAllText("laws.json", JsonConvert.SerializeObject(lawsExport, Formatting.Indented)); } catch { }
@@ -2195,6 +2261,9 @@ namespace FSB_helper_C__
             if (hasProfile) { 
                 InitDefaults(); 
                 txtOverlayName.Text = MasterData[CurrentProfile].OverlayText ?? ""; 
+                if (cbThemeOverlay != null) {
+                    cbThemeOverlay.SelectedItem = MasterData[CurrentProfile].OverlayTheme ?? "Default (Dark Blue)";
+                }
                 UpdateLawsList(); 
                 UpdateBindGroups(); 
                 UpdateBindsList(); 
@@ -5457,13 +5526,15 @@ private void Profile_Clone_Click(object sender, RoutedEventArgs e) { if (sender 
         }
 
         private void ThemeOverlay_Changed(object sender, SelectionChangedEventArgs e) {
-            if (!_isLoaded) return;
+            if (!_isLoaded || _ignoreEvents) return;
             if (cbThemeOverlay.SelectedItem is string tOverlay) {
-                if (MasterData.ContainsKey(CurrentProfile)) {
-                    MasterData[CurrentProfile].OverlayTheme = tOverlay;
+                if (cbThemeOverlay.IsDropDownOpen || cbThemeOverlay.IsMouseOver) {
+                    _isThemeOverlayChanged = true;
+                    if (MasterData.ContainsKey(CurrentProfile)) {
+                        MasterData[CurrentProfile].OverlayTheme = tOverlay;
+                    }
+                    SaveData();
                 }
-                SaveData();
-
             }
         }
 

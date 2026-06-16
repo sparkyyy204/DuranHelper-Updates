@@ -307,6 +307,7 @@ public:
     static void ShowError(const std::string& msg, ImU32 color);
     static void AddNotification(const std::string& type, const std::string& text, const std::string& keyAccept, const std::string& actionAccept, const std::string& keyCancel, const std::string& actionCancel, float maxDuration, bool hasProgress, ImU32 color);
     static void ApplyTheme(float alphaMul = 1.0f);
+    static int ParseThemeName(const std::string& name);
     static void ExecuteLawQuote(const std::string& utf8text);
     static void ExecutePatrolReport();
     static void ClearNotifications();

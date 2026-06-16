@@ -238,25 +238,8 @@ void Gui::LoadSettings() {
                 stopBindKeyStr = "";
                 stopBindNeedsAlt = stopBindNeedsCtrl = stopBindNeedsShift = false;
             }
-            if (j.contains("ThemeOverlay")) {
-                std::string t = j["ThemeOverlay"];
-                if (t == "Default (Dark Black)" || t == "Black" || t == "Monochrome Black") currentTheme = 1;
-                else if (t == "Gray Sport" || t.find("Red") != std::string::npos) currentTheme = 2;
-                else if (t == "Blue" || t.find("White") != std::string::npos) currentTheme = 3;
-                else if (t == "Deep Abyss") currentTheme = 4;
-                else if (t == "Obsidian") currentTheme = 5;
-                else if (t == "Onyx Black") currentTheme = 6;
-                else if (t == "Cyberpunk") currentTheme = 7;
-                else if (t == "Mocha") currentTheme = 8;
-                else if (t == "Crimson") currentTheme = 9;
-                else if (t == "Silver") currentTheme = 10;
-                else if (t == "Carbon") currentTheme = 11;
-                else if (t == "Soft Pink") currentTheme = 12;
-                else if (t == "Emerald") currentTheme = 13;
-                else if (t == "Total Black") currentTheme = 14;
-                else if (t == "Arctic Frost") currentTheme = 15;
-                else if (t == "Luxury Gold") currentTheme = 16;
-                else currentTheme = 0;
+            if (j.contains("OverlayThemeName")) {
+                currentTheme = ParseThemeName(j["OverlayThemeName"]);
             }
             if (j.contains("BinderDelay")) {
                 binderDelay = j["BinderDelay"].get<int>();
@@ -322,23 +305,23 @@ void Gui::SaveSettings() {
     j["IssueFine"] = issueFineKeyStr;
     j["CancelFine"] = cancelFineKeyStr;
     j["StopBind"] = stopBindKeyStr;
-    if (currentTheme == 1) j["ThemeOverlay"] = "Default (Dark Black)";
-    else if (currentTheme == 2) j["ThemeOverlay"] = "Gray Sport";
-    else if (currentTheme == 3) j["ThemeOverlay"] = "Blue";
-    else if (currentTheme == 4) j["ThemeOverlay"] = "Deep Abyss";
-    else if (currentTheme == 5) j["ThemeOverlay"] = "Obsidian";
-    else if (currentTheme == 6) j["ThemeOverlay"] = "Onyx Black";
-    else if (currentTheme == 7) j["ThemeOverlay"] = "Cyberpunk";
-    else if (currentTheme == 8) j["ThemeOverlay"] = "Mocha";
-    else if (currentTheme == 9) j["ThemeOverlay"] = "Crimson";
-    else if (currentTheme == 10) j["ThemeOverlay"] = "Silver";
-    else if (currentTheme == 11) j["ThemeOverlay"] = "Carbon";
-    else if (currentTheme == 12) j["ThemeOverlay"] = "Soft Pink";
-    else if (currentTheme == 13) j["ThemeOverlay"] = "Emerald";
-    else if (currentTheme == 14) j["ThemeOverlay"] = "Total Black";
-    else if (currentTheme == 15) j["ThemeOverlay"] = "Arctic Frost";
-    else if (currentTheme == 16) j["ThemeOverlay"] = "Luxury Gold";
-    else j["ThemeOverlay"] = "Default (Dark Blue)";
+    if (currentTheme == 1) j["OverlayThemeName"] = "Default (Dark Black)";
+    else if (currentTheme == 2) j["OverlayThemeName"] = "Gray Sport";
+    else if (currentTheme == 3) j["OverlayThemeName"] = "Blue";
+    else if (currentTheme == 4) j["OverlayThemeName"] = "Deep Abyss";
+    else if (currentTheme == 5) j["OverlayThemeName"] = "Obsidian";
+    else if (currentTheme == 6) j["OverlayThemeName"] = "Onyx Black";
+    else if (currentTheme == 7) j["OverlayThemeName"] = "Cyberpunk";
+    else if (currentTheme == 8) j["OverlayThemeName"] = "Mocha";
+    else if (currentTheme == 9) j["OverlayThemeName"] = "Crimson";
+    else if (currentTheme == 10) j["OverlayThemeName"] = "Silver";
+    else if (currentTheme == 11) j["OverlayThemeName"] = "Carbon";
+    else if (currentTheme == 12) j["OverlayThemeName"] = "Soft Pink";
+    else if (currentTheme == 13) j["OverlayThemeName"] = "Emerald";
+    else if (currentTheme == 14) j["OverlayThemeName"] = "Total Black";
+    else if (currentTheme == 15) j["OverlayThemeName"] = "Arctic Frost";
+    else if (currentTheme == 16) j["OverlayThemeName"] = "Luxury Gold";
+    else j["OverlayThemeName"] = "Default (Dark Blue)";
     j["BinderDelay"] = binderDelay;
     j["OverlayAlpha"] = settingsAlpha;
     j["WindowDraggable"] = windowDraggable;
@@ -399,6 +382,26 @@ ImU32 C_WHITE       = IM_COL32(255,255,255,255);
 ImU32 C_DARK        = IM_COL32(8,10,15,255);
 ImU32 C_GRID        = IM_COL32(22,27,34,102);
 ImU32 C_HOVER       = IM_COL32(31,36,46,180);
+
+int Gui::ParseThemeName(const std::string& t) {
+    if (t == "Default (Dark Black)" || t == "Black" || t == "Monochrome Black") return 1;
+    if (t == "Gray Sport" || t.find("Red") != std::string::npos || t.find("Sport") != std::string::npos) return 2;
+    if (t == "Blue" || t.find("White") != std::string::npos) return 3;
+    if (t == "Deep Abyss") return 4;
+    if (t == "Obsidian") return 5;
+    if (t == "Onyx Black") return 6;
+    if (t == "Cyberpunk") return 7;
+    if (t == "Mocha") return 8;
+    if (t == "Crimson") return 9;
+    if (t == "Silver") return 10;
+    if (t == "Carbon") return 11;
+    if (t == "Soft Pink") return 12;
+    if (t == "Emerald") return 13;
+    if (t == "Total Black") return 14;
+    if (t == "Arctic Frost") return 15;
+    if (t == "Luxury Gold") return 16;
+    return 0;
+}
 
 void Gui::ApplyTheme(float alphaMul) {
     if (currentTheme == 1) { // Black
