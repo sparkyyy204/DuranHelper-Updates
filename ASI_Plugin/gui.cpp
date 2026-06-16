@@ -40,7 +40,7 @@ bool Gui::useGridMenu = false;
 std::vector<PatrolData> Gui::patrols;
 ActivePatrol Gui::activePatrol = {false, {}, 0, 0.0f, 0, 0, 0.0f, true, {}, 0, 0};
 int Gui::selectedPatrolIndex = 0;
-std::string Gui::versionStr = "4.2.0";
+std::string Gui::versionStr = "4.2.1";
 
 ImFont* Gui::fontArialBlack24 = nullptr;
 ImFont* Gui::fontSegoeBold12 = nullptr;

@@ -361,7 +361,7 @@
                     <Border.BorderBrush>
                         <SolidColorBrush Color="{DynamicResource GoldBrushColor}"/>
                     </Border.BorderBrush>
-                    <TextBlock x:Name="SplashVersionText" Text="V4.2.0" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11">
+                    <TextBlock x:Name="SplashVersionText" Text="V4.2.1" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11">
                         <TextBlock.Foreground>
                             <SolidColorBrush Color="{DynamicResource GoldBrushColor}"/>
                         </TextBlock.Foreground>
@@ -671,7 +671,7 @@
                     <!-- Версия (Centered to align with author text) -->
                     <Grid x:Name="VersionBadgeContainer" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,14" Opacity="0">
                         <Border x:Name="VersionBadge" Padding="12,4" CornerRadius="12" Background="#0Affffff" BorderBrush="#1Affffff" BorderThickness="1">
-                            <TextBlock Text="V4.2.0" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GrayBrush}" Opacity="0.6"/>
+                            <TextBlock Text="V4.2.1" FontFamily="Segoe UI" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource GrayBrush}" Opacity="0.6"/>
                         </Border>
                     </Grid>
 
