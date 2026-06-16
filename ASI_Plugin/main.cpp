@@ -983,6 +983,11 @@ static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
+    if (uMsg == WM_CLOSE || uMsg == WM_DESTROY || uMsg == WM_QUIT) {
+        if (savedSensX > 0.0001f) *(float*)0xB6EC1C = savedSensX;
+        if (savedSensY > 0.0001f) *(float*)0xB6EC18 = savedSensY;
+    }
+
     // Auto-hide overlay if game loses focus (Alt-Tab, minimize)
     if (uMsg == WM_ACTIVATEAPP) {
         g_SkipFrames = 30;  // Skip ImGui rendering for ~30 frames during focus transition
@@ -1115,7 +1120,7 @@ static LRESULT WndProcInner(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
     }
 
-    if (isDown && msgVk == Gui::toggleKey && tAltDown == Gui::toggleNeedsAlt && tCtrlDown == Gui::toggleNeedsCtrl && tShiftDown == Gui::toggleNeedsShift && Gui::scriptEnabled) {
+    if (isDown && msgVk == Gui::toggleKey && tAltDown == Gui::toggleNeedsAlt && tCtrlDown == Gui::toggleNeedsCtrl && tShiftDown == Gui::toggleNeedsShift && Gui::scriptEnabled && Gui::overlayEnabled) {
         if (Gui::radialMenuOpen || Gui::radialIdInputOpen) return 0; // block while radial is open
         Gui::Toggle();
         return 0;
@@ -1720,7 +1725,7 @@ static HRESULT __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice) {
     }
 
     static bool wasMouseBlocked = false;
-    bool shouldBlockMouse = Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen || (GetTickCount64() - Gui::lastCloseTime < 300);
+    bool shouldBlockMouse = Gui::show || Gui::radialMenuOpen || Gui::radialIdInputOpen;
     
     if (shouldBlockMouse) {
         *(float*)0xB6EC1C = 0.0f;
@@ -2011,7 +2016,7 @@ static void MainThread() {
             bool tAltDown = (msg->wParam == VK_MENU || msg->wParam == VK_LMENU || msg->wParam == VK_RMENU) ? Gui::toggleNeedsAlt : ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
             bool tCtrlDown = (msg->wParam == VK_CONTROL || msg->wParam == VK_LCONTROL || msg->wParam == VK_RCONTROL) ? Gui::toggleNeedsCtrl : ((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
             bool tShiftDown = (msg->wParam == VK_SHIFT || msg->wParam == VK_LSHIFT || msg->wParam == VK_RSHIFT) ? Gui::toggleNeedsShift : ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
-            if ((msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN) && msg->wParam == Gui::toggleKey && tAltDown == Gui::toggleNeedsAlt && tCtrlDown == Gui::toggleNeedsCtrl && tShiftDown == Gui::toggleNeedsShift && Gui::scriptEnabled) {
+            if ((msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN) && msg->wParam == Gui::toggleKey && tAltDown == Gui::toggleNeedsAlt && tCtrlDown == Gui::toggleNeedsCtrl && tShiftDown == Gui::toggleNeedsShift && Gui::scriptEnabled && Gui::overlayEnabled) {
                 if (!Gui::radialMenuOpen && !Gui::radialIdInputOpen) {
                     Gui::Toggle();
                 }
