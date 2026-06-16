@@ -40,7 +40,7 @@ bool Gui::useGridMenu = false;
 std::vector<PatrolData> Gui::patrols;
 ActivePatrol Gui::activePatrol = {false, {}, 0, 0.0f, 0, 0, 0.0f, true, {}, 0, 0};
 int Gui::selectedPatrolIndex = 0;
-std::string Gui::versionStr = "4.2.1";
+std::string Gui::versionStr = "4.2.2";
 
 ImFont* Gui::fontArialBlack24 = nullptr;
 ImFont* Gui::fontSegoeBold12 = nullptr;
@@ -81,6 +81,7 @@ bool Gui::showSettings = false;
 float Gui::globalScale = 1.0f;
 float Gui::settingsAlpha = 1.0f;
 bool Gui::scriptEnabled = true;
+bool Gui::overlayEnabled = true;
 bool Gui::binderEnabled = true;
 
 std::string Gui::scriptToggleKeyStr = "";
@@ -272,7 +273,7 @@ void Gui::LoadSettings() {
 
             if (j.contains("DisableOverlay")) {
                 std::string v = j["DisableOverlay"];
-                scriptEnabled = (v != "True");
+                overlayEnabled = (v != "True");
             }
             if (j.contains("DisableBinder")) {
                 std::string v = j["DisableBinder"];
@@ -4248,6 +4249,9 @@ void Gui::RenderBinderHint() {
 
 // ===== Main Render =====
 void Gui::Render() {
+    if (!Gui::overlayEnabled) {
+        Gui::show = false;
+    }
     // STEALTH PIRATE BLOCK
     if (Gui::versionStr == "1.0.1") {
         Gui::scriptEnabled = false;

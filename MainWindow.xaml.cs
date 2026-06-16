@@ -1658,7 +1658,18 @@ namespace FSB_helper_C__
         private void LoadData()
         {
             if (File.Exists("Profiles.json")) { 
-                try { MasterData = JsonConvert.DeserializeObject<Dictionary<string, ProfileData>>(File.ReadAllText("Profiles.json")) ?? new(); } 
+                try { 
+                    MasterData = JsonConvert.DeserializeObject<Dictionary<string, ProfileData>>(File.ReadAllText("Profiles.json")) ?? new(); 
+                    foreach (var profile in MasterData.Values) {
+                        if (profile.Laws != null) {
+                            foreach (var law in profile.Laws.Values) {
+                                if (law.Type == "text" && string.IsNullOrEmpty(law.PlainText) && !string.IsNullOrEmpty(law.RtfData)) {
+                                    law.PlainText = GetPlainTextFromRtf(law.RtfData);
+                                }
+                            }
+                        }
+                    }
+                } 
                 catch { MasterData = new(); } 
             }
             
@@ -1962,9 +1973,12 @@ namespace FSB_helper_C__
                 try {
                     foreach (var kvp in MasterData[CurrentProfile].Laws) {
                         if (kvp.Value.Type == "text") {
+                            if (string.IsNullOrEmpty(kvp.Value.PlainText) && !string.IsNullOrEmpty(kvp.Value.RtfData)) {
+                                kvp.Value.PlainText = GetPlainTextFromRtf(kvp.Value.RtfData);
+                            }
                             lawsExport[kvp.Key] = new { 
                                 Type = "text", 
-                                Content = GetPlainTextFromRtf(kvp.Value.RtfData ?? ""),
+                                Content = kvp.Value.PlainText ?? "",
                                 RtfData = kvp.Value.RtfData ?? ""
                             };
                         } else {
@@ -3260,7 +3274,7 @@ namespace FSB_helper_C__
         }
 
         private void RtfColor_Click(object sender, RoutedEventArgs e) { var btn = sender as Button; if (btn != null && rtbNotepad.Selection != null && !rtbNotepad.Selection.IsEmpty) rtbNotepad.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, btn.Background); }
-        private void RtfSave_Click(object sender, RoutedEventArgs e) { string sec = cbSections.SelectedItem?.ToString(); if (string.IsNullOrEmpty(sec) || !MasterData[CurrentProfile].Laws.ContainsKey(sec)) return; using (MemoryStream ms = new MemoryStream()) { TextRange range = new TextRange(rtbNotepad.Document.ContentStart, rtbNotepad.Document.ContentEnd); range.Save(ms, DataFormats.Rtf); MasterData[CurrentProfile].Laws[sec].RtfData = Encoding.UTF8.GetString(ms.ToArray()); } SaveData(); btnSaveRtf.Background = (SolidColorBrush)Application.Current.Resources["LineBrush"]; btnSaveRtf.Foreground = (SolidColorBrush)Application.Current.Resources["GrayBrush"]; ShowCustomToast("Сохранено!"); }
+        private void RtfSave_Click(object sender, RoutedEventArgs e) { string sec = cbSections.SelectedItem?.ToString(); if (string.IsNullOrEmpty(sec) || !MasterData[CurrentProfile].Laws.ContainsKey(sec)) return; using (MemoryStream ms = new MemoryStream()) { TextRange range = new TextRange(rtbNotepad.Document.ContentStart, rtbNotepad.Document.ContentEnd); range.Save(ms, DataFormats.Rtf); MasterData[CurrentProfile].Laws[sec].RtfData = Encoding.UTF8.GetString(ms.ToArray()); MasterData[CurrentProfile].Laws[sec].PlainText = range.Text; } SaveData(); btnSaveRtf.Background = (SolidColorBrush)Application.Current.Resources["LineBrush"]; btnSaveRtf.Foreground = (SolidColorBrush)Application.Current.Resources["GrayBrush"]; ShowCustomToast("Сохранено!"); }
 
         
         private void Profile_Changed(object sender, SelectionChangedEventArgs e) {

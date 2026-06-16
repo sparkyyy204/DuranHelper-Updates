@@ -194,6 +194,7 @@ public:
     static bool showSettings;         // settings gear panel
     static float settingsAlpha;
     static bool scriptEnabled;
+    static bool overlayEnabled;
     static bool binderEnabled;
     static std::string scriptToggleKeyStr;
     static int scriptToggleKey;
