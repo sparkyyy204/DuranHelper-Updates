@@ -17,7 +17,7 @@
     <UseWPF>true</UseWPF>
     <Title>DURAN HELPER</Title>
     <UseWindowsForms>true</UseWindowsForms>
-    <Version>4.2.0</Version>
+    <Version>4.2.1</Version>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>
 
