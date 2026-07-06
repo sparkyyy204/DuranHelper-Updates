@@ -40,7 +40,8 @@ bool Gui::useGridMenu = false;
 std::vector<PatrolData> Gui::patrols;
 ActivePatrol Gui::activePatrol = {false, {}, 0, 0.0f, 0, 0, 0.0f, true, {}, 0, 0};
 int Gui::selectedPatrolIndex = 0;
-std::string Gui::versionStr = "4.2.2";
+std::string Gui::versionStr = "4.2.3";
+
 
 ImFont* Gui::fontArialBlack24 = nullptr;
 ImFont* Gui::fontSegoeBold12 = nullptr;
@@ -3073,7 +3074,7 @@ void Gui::RenderFinesTab(ImDrawList* dl, ImVec2 o) {
                     revokeArticlesStr += " " + type;
                 }
 
-                if (totalAmt > 25000) totalAmt = 25000;
+                if (totalAmt > 100000) totalAmt = 100000;
 
                 std::string cmd = "/ticket " + idStr + " " + std::to_string(totalAmt) + " " + articlesStr;
                 std::string cp1251cmd = UTF8ToCP1251(cmd.c_str());
